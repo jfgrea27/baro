@@ -3,4 +3,8 @@
     <string name="account">Account</string>
     <string name="create">Create</string>
     <string name="share">Share</string>
+    <string name="followers">Followers</string>
+    <string name="settings">Settings</string>
+    <string name="delete_local">Delete Local</string>
+    <string name="delete_remote">Delete Remote</string>
 </resources>

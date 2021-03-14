@@ -45,14 +45,14 @@
     <TextView
         android:id="@+id/text_account"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/main_text_view_height"
+        android:layout_height="wrap_content"
         android:text="@string/account"
         app:layout_constraintEnd_toEndOf="@+id/btn_account"
         app:layout_constraintStart_toStartOf="@+id/btn_account"
         app:layout_constraintTop_toBottomOf="@+id/btn_account" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/text_create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/create"
@@ -61,10 +61,9 @@
         app:layout_constraintTop_toBottomOf="@+id/btn_create" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/text_share"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="1dp"
         android:text="@string/share"
         app:layout_constraintEnd_toEndOf="@+id/btn_share"
         app:layout_constraintStart_toStartOf="@+id/btn_share"
