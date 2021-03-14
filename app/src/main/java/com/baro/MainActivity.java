@@ -1,10 +1,9 @@
-package com.baro;
+ package com.baro;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.text.Html;
-import android.view.View;
 import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -12,6 +11,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton accountButton;
     private ImageButton shareButton;
     private ImageButton createButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,18 +26,23 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void configureAccountButton() {
-        accountButton =findViewById(R.id.btn_account);
-
+        accountButton = findViewById(R.id.btn_account);
         accountButton.setOnClickListener(v -> {
-            // TODO complete this method
+            Intent intentAccountActivity = new Intent(
+                    MainActivity.this,
+                    AccountActivity.class);
+            startActivity(intentAccountActivity);
         });
     }
 
     private void configureCreateButton() {
-        createButton =findViewById(R.id.btn_create);
+        createButton = findViewById(R.id.btn_create);
 
         createButton.setOnClickListener(v -> {
-            // TODO complete this method
+            Intent intentCreateCourse = new Intent(
+                    MainActivity.this,
+                    CreateActivity.class);
+            startActivity(intentCreateCourse);
         });
     }
 
@@ -45,8 +50,10 @@ public class MainActivity extends AppCompatActivity {
         shareButton = findViewById(R.id.btn_share);
 
         shareButton.setOnClickListener(v -> {
-            // TODO complete this method
+            Intent intentShareActivity = new Intent(
+                    MainActivity.this,
+                    ShareActivity.class);
+            startActivity(intentShareActivity);
         });
     }
-
 }
