@@ -1,11 +1,12 @@
 package com.baro.helper;
 
+import android.graphics.Bitmap;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -55,27 +56,10 @@ public class FileHelper {
 
     /**
      * This method writes data to file.
-     * @param file This is a File where the data is intended to be written.
-     * @param data This is the data to be written to the File.
-     * @return boolean This returns true only if the data was successfully written to the file.
-     */
-    public static boolean writeToFile(File file, String data) {
-
-        try {
-            return writeToFile(new FileWriter(file), data);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-
-
-    /**
-     * This  method writes data to file.
      * @param writer This is a FileWriter, used to write to a file.
      * @param data This is the data to be written via the FileWriter.
-     * @return boolean This returns true only if the data was successfully written to the file.
+     * @return boolean This returns true only if the data was successfully written to the file;
+     * false otherwise
      */
     public static boolean writeToFile(FileWriter writer, String data) {
         try {
@@ -90,35 +74,34 @@ public class FileHelper {
     }
 
 
+    /**
+     * This  method reads data in file.
+     * @param reader This is a Scanner used to read file.
+     * @return String This returns a String of the file' qs content, returning null if an error was
+     * caught
+     */
+    public static String readFile(Scanner reader) {
+        return reader.useDelimiter("\\Z").next();
+    }
 
-    public static String readFile(File file){
 
+    /**
+     * This  method writes a Bitmap object to a file's FileOutputStream.
+     * @param fos This is a file's FileOutputStream.
+     * @param bitmap This is the desired Bitmap to write to file.
+     * @return boolean This returns true if the Bitmap was appropriately written to the file; false
+     * otherwise
+     */
+    public static boolean writeBitmapToFile(FileOutputStream fos, Bitmap bitmap) {
 
         try {
-            return readFile(new Scanner(file));
-        } catch (FileNotFoundException e) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return false;
         }
 
-    }
-
-    public static String readFile(Scanner reader) {
-        String output = "";
-
-        while (reader.hasNextLine()) {
-            output += reader.nextLine();
-        }
-        reader.close();
-
-        return output;
-
-    }
-
-
-    public static boolean writeBitmapToFile(File file, String text) {
-
-        return false;
+        return true;
     }
 
 

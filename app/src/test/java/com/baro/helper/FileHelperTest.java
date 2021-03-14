@@ -1,5 +1,7 @@
 package com.baro.helper;
 
+import android.graphics.Bitmap;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
@@ -57,28 +60,24 @@ public class FileHelperTest {
     }
 
 
-
     @Test
     public void readFileShouldReturnFileContent() throws IOException {
         Scanner mockScanner = Mockito.mock(Scanner.class);
 
-        when(mockScanner.hasNextLine()).thenReturn(true, false);
-        when(mockScanner.nextLine()).thenReturn("data");
+        when(mockScanner.useDelimiter("\\Z")).thenReturn(mockScanner);
+        when(mockScanner.next()).thenReturn("file content");
 
-        assertEquals(FileHelper.readFile(mockScanner), "data");
+        assertEquals(FileHelper.readFile(mockScanner), "file content");
     }
 
 
     @Test
-    public void readFileShouldCloseScanner() throws IOException {
-        Scanner mockScanner = Mockito.mock(Scanner.class);
+    public void writeBitmapToFileShouldReturnTrueWhenBitmapIsSaved()  {
+        Bitmap mockBitmap = Mockito.mock(Bitmap.class);
+        FileOutputStream mockFOS = Mockito.mock(FileOutputStream.class);
 
-        when(mockScanner.hasNextLine()).thenReturn(false);
-        FileHelper.readFile(mockScanner);
+        when(mockBitmap.compress(Bitmap.CompressFormat.JPEG, 100, mockFOS)).thenReturn(true);
 
-        verify(mockScanner).close();
+        assertTrue(FileHelper.writeBitmapToFile(mockFOS, mockBitmap));
     }
-
-
-
 }
