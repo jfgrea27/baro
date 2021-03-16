@@ -1,10 +1,12 @@
-package com.baro;
+package com.baro.ui.create;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageButton;
+
+import com.baro.R;
 
 public class CreateActivity extends AppCompatActivity {
 
@@ -16,7 +18,7 @@ public class CreateActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_activity);
+        setContentView(R.layout.activity_create);
 
         configureCourseEditText();
         configureCategoryButton();
@@ -53,7 +55,9 @@ public class CreateActivity extends AppCompatActivity {
         createButton = findViewById(R.id.btn_create);
 
         createButton.setOnClickListener(v -> {
-            // TODO Implement this method. Gathers the couresname, category, lannguage and creator UUID
+
+
+            // TODO get the language and categories - must discuss this
         });
     }
 

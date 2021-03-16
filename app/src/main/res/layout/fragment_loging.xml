@@ -1,0 +1,61 @@
+<androidx.fragment.app.FragmentContainerView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment_container_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/btn_account"
+            android:layout_width="@dimen/large_logo_width"
+            android:layout_height="@dimen/large_logo_height"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3"
+            app:srcCompat="@drawable/ic_account" />
+
+        <ImageButton
+            android:id="@+id/btn_next"
+            android:layout_width="@dimen/main_icon_width"
+            android:layout_height="@dimen/main_icon_height"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_next"
+            android:backgroundTint="@color/white"
+            android:scaleType="fitCenter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_text_password" />
+
+        <EditText
+            android:id="@+id/edit_text_username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:hint="@string/username"
+            app:layout_constraintBottom_toTopOf="@+id/edit_text_password"
+            app:layout_constraintEnd_toEndOf="@+id/btn_account"
+            app:layout_constraintStart_toStartOf="@+id/btn_account"
+            app:layout_constraintTop_toBottomOf="@+id/btn_account" />
+
+        <EditText
+            android:id="@+id/edit_text_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:hint="@string/password"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@+id/edit_text_username"
+            app:layout_constraintStart_toStartOf="@+id/edit_text_username"
+            app:layout_constraintTop_toBottomOf="@+id/btn_account" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.fragment.app.FragmentContainerView>
+

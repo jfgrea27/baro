@@ -9,4 +9,10 @@
     <string name="delete_remote">Delete Remote</string>
     <string name="language">Language</string>
     <string name="category">Category</string>
+    <string name="course_name">Course Name</string>
+    <string name="skip">Skip</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

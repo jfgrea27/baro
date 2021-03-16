@@ -1,6 +1,6 @@
-package com.baro.model;
+package com.baro.constants;
 
-public enum Constant {
+public enum JSONEnum {
 
     COURSE_NAME_KEY("course-name"),
     COURSE_UUID_KEY("course-uuid"),
@@ -11,7 +11,7 @@ public enum Constant {
 
 
     public final String key;
-    Constant(String key) {
+    JSONEnum(String key) {
         this.key = key;
     }
 }

@@ -1,4 +1,4 @@
-package com.baro.model;
+package com.baro.models;
 
 import java.net.URI;
 import java.util.ArrayList;

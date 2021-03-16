@@ -1,6 +1,6 @@
-package com.baro.helper;
+package com.baro.helpers;
 
-import com.baro.model.Constant;
+import com.baro.constants.JSONEnum;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,15 +16,15 @@ public class JSONHelperTest {
 
     @Test
     public void createJSONFromHashMapShouldReturnJSONObject() throws JSONException {
-        HashMap<Constant, String> sampleHashMap = new HashMap<>();
-        sampleHashMap.put(Constant.COURSE_NAME_KEY, "Course Name");
-        sampleHashMap.put(Constant.COURSE_UUID_KEY, "Course UUID");
+        HashMap<JSONEnum, String> sampleHashMap = new HashMap<>();
+        sampleHashMap.put(JSONEnum.COURSE_NAME_KEY, "Course Name");
+        sampleHashMap.put(JSONEnum.COURSE_UUID_KEY, "Course UUID");
 
         JSONObject jsonTest = JSONHelper.createJSONFromHashMap(sampleHashMap);
 
         assertEquals(jsonTest.length(), 2);
-        assertEquals(jsonTest.get(Constant.COURSE_NAME_KEY.toString()), "Course Name");
-        assertEquals(jsonTest.get(Constant.COURSE_UUID_KEY.toString()), "Course UUID");
+        assertEquals(jsonTest.get(JSONEnum.COURSE_NAME_KEY.toString()), "Course Name");
+        assertEquals(jsonTest.get(JSONEnum.COURSE_UUID_KEY.toString()), "Course UUID");
 
     }
 

@@ -12,17 +12,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Baro">
-        <activity android:name=".ShareActivity"></activity>
-        <activity android:name=".CreateActivity" />
+        <activity android:name=".ui.share.ShareActivity"></activity>
+        <activity android:name=".ui.create.CreateActivity" />
         <activity android:name=".AccountActivity" />
-        <activity android:name=".SplashActivity">
+        <activity android:name=".ui.spalsh.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
+        <activity android:name=".ui.main.MainActivity" />
     </application>
 
 </manifest>

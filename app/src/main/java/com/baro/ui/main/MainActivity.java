@@ -1,4 +1,4 @@
- package com.baro;
+ package com.baro.ui.main;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -6,7 +6,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
 
-public class MainActivity extends AppCompatActivity {
+import com.baro.AccountActivity;
+import com.baro.ui.create.CreateActivity;
+import com.baro.R;
+import com.baro.ui.share.ShareActivity;
+
+ public class MainActivity extends AppCompatActivity {
 
     private ImageButton accountButton;
     private ImageButton shareButton;

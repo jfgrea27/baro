@@ -1,8 +1,11 @@
-package com.baro;
+package com.baro.ui.share;
+
+
+import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
+import com.baro.R;
 
 public class ShareActivity extends AppCompatActivity {
 

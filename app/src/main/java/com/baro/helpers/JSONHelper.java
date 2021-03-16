@@ -1,6 +1,6 @@
-package com.baro.helper;
+package com.baro.helpers;
 
-import com.baro.model.Constant;
+import com.baro.constants.JSONEnum;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,12 +18,12 @@ public class JSONHelper {
      * @return JSONObject This returns the corresponding JSONObject for keyValuePairs if valid;
      * null if an error has been caught.
      */
-    public static JSONObject createJSONFromHashMap(HashMap<Constant, String> keyValuePairs) {
+    public static JSONObject createJSONFromHashMap(HashMap<JSONEnum, String> keyValuePairs) {
         JSONObject json = new JSONObject();
 
         try {
 
-            for(Map.Entry<Constant, String> entry: keyValuePairs.entrySet()) {
+            for(Map.Entry<JSONEnum, String> entry: keyValuePairs.entrySet()) {
                 json.put(entry.getKey().toString(), entry.getValue());
             }
         } catch (JSONException e) {
