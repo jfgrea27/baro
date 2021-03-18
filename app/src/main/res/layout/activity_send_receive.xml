@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.share.SendReceiveActivity">
 
+<!-- TODO - Change Background to Theme Background across all ImageButtons -->
     <ImageButton
         android:id="@+id/btn_receive"
         android:layout_width="@dimen/main_icon_width"
