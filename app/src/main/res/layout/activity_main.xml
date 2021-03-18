@@ -23,7 +23,7 @@
     <ImageButton
         android:id="@+id/btn_share"
         android:layout_width="@dimen/main_icon_width"
-        android:layout_height="@dimen/main_icon_width"
+        android:layout_height="@dimen/main_icon_height"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_create"
         app:layout_constraintHorizontal_bias="0.5"
