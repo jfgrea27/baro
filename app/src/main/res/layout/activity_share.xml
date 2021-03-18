@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.2"
-        app:srcCompat="@drawable/ic_account"
+        app:srcCompat="@drawable/ic_cloud_circle_black_48dp"
         android:background="?android:selectableItemBackground"/>
 
     <ImageButton
@@ -31,7 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintVertical_bias="0.5"
-        app:srcCompat="@drawable/ic_account"
+        app:srcCompat="@drawable/ic_settings_remote_black_48dp"
         android:background="?android:selectableItemBackground"/>
 
     <TextView
