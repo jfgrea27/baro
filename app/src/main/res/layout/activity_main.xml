@@ -10,7 +10,7 @@
         android:id="@+id/btn_account"
         android:layout_width="@dimen/main_icon_width"
         android:layout_height="@dimen/main_icon_height"
-        android:backgroundTint="@color/white"
+        android:background="?android:selectableItemBackground"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
