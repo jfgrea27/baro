@@ -4,10 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.share.ShareActivity">
+    tools:context=".ui.share.SendReceiveActivity">
 
+<!-- TODO - Change Background to Theme Background across all ImageButtons -->
     <ImageButton
-        android:id="@+id/btn_internet"
+        android:id="@+id/btn_receive"
         android:layout_width="@dimen/main_icon_width"
         android:layout_height="@dimen/main_icon_height"
         android:scaleType="fitCenter"
@@ -21,11 +22,11 @@
         android:background="@null"/>
 
     <ImageButton
-        android:id="@+id/btn_local"
+        android:id="@+id/btn_send"
         android:layout_width="@dimen/main_icon_width"
         android:layout_height="@dimen/main_icon_height"
         android:scaleType="fitCenter"
-        app:layout_constraintTop_toBottomOf="@id/text_internet"
+        app:layout_constraintTop_toBottomOf="@id/text_receive"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -35,21 +36,21 @@
         android:background="@null"/>
 
     <TextView
-        android:id="@+id/text_internet"
+        android:id="@+id/text_receive"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/share_online"
-        app:layout_constraintTop_toBottomOf="@id/btn_internet"
-        app:layout_constraintStart_toStartOf="@id/btn_internet"
-        app:layout_constraintEnd_toEndOf="@id/btn_internet"/>
+        android:text="@string/receive"
+        app:layout_constraintTop_toBottomOf="@id/btn_receive"
+        app:layout_constraintStart_toStartOf="@id/btn_receive"
+        app:layout_constraintEnd_toEndOf="@id/btn_receive"/>
 
     <TextView
-        android:id="@+id/text_local"
+        android:id="@+id/text_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/share_locally"
-        app:layout_constraintTop_toBottomOf="@id/btn_local"
-        app:layout_constraintStart_toStartOf="@id/btn_local"
-        app:layout_constraintEnd_toEndOf="@id/btn_local"/>
+        android:text="@string/send"
+        app:layout_constraintTop_toBottomOf="@id/btn_send"
+        app:layout_constraintStart_toStartOf="@id/btn_send"
+        app:layout_constraintEnd_toEndOf="@id/btn_send"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,7 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Baro">
-        <activity android:name=".ui.share.ShareActivity"></activity>
+        <activity android:name=".ui.share.UploadActivity"></activity>
+        <activity android:name=".ui.share.BluetoothReceiveActivity" />
+        <activity android:name=".ui.share.BluetoothSendActivity" />
+        <activity android:name=".ui.share.SendReceiveActivity" />
+        <activity android:name=".ui.share.ShareActivity" />
         <activity android:name=".ui.create.CreateActivity" />
         <activity android:name=".AccountActivity" />
         <activity android:name=".ui.spalsh.SplashActivity">
