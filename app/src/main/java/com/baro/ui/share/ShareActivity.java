@@ -27,7 +27,12 @@ public class ShareActivity extends AppCompatActivity {
 
     private void configureInternetButton() {
         internetButton = findViewById(R.id.btn_internet);
-        //TODO Setup Internet Button
+
+        internetButton.setOnClickListener(v -> {
+            Intent intentUploadActivity = new Intent(ShareActivity.this,
+                    UploadActivity.class);
+            startActivity(intentUploadActivity);
+        });
     }
 
     private void configureLocalButton() {
