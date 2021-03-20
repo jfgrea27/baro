@@ -57,7 +57,6 @@ public class SplashLoggingFragment extends Fragment {
 
     }
 
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
