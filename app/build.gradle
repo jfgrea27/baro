@@ -36,10 +36,13 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation "androidx.fragment:fragment:+"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation "androidx.activity:activity:+"
 
     testImplementation 'junit:junit:4.+'
     testImplementation 'org.json:json:+'
     testImplementation 'org.jmockit:jmockit:1.8'
+
+    debugImplementation "androidx.fragment:fragment-testing:+"
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

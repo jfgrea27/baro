@@ -101,7 +101,6 @@ public class  SplashActivity extends AppCompatActivity {
                 Intent startMainActivity = new Intent(
                         SplashActivity.this,
                         MainActivity.class);
-                // Passing User to MainActivity
                 startActivity(startMainActivity);
                 SplashActivity.this.finish();
             } else {

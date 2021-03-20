@@ -33,7 +33,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static org.hamcrest.Matchers.allOf;
 
 @LargeTest
-@RunWith(AndroidJUnit4.class)
+@RunWith(And.class)
 public class ShareActivityTest {
 
     @Rule

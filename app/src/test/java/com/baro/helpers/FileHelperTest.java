@@ -4,9 +4,6 @@ import android.graphics.Bitmap;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,14 +26,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+
 @RunWith(JMockit.class)
 public class FileHelperTest {
 
 
     @Test
-    public void getFileAtPathShouldReturnFileIfExists(@Mocked File file) {
+    public void getFileAtPathShouldReturnFileIfFileExists(@Mocked File file) {
         Path pathToFile = Paths.get("path/to/parent", "filename");
 
         new Expectations() {{
@@ -51,6 +47,34 @@ public class FileHelperTest {
     }
 
     @Test
+    public void getFileAtPathShouldReturnNullIfFileDoesNotExists(@Mocked File file) {
+        Path pathToFile = Paths.get("path/to/nothing", "filename");
+
+        new Expectations() {{
+            new File(pathToFile.toString());
+            file.exists(); result = false;
+        }};
+
+        File outputFile = FileHelper.getFileAtPath(pathToFile);
+        assertNull(outputFile);
+    }
+
+    @Test
+    public void createFileAtPathShouldReturnFileAtPathIfFileExists(@Mocked File file) {
+        Path pathToFile = Paths.get("path/to/parent", "filename");
+
+        new Expectations() {{
+            new File(pathToFile.toString());
+            file.exists(); result = true;
+            file.getAbsolutePath(); result = "path/to/parent/filename";
+        }};
+
+        File outputFile = FileHelper.createFileAtPath(pathToFile);
+        assertEquals(outputFile.getAbsolutePath(), "path/to/parent/filename");
+    }
+
+
+    @Test
     public void createDirectoryShouldReturnTrueIfDirectoryIsCreated() {
         File parent = new File("path/to/parent/directory");
         String directoryName = "Directory Name";
@@ -59,14 +83,6 @@ public class FileHelperTest {
     }
 
 
-    @Test
-    public void createFileShouldReturnTrueIfFileIsCreated() {
-        File parent = new File("path/to/parent/directory");
-
-        String fileName = "File Name";
-
-        assertTrue(FileHelper.createFile(parent, fileName));
-    }
 
 
     @Test

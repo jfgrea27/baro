@@ -16,15 +16,6 @@ import java.util.Scanner;
 
 public class FileHelper {
 
-    public static File createFileAtPath(Path path) {
-        File file = new File(path.toString());
-
-        if(file.exists()) {
-            return file;
-        } else {
-            return createFile(file);
-        }
-    }
 
     /**
      * This method returns a File Object if a file exists at the given Path object Path.
@@ -40,6 +31,23 @@ public class FileHelper {
             return file;
         } else {
             return null;
+        }
+    }
+
+    /**
+     * This method returns a File Object for file at path, creating the file and
+     * its file system path if it does not already exist.
+     * @param path This is a Path Object of the candidate file.
+     * @return File This returns a File Object for the file at path; if fails to create,
+     * returns null
+     */
+    public static File createFileAtPath(Path path) {
+        File file = new File(path.toString());
+
+        if(file.exists()) {
+            return file;
+        } else {
+            return createFile(file);
         }
     }
 
@@ -74,25 +82,6 @@ public class FileHelper {
 
 
     /**
-     * This method creates a file at path/to/parentDirectory/fileName.
-     * @param parentDirectory This is a File object of the parent directory.
-     * @param fileName This is a String object of the desired file name.
-     * @return boolean This returns true only if a file at path/to/parentDirectory/directoryName.
-     * was successfully created/already exists.
-     */
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    public static boolean createFile(File parentDirectory, String fileName) {
-        Path filePath = Paths.get(parentDirectory.getAbsolutePath(), fileName);
-
-        File fileFile = new File(String.valueOf(filePath));
-
-        if(!fileFile.exists()) {
-            return fileFile.mkdir();
-        }
-        return  true;
-    }
-
-    /**
      * This method writes data to file.
      * @param file This is the desire file the data will be written to.
      * @param data This is the data to be written to the file.
@@ -125,8 +114,6 @@ public class FileHelper {
             return null;
         }
     }
-
-
 
     /**
      * This  method writes a Bitmap object to a file.

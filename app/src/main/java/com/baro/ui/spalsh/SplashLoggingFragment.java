@@ -1,6 +1,8 @@
 package com.baro.ui.spalsh;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,7 +12,10 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.baro.R;
@@ -69,9 +74,13 @@ public class SplashLoggingFragment extends Fragment {
         photoThumbnailButton = view.findViewById(R.id.btn_account);
 
         photoThumbnailButton.setOnClickListener(v -> {
-            // TODO Implement this
+            if(checkPermissions()) {
+
+            }
+
         });
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void configureNextButton(View view) {
@@ -104,6 +113,39 @@ public class SplashLoggingFragment extends Fragment {
         passwordEditText = view.findViewById(R.id.edit_text_password);
     }
 
+
+    // Permissions
+
+    private boolean checkPermissions() {
+        return false;
+//
+//        if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)){
+//            if(shouldShowRequestPermissionRationale(getString(R.string.permssion_camera_info_message))) {
+//                Toast.makeText(getView().getContext(), R.string.permssion_camera_info_message, Toast.LENGTH_LONG).show();
+//            }
+//
+//            ActivityResultContracts.RequestPermission();
+//        } else {
+//            hasInternetAccess = true;
+//        }
+//
+//        if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+//                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
+//            Toast.makeText(getView().getContext(), R.string.accessStorage, Toast.LENGTH_SHORT).show();
+//            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
+//        } else {
+//            hasReadWriteStorageAccess = true;
+//        }
+    }
+
+    private ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+
+                } else {
+                    Toast.makeText(getView().getContext(), "Neec camera access", Toast.LENGTH_SHORT).show();
+                }
+            });
     // Controller
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void saveCredentials() {
@@ -123,6 +165,7 @@ public class SplashLoggingFragment extends Fragment {
 
         FileHelper.writeToFile(userMetaDataFile, jsonCredentials.toString());
     }
+
 
 
 }

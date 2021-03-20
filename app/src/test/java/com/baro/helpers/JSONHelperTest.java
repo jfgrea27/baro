@@ -16,15 +16,15 @@ public class JSONHelperTest {
 
     @Test
     public void createJSONFromHashMapShouldReturnJSONObject() throws JSONException {
-        HashMap<JSONEnum, String> sampleHashMap = new HashMap<>();
-        sampleHashMap.put(JSONEnum.COURSE_NAME_KEY, "Course Name");
-        sampleHashMap.put(JSONEnum.COURSE_UUID_KEY, "Course UUID");
+        HashMap<String, String> sampleHashMap = new HashMap<>();
+        sampleHashMap.put(JSONEnum.COURSE_NAME_KEY.key, "Course Name");
+        sampleHashMap.put(JSONEnum.COURSE_UUID_KEY.key, "Course UUID");
 
         JSONObject jsonTest = JSONHelper.createJSONFromHashMap(sampleHashMap);
 
         assertEquals(jsonTest.length(), 2);
-        assertEquals(jsonTest.get(JSONEnum.COURSE_NAME_KEY.toString()), "Course Name");
-        assertEquals(jsonTest.get(JSONEnum.COURSE_UUID_KEY.toString()), "Course UUID");
+        assertEquals(jsonTest.get(JSONEnum.COURSE_NAME_KEY.key), "Course Name");
+        assertEquals(jsonTest.get(JSONEnum.COURSE_UUID_KEY.key), "Course UUID");
 
     }
 
