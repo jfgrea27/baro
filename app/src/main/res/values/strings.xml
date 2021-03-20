@@ -10,7 +10,6 @@
     <string name="language">Language</string>
     <string name="category">Category</string>
     <string name="course_name">Course Name</string>
-    <string name="skip">Skip</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="share_locally">Share Locally</string>
@@ -20,11 +19,9 @@
     <string name="toast_logging_in_user">\"Logging in user: \"</string>
     <string name="toast_no_username_found">\"No username found. \"</string>
     <string name="please_enter_valid_username_toast">Please enter a valid username</string>
-    <string name="permssion_camera_info_message">Requesting Permission to use device camera.</string>
     <string name="need_camera_access_toast">Need camera access</string>
     <string name="write_storage_permission">Need write external storage access</string>
     <string name="read_storage_permission">Need read external storage access</string>
-    <string name="image_thumbnail_not_updated_toast">Image Thumbnail not updated</string>
     <string name="choose_image_input">Image Input</string>
     <string name="error_saving_credentials">Error in saving credentials</string>
 </resources>

@@ -32,7 +32,7 @@
         <activity android:name=".ui.share.ShareActivity" />
         <activity android:name=".ui.create.CreateActivity" />
         <activity android:name=".AccountActivity" />
-        <activity android:name=".ui.spalsh.SplashActivity">
+        <activity android:name=".ui.splash.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
