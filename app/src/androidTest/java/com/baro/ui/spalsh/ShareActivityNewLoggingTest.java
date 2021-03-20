@@ -1,10 +1,19 @@
 package com.baro.ui.spalsh;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+
+import androidx.activity.result.ActivityResultRegistry;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.InstrumentationRegistry;
 import androidx.test.core.app.ActivityScenario;
@@ -12,6 +21,7 @@ import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 import androidx.test.rule.ActivityTestRule;
+import androidx.test.rule.GrantPermissionRule;
 
 import com.baro.R;
 import com.baro.constants.FileEnum;
@@ -25,6 +35,7 @@ import org.hamcrest.TypeSafeMatcher;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,9 +45,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
+import static androidx.core.os.BundleKt.bundleOf;
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
+import static androidx.test.espresso.action.ViewActions.pressImeActionButton;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -51,6 +65,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 
 @RunWith(AndroidJUnit4ClassRunner.class)
@@ -58,6 +73,14 @@ public class ShareActivityNewLoggingTest {
 
     @Rule
     public ActivityTestRule<SplashActivity> mActivityTestRule = new ActivityTestRule<>(SplashActivity.class);
+
+    @Rule
+    public GrantPermissionRule mGrantPermissionRule =
+            GrantPermissionRule.grant(
+                    "android.permission.CAMERA",
+                    "android.permission.READ_EXTERNAL_STORAGE",
+                    "android.permission.WRITE_EXTERNAL_STORAGE");
+
 
     @Before
     public void deletePreviousUser() {
@@ -71,6 +94,7 @@ public class ShareActivityNewLoggingTest {
         FileHelper.deleteFile(userDirectoryFile);
     }
 
+    @Ignore
     public static void mySleep (int val) {
         try {
             TimeUnit.SECONDS.sleep(val);
@@ -80,7 +104,7 @@ public class ShareActivityNewLoggingTest {
     }
 
     @Test
-    public void createUserTest() throws JSONException {
+    public void createUserCredentialsShouldPassIfCredentialsWereSaved() throws JSONException {
 
         mySleep (3);
 
@@ -150,7 +174,7 @@ public class ShareActivityNewLoggingTest {
     }
 
     @Test
-    public void createInvalidUserShouldNotCreateUser() throws JSONException {
+    public void createUserShouldNotCreateUserIfCredentialsAreNotStrongEnough() throws JSONException {
 
         mySleep (3);
 
@@ -213,6 +237,19 @@ public class ShareActivityNewLoggingTest {
         assertNull(FileHelper.getFileAtPath(userMetaFile));
     }
 
+    @Test
+    public void selectThumbnailPictureShouldSaveThumbnailPictureWhenCreatingUser() throws JSONException {
+        // TODO
+
+
+
+    }
+
+    @Test
+    public void selectCameraShouldSaveThumbnailPicture() throws JSONException {
+        // TODO
+
+    }
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {

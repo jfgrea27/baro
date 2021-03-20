@@ -21,4 +21,10 @@
     <string name="toast_no_username_found">\"No username found. \"</string>
     <string name="please_enter_valid_username_toast">Please enter a valid username</string>
     <string name="permssion_camera_info_message">Requesting Permission to use device camera.</string>
+    <string name="need_camera_access_toast">Need camera access</string>
+    <string name="write_storage_permission">Need write external storage access</string>
+    <string name="read_storage_permission">Need read external storage access</string>
+    <string name="image_thumbnail_not_updated_toast">Image Thumbnail not updated</string>
+    <string name="choose_image_input">Image Input</string>
+    <string name="error_saving_credentials">Error in saving credentials</string>
 </resources>

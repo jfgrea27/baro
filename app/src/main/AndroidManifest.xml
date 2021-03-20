@@ -13,7 +13,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Baro">
-        <activity android:name=".ui.share.UploadActivity"></activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.baro.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+
+        <activity android:name=".ui.share.UploadActivity" />
         <activity android:name=".ui.share.BluetoothReceiveActivity" />
         <activity android:name=".ui.share.BluetoothSendActivity" />
         <activity android:name=".ui.share.SendReceiveActivity" />

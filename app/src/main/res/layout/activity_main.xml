@@ -8,8 +8,8 @@
 
     <ImageButton
         android:id="@+id/btn_account"
-        android:layout_width="@dimen/main_icon_width"
-        android:layout_height="@dimen/main_icon_height"
+        android:layout_width="@dimen/medium_icon_width"
+        android:layout_height="@dimen/medium_icon_height"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -25,8 +25,8 @@
 
     <ImageButton
         android:id="@+id/btn_share"
-        android:layout_width="@dimen/main_icon_width"
-        android:layout_height="@dimen/main_icon_height"
+        android:layout_width="@dimen/medium_icon_width"
+        android:layout_height="@dimen/medium_icon_height"
         android:background="?android:selectableItemBackground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_create"
@@ -40,8 +40,8 @@
 
     <ImageButton
         android:id="@+id/btn_create"
-        android:layout_width="@dimen/main_icon_width"
-        android:layout_height="@dimen/main_icon_height"
+        android:layout_width="@dimen/medium_icon_width"
+        android:layout_height="@dimen/medium_icon_height"
         android:text="Button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

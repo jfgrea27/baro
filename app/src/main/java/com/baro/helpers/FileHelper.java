@@ -1,6 +1,8 @@
 package com.baro.helpers;
 
+import android.content.ContentResolver;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 
 import androidx.annotation.RequiresApi;
@@ -10,6 +12,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
@@ -131,6 +135,45 @@ public class FileHelper {
             return  false;
         }
     }
+
+    public static File writeUriToFile(File destination, Uri uri, ContentResolver content) {
+
+        File file = createFile(destination);
+        InputStream in = null;
+        try {
+            in = content.openInputStream(uri);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+        try {
+            return saveInputStream(in, file.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return  null;
+        }
+    }
+
+    private static File saveInputStream(InputStream in, String desiredLocation) throws IOException {
+        File outputFile = new File(desiredLocation);
+
+        FileOutputStream fos = new FileOutputStream(outputFile);
+
+        copyStream(in, fos);
+
+        return outputFile;
+    }
+
+    private static void copyStream(InputStream input, OutputStream output)
+            throws IOException {
+
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
+        }
+    }
+
 
 
     public static void deleteFile(File file) {

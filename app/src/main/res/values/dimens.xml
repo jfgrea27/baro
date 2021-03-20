@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="main_icon_height">100dp</dimen>
-    <dimen name="main_icon_width">100dp</dimen>
+    <dimen name="medium_icon_height">100dp</dimen>
+    <dimen name="medium_icon_width">100dp</dimen>
     <dimen name="smaller_icon_width">60dp</dimen>
     <dimen name="smaller_icon_height">60dp</dimen>
     <dimen name="grid_height">500dp</dimen>
     <dimen name="large_logo_width">200dp</dimen>
     <dimen name="large_logo_height">200dp</dimen>
+    <dimen name="large_text">40sp</dimen>
 </resources>
