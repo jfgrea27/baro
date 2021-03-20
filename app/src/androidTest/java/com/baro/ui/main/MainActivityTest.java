@@ -1,10 +1,13 @@
-package com.baro;
+package com.baro.ui.main;
 
 
 import androidx.test.espresso.intent.rule.IntentsTestRule;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 
+import com.baro.AccountActivity;
+import com.baro.R;
 import com.baro.ui.create.CreateActivity;
 import com.baro.ui.main.MainActivity;
 import com.baro.ui.share.ShareActivity;
@@ -36,7 +39,7 @@ public class MainActivityTest {
     public void clickOnCreateButtonShouldLaunchCreateActivity() {
 
 
-        onView(withId(R.id.btn_create)).perform(click());
+        onView(ViewMatchers.withId(R.id.btn_create)).perform(click());
 
         intended(hasComponent(CreateActivity.class.getName()));
     }
