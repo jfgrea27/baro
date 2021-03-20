@@ -8,6 +8,7 @@ import android.view.ViewParent;
 
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
+import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
 
@@ -33,7 +34,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static org.hamcrest.Matchers.allOf;
 
 @LargeTest
-@RunWith(And.class)
+@RunWith(AndroidJUnit4ClassRunner.class)
 public class ShareActivityTest {
 
     @Rule
@@ -56,7 +57,7 @@ public class ShareActivityTest {
 
         while (shareDoesNotExist) {
             try {
-                mySleep (1);
+                mySleep (5);
                 ViewInteraction attemptClick = onView(
                         allOf(withId(R.id.btn_share),
                                 childAtPosition(

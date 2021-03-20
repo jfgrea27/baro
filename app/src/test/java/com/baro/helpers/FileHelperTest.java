@@ -173,4 +173,5 @@ public class FileHelperTest {
 
         assertFalse(FileHelper.writeBitmapToFile(file, bitmap));
     }
+
 }
