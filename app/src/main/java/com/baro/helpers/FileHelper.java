@@ -16,6 +16,15 @@ import java.util.Scanner;
 
 public class FileHelper {
 
+    public static File createFileAtPath(Path path) {
+        File file = new File(path.toString());
+
+        if(file.exists()) {
+            return file;
+        } else {
+            return createFile(file);
+        }
+    }
 
     /**
      * This method returns a File Object if a file exists at the given Path object Path.
@@ -29,8 +38,19 @@ public class FileHelper {
 
         if(file.exists()) {
             return file;
+        } else {
+            return null;
         }
-        return null;
+    }
+
+    private static File createFile(File file) {
+        file.getParentFile().mkdirs();
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            return  null;
+        }
+        return file;
     }
 
     /**

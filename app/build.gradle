@@ -39,8 +39,6 @@ dependencies {
 
     testImplementation 'junit:junit:4.+'
     testImplementation 'org.json:json:+'
-    testImplementation 'org.mockito:mockito-core:+'
-    testImplementation 'org.mockito:mockito-inline:2.13.0'
     testImplementation 'org.jmockit:jmockit:1.8'
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

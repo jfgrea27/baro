@@ -17,4 +17,7 @@
     <string name="share_online">Share Online</string>
     <string name="receive">Receive</string>
     <string name="send">Send</string>
+    <string name="toast_logging_in_user">\"Logging in user: \"</string>
+    <string name="toast_no_username_found">\"No username found. \"</string>
+    <string name="please_enter_valid_username_toast">Please enter a valid username</string>
 </resources>

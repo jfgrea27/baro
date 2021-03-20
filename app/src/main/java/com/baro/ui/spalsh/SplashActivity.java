@@ -8,63 +8,64 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.baro.R;
 import com.baro.constants.FileEnum;
+import com.baro.constants.IntentEnum;
 import com.baro.constants.JSONEnum;
 import com.baro.helpers.FileHelper;
 import com.baro.helpers.JSONHelper;
+import com.baro.models.User;
 import com.baro.ui.main.MainActivity;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Scanner;
+import java.util.UUID;
 
-public class SplashActivity extends AppCompatActivity {
+public class  SplashActivity extends AppCompatActivity {
 
-
-    private boolean loggedIn = true;
-
+    private static int SPLASH_TIME_OUT = 1000;
+    private ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        configureProgressBar();
+
 
         if (savedInstanceState == null) {
 
-            checkLoggedIn();
+            new Handler().postDelayed((Runnable) () -> {
+                getCurrentlyLoggingInUser();
+            }, SPLASH_TIME_OUT);
 
-            if (loggedIn) {
-                getSupportFragmentManager().beginTransaction()
-                        .setReorderingAllowed(true)
-                        .add(R.id.fragment_container_view, SplashLoadingFragment.class, null)
-                        .commit();
-
-            } else{
-                getSupportFragmentManager().beginTransaction()
-                        .setReorderingAllowed(true)
-                        .add(R.id.fragment_container_view, SplashLoggingFragment.class, null)
-                        .commit();
-
-            }
         }
     }
 
-    private void checkLoggedIn() {
+    private void configureProgressBar() {
+        progressBar = findViewById(R.id.progress_bar);
+    }
 
+    private void getCurrentlyLoggingInUser() {
+        UserCredentialsTask userCredentialsTask = new UserCredentialsTask();
+        userCredentialsTask.execute();
     }
 
 
-    private class LogingData extends AsyncTask<String, Void, Boolean> {
+    private class UserCredentialsTask extends AsyncTask<Void, Void, User> {
 
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
-        protected Boolean doInBackground(String... params) {
+        protected User doInBackground(Void... voids) {
 
             Path userMetaDataPath = Paths.get(
                     String.valueOf(getExternalFilesDir(null)),
@@ -76,14 +77,47 @@ public class SplashActivity extends AppCompatActivity {
             if (userMetaDataFile != null) {
                 String contentMetaData = FileHelper.readFile(userMetaDataFile);
                 JSONObject jsonMetaData = JSONHelper.createJSONFromString(contentMetaData);
+                try {
+                    User user = new User(
+                            UUID.fromString((String) jsonMetaData.get(JSONEnum.USER_UUID_KEY.key)),
+                            (String) jsonMetaData.get(JSONEnum.USER_NAME_KEY.key));
+                    return user;
+                } catch (JSONException e) {
+                    return null;
+                }
             }
+            return null;
 
-            return false;
         }
 
-        protected void onPostExecute(Boolean result) {
-            // TODO complete this
+        protected void onPostExecute(User result) {
 
+
+            if (result != null) {
+                Toast.makeText(SplashActivity.this,
+                        getString(R.string.toast_logging_in_user) + result.getUsername(),
+                        Toast.LENGTH_LONG)
+                        .show();
+                Intent startMainActivity = new Intent(
+                        SplashActivity.this,
+                        MainActivity.class);
+                // Passing User to MainActivity
+                startActivity(startMainActivity);
+                SplashActivity.this.finish();
+            } else {
+                Toast.makeText(SplashActivity.this,
+                        getString(R.string.toast_no_username_found),
+                        Toast.LENGTH_LONG)
+                        .show();
+
+                progressBar.setVisibility(View.INVISIBLE);
+
+                getSupportFragmentManager().beginTransaction()
+                        .setReorderingAllowed(true)
+                        .add(R.id.fragment_container_view, SplashLoggingFragment.class, null)
+                        .commit();
+
+            }
         }
     }
 }
