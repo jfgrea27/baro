@@ -24,4 +24,5 @@
     <string name="read_storage_permission">Need read external storage access</string>
     <string name="choose_image_input">Image Input</string>
     <string name="error_saving_credentials">Error in saving credentials</string>
+    <string name="learn">Learn</string>
 </resources>

@@ -12,10 +12,12 @@ import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.baro.AccountActivity
 import com.baro.R
 import com.baro.ui.create.CreateActivity
+import com.baro.ui.learn.LearnActivity
 import com.baro.ui.share.ShareActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.lang.Thread.sleep
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 @LargeTest
@@ -25,19 +27,21 @@ class MainActivityTest {
 
     @Test
     fun clickOnCreateButtonShouldLaunchCreateActivity() {
+
         Espresso.onView(ViewMatchers.withId(R.id.btn_create)).perform(ViewActions.click())
         Intents.intended(IntentMatchers.hasComponent(CreateActivity::class.java.name))
-    }
-
-    @Test
-    fun clickOnAccountButtonShouldLaunchCreateActivity() {
+        Espresso.pressBack()
+        sleep(0.5.toLong())
         Espresso.onView(ViewMatchers.withId(R.id.btn_account)).perform(ViewActions.click())
         Intents.intended(IntentMatchers.hasComponent(AccountActivity::class.java.name))
-    }
-
-    @Test
-    fun clickOnShareButtonShouldLaunchCreateActivity() {
+        Espresso.pressBack()
+        sleep(0.5.toLong())
         Espresso.onView(ViewMatchers.withId(R.id.btn_share)).perform(ViewActions.click())
         Intents.intended(IntentMatchers.hasComponent(ShareActivity::class.java.name))
+        Espresso.pressBack()
+        sleep(0.5.toLong())
+        Espresso.onView(ViewMatchers.withId(R.id.btn_learn)).perform(ViewActions.click())
+        Intents.intended(IntentMatchers.hasComponent(LearnActivity::class.java.name))
     }
+
 }

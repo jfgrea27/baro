@@ -21,33 +21,31 @@
         app:srcCompat="@drawable/ic_account" />
 
 
-
-
     <ImageButton
         android:id="@+id/btn_share"
         android:layout_width="@dimen/medium_icon_width"
         android:layout_height="@dimen/medium_icon_height"
         android:background="?android:selectableItemBackground"
+        android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/btn_create"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_account"
-        app:layout_constraintVertical_bias="0.50"
-        app:srcCompat="@drawable/ic_share_black_48dp"
-        android:scaleType="fitCenter"
-        />
+        app:layout_constraintVertical_bias="0.316"
+        app:srcCompat="@drawable/ic_share_black_48dp" />
 
     <ImageButton
         android:id="@+id/btn_create"
         android:layout_width="@dimen/medium_icon_width"
         android:layout_height="@dimen/medium_icon_height"
         android:text="Button"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_share"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/btn_share"
-        app:layout_constraintTop_toBottomOf="@+id/text_account" />
+        app:layout_constraintTop_toTopOf="@+id/btn_share"
+        app:layout_constraintVertical_bias="0.264" />
 
     <TextView
         android:id="@+id/text_account"
@@ -75,4 +73,25 @@
         app:layout_constraintEnd_toEndOf="@+id/btn_share"
         app:layout_constraintStart_toStartOf="@+id/btn_share"
         app:layout_constraintTop_toBottomOf="@+id/btn_share" />
+
+    <TextView
+        android:id="@+id/text_learn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/learn"
+        app:layout_constraintEnd_toEndOf="@+id/btn_learn"
+        app:layout_constraintStart_toStartOf="@+id/btn_learn"
+        app:layout_constraintTop_toBottomOf="@+id/btn_learn" />
+
+    <ImageButton
+        android:id="@+id/btn_learn"
+        android:layout_width="@dimen/medium_icon_width"
+        android:layout_height="@dimen/medium_icon_height"
+        android:background="?android:selectableItemBackground"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/btn_create"
+        app:layout_constraintStart_toStartOf="@+id/btn_share"
+        app:layout_constraintTop_toBottomOf="@+id/text_create"
+        app:srcCompat="@drawable/ic_book" />
 </androidx.constraintlayout.widget.ConstraintLayout>
