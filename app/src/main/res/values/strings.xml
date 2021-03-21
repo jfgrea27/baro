@@ -20,8 +20,6 @@
     <string name="error_saving_credentials">Error in saving credentials</string>
     <string name="learn">Learn</string>
     <string name="error_retrieving_credentials">Could not retrieve credentials</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="course_name">Course Name</string>
     <string name="choose_language">Choose Language</string>
     <string name="text_choose_category">Choose Category</string>
     <string name="text_choose_thumbnail">Choose Thumbnail</string>

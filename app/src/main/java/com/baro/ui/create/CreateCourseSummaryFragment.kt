@@ -1,7 +1,6 @@
 package com.baro.ui.create
 
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -9,18 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
-import androidx.core.content.FileProvider
 import com.baro.R
-import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
-import com.baro.constants.FileEnum
-import com.baro.dialogs.ImageDialog
-import com.baro.helpers.FileHelper
 import com.baro.models.User
-import java.nio.file.Paths
+
 
 class CreateCourseSummaryFragment : Fragment()  {
 
@@ -33,21 +24,22 @@ class CreateCourseSummaryFragment : Fragment()  {
 
     // Model
     private lateinit var user: User
+
     private var thumbnailUri: Uri? = null
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        arguments?.let {
+            user = it.getParcelable(USER_PARAM)!!
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
         val view = inflater.inflate(R.layout.fragment_create_course_summary, container, false)
-
-        // Gets User Credentials
-        user = arguments?.get(AppTags.USER_OBJECT.name) as User
 
         // Configure UI
         configureCourseTitleEditText(view)
@@ -66,7 +58,6 @@ class CreateCourseSummaryFragment : Fragment()  {
     private fun configureThumbnailButton(view: View) {
         thumbnailButton = view.findViewById(R.id.btn_course_thumbnail)
 
-
     }
 
     private fun configureCategoryButton(view: View) {
@@ -81,6 +72,8 @@ class CreateCourseSummaryFragment : Fragment()  {
     private fun configureCreateButton(view: View) {
         createButton = view.findViewById(R.id.btn_create)
     }
+
+
 
 //
 //    private var getGalleryContent: ActivityResultLauncher<String?>? = registerForActivityResult(ActivityResultContracts.GetContent()
@@ -112,5 +105,18 @@ class CreateCourseSummaryFragment : Fragment()  {
 //            getGalleryContent?.launch("image/*")
 //        }
 //    }
+
+
+    companion object {
+        private val USER_PARAM = AppTags.USER_OBJECT.name
+
+        @JvmStatic
+        fun newInstance(user: User?) =
+                CreateCourseSummaryFragment().apply {
+                    arguments = Bundle().apply {
+                        putParcelable(USER_PARAM, user)
+                    }
+                }
+    }
 
 }

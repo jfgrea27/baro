@@ -5,16 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.create.CreateCourseSummaryFragment"
-
-    android:layout_marginBottom="@dimen/fragment_side_margin"
-    android:layout_marginLeft="@dimen/fragment_side_margin"
-    android:layout_marginRight="@dimen/fragment_side_margin"
-    android:layout_marginTop="@dimen/fragment_side_margin"
-    >
+    android:background="@color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:alpha="0.5"
+        android:background="@color/gray">
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_marginBottom="@dimen/fragment_side_margin"
+        android:layout_marginLeft="@dimen/fragment_side_margin"
+        android:layout_marginRight="@dimen/fragment_side_margin"
+        android:layout_marginTop="@dimen/fragment_side_margin"
+        android:layout_height="match_parent"
+        android:alpha="1"
+        android:background="@color/white"
+        android:layout_width="match_parent">
+
+
 
 
         <EditText
@@ -24,7 +35,7 @@
             android:layout_gravity="center_horizontal"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="@string/course_name"
+            android:hint="@string/course_name"
             android:textAlignment="center"
             android:textSize="@dimen/medium_text"
             app:layout_constraintEnd_toEndOf="parent"
@@ -83,12 +94,12 @@
 
         <TextView
             android:id="@+id/text_create"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="44dp"
+            android:layout_height="21dp"
             android:text="@string/create"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/imageView"
-            app:layout_constraintStart_toStartOf="@+id/imageView" />
+            app:layout_constraintStart_toStartOf="@+id/btn_create" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -106,10 +117,12 @@
             app:layout_constraintStart_toStartOf="@+id/btn_course_thumbnail"
             app:layout_constraintTop_toBottomOf="@+id/btn_course_thumbnail" />
 
-        <ImageView
-            android:id="@+id/imageView"
+        <ImageButton
+            android:id="@+id/btn_create"
             android:layout_width="@dimen/smaller_icon_width"
             android:layout_height="@dimen/smaller_icon_width"
+            android:background="@color/white"
+            android:scaleType="fitCenter"
             app:layout_constraintBottom_toTopOf="@+id/text_create"
             app:layout_constraintEnd_toEndOf="@+id/btn_category"
             app:layout_constraintStart_toStartOf="@+id/btn_language"
