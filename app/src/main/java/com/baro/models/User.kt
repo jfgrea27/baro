@@ -1,18 +1,31 @@
 package com.baro.models
 
 
-import java.net.URI
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+import java.io.File
 import java.util.*
 
-class User // TODO discuss properties
-(private val userUUID: UUID?, private val username: String?) {
-    private val photoThumbnail: URI? = null
-    private val followings: ArrayList<User?>? = null
-    private val courses: ArrayList<Course?>? = null
-    fun getUsername(): String? {
+
+@Parcelize
+data class User
+(private val userUUID: UUID, private val username: String, private var thumbnail: File? = null
+) : Parcelable {
+
+    fun getUsername(): String {
         return username
     }
-    fun getUserUUID(): UUID? {
+    fun getUserUUID(): UUID {
         return userUUID
     }
+    fun getThumbnailFile(): File?  {
+        return thumbnail
+    }
+
+    fun setThumbnailPath(thumbnailPath: String) {
+        thumbnail = File(thumbnailPath)
+    }
+
+    private val courses: ArrayList<Course?>? = null
+    private val followings: ArrayList<User?>? = null
 }

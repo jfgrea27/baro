@@ -4,17 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AccountActivity">
+    tools:context=".ui.account.AccountActivity">
 
-    <ImageButton
-        android:id="@+id/btn_account"
+    <ImageView
+        android:id="@+id/im_account"
         android:layout_width="@dimen/medium_icon_width"
         android:layout_height="@dimen/medium_icon_height"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitCenter"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_account" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 
     <ImageButton
@@ -23,8 +22,8 @@
         android:layout_height="@dimen/smaller_icon_height"
         app:layout_constraintBottom_toTopOf="@+id/text_account"
         app:layout_constraintEnd_toStartOf="@+id/btn_settings"
-        app:layout_constraintStart_toEndOf="@+id/btn_account"
-        app:layout_constraintTop_toTopOf="@+id/btn_account" />
+        app:layout_constraintStart_toEndOf="@+id/im_account"
+        app:layout_constraintTop_toTopOf="@+id/im_account" />
 
     <ImageButton
         android:id="@+id/btn_settings"
@@ -35,7 +34,7 @@
         app:layout_constraintBottom_toTopOf="@+id/text_account"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/btn_followers"
-        app:layout_constraintTop_toTopOf="@+id/btn_account"
+        app:layout_constraintTop_toTopOf="@+id/im_account"
         app:srcCompat="@drawable/ic_settings" />
 
     <TextView
@@ -43,9 +42,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/account"
-        app:layout_constraintEnd_toEndOf="@+id/btn_account"
-        app:layout_constraintStart_toStartOf="@+id/btn_account"
-        app:layout_constraintTop_toBottomOf="@+id/btn_account" />
+        app:layout_constraintEnd_toEndOf="@+id/im_account"
+        app:layout_constraintStart_toStartOf="@+id/im_account"
+        app:layout_constraintTop_toBottomOf="@+id/im_account" />
+
+
 
     <TextView
         android:id="@+id/text_followers"
@@ -74,47 +75,25 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
-
     <ImageButton
-        android:id="@+id/btn_delete_remote"
+        android:id="@+id/btn_create"
         android:layout_width="@dimen/smaller_icon_width"
         android:layout_height="@dimen/smaller_icon_height"
-        android:background="?android:selectableItemBackground"
+        android:backgroundTint="@color/white"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/text_delete_remote"
-        app:layout_constraintEnd_toStartOf="@+id/btn_delete_local"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_settings" />
-
-    <ImageButton
-        android:id="@+id/btn_delete_local"
-        android:layout_width="@dimen/smaller_icon_width"
-        android:layout_height="@dimen/smaller_icon_height"
-        android:background="?android:selectableItemBackground"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/text_delete_local"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btn_delete_remote"
-        app:srcCompat="@drawable/ic_settings" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/grid_courses"
+        app:srcCompat="@drawable/ic_create" />
 
     <TextView
-        android:id="@+id/text_delete_local"
+        android:id="@+id/text_create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/delete_local"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/btn_delete_local"
-        app:layout_constraintStart_toStartOf="@+id/btn_delete_local" />
-
-    <TextView
-        android:id="@+id/text_delete_remote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/delete_remote"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/btn_delete_remote"
-        app:layout_constraintStart_toStartOf="@+id/btn_delete_remote" />
+        android:text="@string/create"
+        app:layout_constraintEnd_toEndOf="@+id/btn_create"
+        app:layout_constraintStart_toStartOf="@+id/btn_create"
+        app:layout_constraintTop_toBottomOf="@+id/btn_create" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,9 +1,8 @@
-package com.baro.ui.splash
+package com.baroCCredentialsredentials.ui.splash
 
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.AsyncTask
@@ -16,7 +15,6 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
@@ -55,6 +53,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_logging, container, false)
 
+        // Configure UI
         configurePhotoThumbnailButton(view)
         configureUsernameEditText(view)
         configurePasswordEditText(view)
@@ -64,7 +63,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun configurePhotoThumbnailButton(view: View?) {
-        photoThumbnailButton = view?.findViewById(R.id.btn_account )!!
+        photoThumbnailButton = view?.findViewById(R.id.im_account )!!
 
         photoThumbnailButton.setOnClickListener { v: View? ->
             checkCameraPermissions()
@@ -171,7 +170,6 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         }
     }
 
-    //TODO - Refactor
     private fun handlePermission(permission: String?, isGranted: Boolean) {
         when (permission) {
             Manifest.permission.READ_EXTERNAL_STORAGE -> if (!isGranted) {
@@ -189,14 +187,10 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
             } else {
                 cameraPermission = true
             }
-            // TODO - Remove?
-            else -> {
-            }
         }
     }
 
-    //TODO - Refactor - Check if internet exists - If it does - Can create an account - if not just ask for Image + Username
-    // LATER -- If internet exists - ++ Optional ask for Email and Pwd
+    // TODO __ASYNC_REFACTOR__
     private inner class UserCredentialsSave : AsyncTask<Void?, Void?, Boolean?>() {
         @RequiresApi(api = Build.VERSION_CODES.P)
         override fun doInBackground(vararg voids: Void?): Boolean? {
@@ -212,6 +206,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
                 val startMainActivity = Intent(
                         activity,
                         MainActivity::class.java)
+                // Perhaps use UserCredentialsTask From SplashActivity to get the credentials once created
                 startActivity(startMainActivity)
                 activity!!.finish()
             } else {
