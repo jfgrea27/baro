@@ -53,6 +53,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_logging, container, false)
 
+        // Configure UI
         configurePhotoThumbnailButton(view)
         configureUsernameEditText(view)
         configurePasswordEditText(view)
@@ -185,12 +186,10 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
             } else {
                 cameraPermission = true
             }
-            else -> {
-            }
         }
     }
 
-
+    // TODO __ASYNC_REFACTOR__
     private inner class UserCredentialsSave : AsyncTask<Void?, Void?, Boolean?>() {
         @RequiresApi(api = Build.VERSION_CODES.P)
         override fun doInBackground(vararg voids: Void?): Boolean? {
@@ -206,6 +205,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
                 val startMainActivity = Intent(
                         activity,
                         MainActivity::class.java)
+                // Perhaps use UserCredentialsTask From SplashActivity to get the credentials once created
                 startActivity(startMainActivity)
                 activity!!.finish()
             } else {

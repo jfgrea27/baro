@@ -28,7 +28,6 @@ class AccountActivity : AppCompatActivity() {
 
     // Model
     private var user: User? = null
-    private var thumbnailUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +54,11 @@ class AccountActivity : AppCompatActivity() {
 
 
     private fun configureCreateButton() {
+        createButton = findViewById(R.id.btn_create)
 
+        createButton.setOnClickListener {
+            // TODO __PERMISSION_REFACTOR__
+        }
     }
 
     private fun configureUserThumbnailImageview() {
