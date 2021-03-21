@@ -42,13 +42,13 @@ class MainActivity : AppCompatActivity() {
         configureAccountButton()
         configureShareButton()
         configureLearnButton()
-        configurWelcomeTextView()
+        configureWelcomeTextView()
 
         // Update UI with User Credentials
         updateUserInfo()
     }
 
-    private fun configurWelcomeTextView() {
+    private fun configureWelcomeTextView() {
         welcomeTextView = findViewById(R.id.text_account)
     }
 
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configureAccountButton() {
-        accountButton = findViewById(R.id.im_account)
+        accountButton = findViewById(R.id.btn_account)
         accountButton.setOnClickListener {
             if (user != null) {
                 val intentAccountActivity = Intent(

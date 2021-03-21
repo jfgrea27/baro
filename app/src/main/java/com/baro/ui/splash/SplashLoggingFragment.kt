@@ -1,4 +1,4 @@
-package com.baroCCredentialsredentials.ui.splash
+package com.baro.ui.splash
 
 import android.Manifest
 import android.content.Intent
@@ -42,12 +42,13 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
 
     private lateinit var photoThumbnailButton: ImageButton
     private lateinit var usernameEditText: EditText
-    private lateinit var passwordEditText: EditText
     private lateinit var nextButton: ImageButton
+    private var photoUri: Uri? = null
+
+    // TODO __PERMISSION_REFACTOR__
     private var cameraPermission = false
     private var readPermission = false
     private var writePermission = false
-    private var photoUri: Uri? = null
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -56,7 +57,6 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         // Configure UI
         configurePhotoThumbnailButton(view)
         configureUsernameEditText(view)
-        configurePasswordEditText(view)
         configureNextButton(view)
         return view
     }
@@ -126,11 +126,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         usernameEditText = view?.findViewById(R.id.edit_text_username)!!
     }
 
-    private fun configurePasswordEditText(view: View?) {
-        passwordEditText = view?.findViewById(R.id.edit_text_password)!!
-    }
-
-    // Permissions
+    // TODO __PERMISSION_REFACTOR__
     private fun checkCameraPermissions() {
         val permissionsToBeGranted = ArrayList<String?>()
         if (ContextCompat.checkSelfPermission(

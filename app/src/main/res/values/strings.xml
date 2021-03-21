@@ -5,18 +5,12 @@
     <string name="share">Share</string>
     <string name="followers">Followers</string>
     <string name="settings">Settings</string>
-    <string name="delete_local">Delete Local</string>
-    <string name="delete_remote">Delete Remote</string>
-    <string name="language">Language</string>
-    <string name="category">Category</string>
     <string name="course_name">Course Name</string>
     <string name="username">Username</string>
-    <string name="password">Password</string>
     <string name="share_locally">Share Locally</string>
     <string name="share_online">Share Online</string>
     <string name="receive">Receive</string>
     <string name="send">Send</string>
-    <string name="toast_logging_in_user">\"Logging in user: \"</string>
     <string name="toast_no_username_found">\"No username found. \"</string>
     <string name="please_enter_valid_username_toast">Please enter a valid username</string>
     <string name="need_camera_access_toast">Need camera access</string>
@@ -26,5 +20,9 @@
     <string name="error_saving_credentials">Error in saving credentials</string>
     <string name="learn">Learn</string>
     <string name="error_retrieving_credentials">Could not retrieve credentials</string>
-    <string name="welcome">Welcome</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="course_name">Course Name</string>
+    <string name="choose_language">Choose Language</string>
+    <string name="text_choose_category">Choose Category</string>
+    <string name="text_choose_thumbnail">Choose Thumbnail</string>
 </resources>

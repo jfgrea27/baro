@@ -1,5 +1,7 @@
 package com.baro.ui.account
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -10,15 +12,22 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.baro.R
 import com.baro.constants.AppTags
+import com.baro.dialogs.ImageDialog
 import com.baro.models.User
+import java.util.ArrayList
 
 
 class AccountActivity : AppCompatActivity() {
+
     // UI
     private lateinit var userThumbnailImageView: ImageView
     private lateinit var followersButton: ImageButton
@@ -28,6 +37,13 @@ class AccountActivity : AppCompatActivity() {
 
     // Model
     private var user: User? = null
+
+
+    // TODO __PERMISSION_REFACTOR__
+    private var cameraPermission = false
+    private var readPermission = false
+    private var writePermission = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +73,13 @@ class AccountActivity : AppCompatActivity() {
         createButton = findViewById(R.id.btn_create)
 
         createButton.setOnClickListener {
-            // TODO __PERMISSION_REFACTOR__
+            checkCameraPermissions()
+            if (cameraPermission and readPermission and writePermission) {
+
+
+
+                Toast.makeText(applicationContext, "DialogCreate Course", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -80,7 +102,7 @@ class AccountActivity : AppCompatActivity() {
     }
 
     private fun configureRecycleView() {
-        // TODO Gridview that holds the Courses
+        // TODO GridView that holds the Courses
     }
 
 
@@ -107,4 +129,61 @@ class AccountActivity : AppCompatActivity() {
         }
     }
 
+    // Permissions
+    private fun checkCameraPermissions() {
+        val permissionsToBeGranted = ArrayList<String?>()
+        if (ContextCompat.checkSelfPermission(
+                        applicationContext, Manifest.permission.READ_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            permissionsToBeGranted.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+        } else {
+            readPermission = true
+        }
+        if (ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            permissionsToBeGranted.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        } else {
+            writePermission = true
+        }
+        if (ContextCompat.checkSelfPermission(
+                        applicationContext, Manifest.permission.CAMERA) !=
+                PackageManager.PERMISSION_GRANTED) {
+            permissionsToBeGranted.add(Manifest.permission.CAMERA)
+        } else {
+            cameraPermission = true
+        }
+        if (permissionsToBeGranted.size > 0) {
+            val permissions = permissionsToBeGranted.toTypedArray()
+            requestPermissionLauncher!!.launch(permissions)
+        }
+    }
+
+    @VisibleForTesting
+    private val requestPermissionLauncher: ActivityResultLauncher<Array<String?>?>? = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions: MutableMap<String?, Boolean?>? ->
+        if (permissions != null) {
+            for ((key, value) in permissions) {
+                value?.let { handlePermission(key, it) }
+            }
+        }
+    }
+
+    private fun handlePermission(permission: String?, isGranted: Boolean) {
+        when (permission) {
+            Manifest.permission.READ_EXTERNAL_STORAGE -> if (!isGranted) {
+                Toast.makeText(applicationContext, R.string.read_storage_permission, Toast.LENGTH_LONG).show()
+            } else {
+                readPermission = true
+            }
+            Manifest.permission.WRITE_EXTERNAL_STORAGE -> if (!isGranted) {
+                Toast.makeText(applicationContext, R.string.write_storage_permission, Toast.LENGTH_LONG).show()
+            } else {
+                writePermission = true
+            }
+            Manifest.permission.CAMERA -> if (!isGranted) {
+                Toast.makeText(applicationContext, R.string.need_camera_access_toast, Toast.LENGTH_LONG).show()
+            } else {
+                cameraPermission = true
+            }
+        }
+    }
 }

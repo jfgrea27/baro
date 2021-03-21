@@ -8,4 +8,6 @@
     <dimen name="large_logo_width">200dp</dimen>
     <dimen name="large_logo_height">200dp</dimen>
     <dimen name="large_text">40sp</dimen>
+    <dimen name="fragment_side_margin">20dp</dimen>
+    <dimen name="medium_text">30sp</dimen>
 </resources>

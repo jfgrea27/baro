@@ -25,31 +25,18 @@
         app:srcCompat="@drawable/ic_next"
         android:background="?android:selectableItemBackground"
         android:scaleType="fitCenter"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_text_password" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/edit_text_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:inputType="textPersonName"
         android:hint="@string/username"
-        app:layout_constraintBottom_toTopOf="@+id/edit_text_password"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toTopOf="@+id/btn_next"
         app:layout_constraintEnd_toEndOf="@+id/im_account"
         app:layout_constraintStart_toStartOf="@+id/im_account"
-        app:layout_constraintTop_toBottomOf="@+id/im_account" />
-
-    <EditText
-        android:id="@+id/edit_text_password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:inputType="textPassword"
-        android:hint="@string/password"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/edit_text_username"
-        app:layout_constraintStart_toStartOf="@+id/edit_text_username"
         app:layout_constraintTop_toBottomOf="@+id/im_account" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

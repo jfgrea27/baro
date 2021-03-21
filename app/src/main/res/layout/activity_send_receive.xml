@@ -45,7 +45,6 @@
         app:layout_constraintEnd_toEndOf="@id/btn_receive"/>
 
     <TextView
-        android:id="@+id/text_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/send"

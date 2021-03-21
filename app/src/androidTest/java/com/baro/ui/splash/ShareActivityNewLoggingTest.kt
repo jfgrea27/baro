@@ -60,15 +60,7 @@ class ShareActivityNewLoggingTest {
                                 2),
                         ViewMatchers.isDisplayed()))
         appCompatEditText.perform(ViewActions.replaceText("valid_username"), ViewActions.closeSoftKeyboard())
-        val appCompatEditText4 = Espresso.onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.edit_text_password),
-                        childAtPosition(
-                                childAtPosition(
-                                        ViewMatchers.withId(R.id.fragment_container_view),
-                                        0),
-                                3),
-                        ViewMatchers.isDisplayed()))
-        appCompatEditText4.perform(ViewActions.replaceText("valid_password"), ViewActions.closeSoftKeyboard())
+
         val appCompatImageButton = Espresso.onView(
                 Matchers.allOf(ViewMatchers.withId(R.id.btn_next),
                         childAtPosition(
@@ -114,15 +106,7 @@ class ShareActivityNewLoggingTest {
                                 2),
                         ViewMatchers.isDisplayed()))
         appCompatEditText.perform(ViewActions.replaceText("false"), ViewActions.closeSoftKeyboard())
-        val appCompatEditText4 = Espresso.onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.edit_text_password),
-                        childAtPosition(
-                                childAtPosition(
-                                        ViewMatchers.withId(R.id.fragment_container_view),
-                                        0),
-                                3),
-                        ViewMatchers.isDisplayed()))
-        appCompatEditText4.perform(ViewActions.replaceText("valid_password"), ViewActions.closeSoftKeyboard())
+
         val appCompatImageButton = Espresso.onView(
                 Matchers.allOf(ViewMatchers.withId(R.id.btn_next),
                         childAtPosition(
