@@ -97,9 +97,9 @@ class MainActivity : AppCompatActivity() {
     private inner class UserCredentialsRetrieve : AsyncTask<Void?, Void?, Boolean?>() {
         @RequiresApi(api = Build.VERSION_CODES.O)
         override fun doInBackground(vararg voids: Void?): Boolean? {
-            // Save the Meta information
+            // Retrieve the Meta information
             user = retrieveUserCredentials()
-            // Save Photo URI
+            // Retrieve Thumbnail URI
             val uri = retrieveThumbnailUri()
             if (uri != null) {
                 thumbnailUri = uri

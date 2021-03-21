@@ -3,6 +3,8 @@ package com.baro.ui.splash
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -84,11 +86,6 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
             TakePicture()
     ) { result: Boolean? ->
         if (result == true) {
-            val userMetaDataPath = Paths.get(activity?.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.PHOTO_THUMBNAIL_FILE.key)
-            val userThumbnailFile = FileHelper.createFileAtPath(userMetaDataPath)
-            photoUri = Uri.fromFile(userThumbnailFile)
             photoThumbnailButton.setImageURI(photoUri)
         }
     }
@@ -127,11 +124,11 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
     }
 
     private fun configureUsernameEditText(view: View?) {
-        usernameEditText = view?.findViewById<EditText?>(R.id.edit_text_username)!!
+        usernameEditText = view?.findViewById(R.id.edit_text_username)!!
     }
 
     private fun configurePasswordEditText(view: View?) {
-        passwordEditText = view?.findViewById<EditText?>(R.id.edit_text_password)!!
+        passwordEditText = view?.findViewById(R.id.edit_text_password)!!
     }
 
     // Permissions
@@ -173,7 +170,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         }
     }
 
-    fun handlePermission(permission: String?, isGranted: Boolean) {
+    private fun handlePermission(permission: String?, isGranted: Boolean) {
         when (permission) {
             Manifest.permission.READ_EXTERNAL_STORAGE -> if (!isGranted) {
                 Toast.makeText(context, R.string.read_storage_permission, Toast.LENGTH_LONG).show()
@@ -195,8 +192,9 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         }
     }
 
+
     private inner class UserCredentialsSave : AsyncTask<Void?, Void?, Boolean?>() {
-        @RequiresApi(api = Build.VERSION_CODES.O)
+        @RequiresApi(api = Build.VERSION_CODES.P)
         override fun doInBackground(vararg voids: Void?): Boolean? {
             // Save the Meta information
             saveCredentials()
@@ -231,14 +229,17 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
             FileHelper.writeToFile(userMetaDataFile, jsonCredentials.toString())
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
+        @RequiresApi(api = Build.VERSION_CODES.P)
         private fun savePhotoUri() {
             if (photoUri != null) {
+
+                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(requireContext().contentResolver, photoUri!!))
                 val userThumbnailPicturePath = Paths.get(context!!.getExternalFilesDir(null).toString(),
                         FileEnum.USER_DIRECTORY.key,
                         FileEnum.PHOTO_THUMBNAIL_FILE.key)
                 val file = File(userThumbnailPicturePath.toString())
-                FileHelper.writeUriToFile(file, photoUri, activity!!.contentResolver)
+
+                FileHelper.writeBitmapToFile(file, bitmap)
             }
         }
     }

@@ -6,6 +6,8 @@ enum class JSONEnum(// TODO add more as needed
     COURSE_NAME_KEY("course-name"),
     COURSE_UUID_KEY("course-uuid"),
     USER_UUID_KEY("user-uuid"),
-    USER_NAME_KEY("user-name");
+    USER_NAME_KEY("user-name"),
+    COURSE_LANGUAGE("course-language"),
+    COURSE_CATEGORY("course-category");
 
 }

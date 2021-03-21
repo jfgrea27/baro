@@ -12,5 +12,7 @@ class User // TODO discuss properties
     fun getUsername(): String? {
         return username
     }
-
+    fun getUserUUID(): UUID? {
+        return userUUID
+    }
 }
