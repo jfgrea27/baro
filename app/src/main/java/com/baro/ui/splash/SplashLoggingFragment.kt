@@ -1,9 +1,8 @@
-package com.baro.ui.splash
+package com.baroCCredentialsredentials.ui.splash
 
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.AsyncTask
@@ -16,7 +15,6 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.*
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
@@ -64,7 +62,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun configurePhotoThumbnailButton(view: View?) {
-        photoThumbnailButton = view?.findViewById(R.id.btn_account )!!
+        photoThumbnailButton = view?.findViewById(R.id.im_account )!!
 
         photoThumbnailButton.setOnClickListener { v: View? ->
             checkCameraPermissions()

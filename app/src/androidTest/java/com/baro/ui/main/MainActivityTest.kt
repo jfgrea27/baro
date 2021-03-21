@@ -25,7 +25,7 @@ class MainActivityTest {
 
     @Test
     fun clickOnCreateButtonShouldLaunchCreateActivity() {
-        Espresso.onView(ViewMatchers.withId(R.id.btn_account)).perform(ViewActions.click())
+        Espresso.onView(ViewMatchers.withId(R.id.im_account)).perform(ViewActions.click())
         Intents.intended(IntentMatchers.hasComponent(AccountActivity::class.java.name))
         Espresso.pressBack()
         sleep(0.5.toLong())

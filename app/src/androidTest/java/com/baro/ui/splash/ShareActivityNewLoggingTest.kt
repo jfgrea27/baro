@@ -1,7 +1,6 @@
 package com.baro.ui.splash
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import androidx.test.core.app.ApplicationProvider
@@ -27,7 +26,6 @@ import org.junit.runner.RunWith
 import java.io.File
 import java.lang.Thread.sleep
 import java.nio.file.Paths
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4ClassRunner::class)
 class ShareActivityNewLoggingTest {
@@ -81,7 +79,7 @@ class ShareActivityNewLoggingTest {
                         ViewMatchers.isDisplayed()))
         appCompatImageButton.perform(ViewActions.click())
         val imageButton = Espresso.onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.btn_account),
+                Matchers.allOf(ViewMatchers.withId(R.id.im_account),
                         ViewMatchers.withParent(ViewMatchers.withParent(ViewMatchers.withId(android.R.id.content))),
                         ViewMatchers.isDisplayed()))
         imageButton.check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
@@ -135,7 +133,7 @@ class ShareActivityNewLoggingTest {
                         ViewMatchers.isDisplayed()))
         appCompatImageButton.perform(ViewActions.click())
         val imageButton = Espresso.onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.btn_account),
+                Matchers.allOf(ViewMatchers.withId(R.id.im_account),
                         ViewMatchers.withParent(ViewMatchers.withParent(ViewMatchers.withId(android.R.id.content))),
                         ViewMatchers.isDisplayed()))
         imageButton.check(ViewAssertions.doesNotExist())

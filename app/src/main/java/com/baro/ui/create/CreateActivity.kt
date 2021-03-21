@@ -9,10 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 
 import com.baro.R
-import com.baro.constants.CategoryEnum
-import com.baro.constants.FileEnum
-import com.baro.constants.JSONEnum
-import com.baro.constants.LanguageEnum
+import com.baro.constants.*
 import com.baro.helpers.FileHelper
 import com.baro.helpers.JSONHelper
 import com.baro.models.Course
@@ -36,10 +33,16 @@ class CreateActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create)
+
+        // Get User Credentials
+        user = intent.getParcelableExtra(AppTags.USER_OBJECT.name)
+        // Configure UI
         configureCourseEditText()
         configureCategoryButton()
         configureLanguageButton()
         configureCreateButton()
+
+        // Update UI with User Credentials
     }
 
     private fun configureCourseEditText() {

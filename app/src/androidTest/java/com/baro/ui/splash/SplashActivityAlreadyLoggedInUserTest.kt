@@ -56,7 +56,7 @@ class SplashActivityAlreadyLoggedInUserTest {
 
 
         val imageButton = Espresso.onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.btn_account),
+                Matchers.allOf(ViewMatchers.withId(R.id.im_account),
                         ViewMatchers.withParent(ViewMatchers.withParent(ViewMatchers.withId(android.R.id.content))),
                         ViewMatchers.isDisplayed()))
         imageButton.check(ViewAssertions.matches(ViewMatchers.isDisplayed()))

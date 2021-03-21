@@ -21,6 +21,7 @@ import com.baro.helpers.FileHelper
 import com.baro.helpers.JSONHelper
 import com.baro.models.User
 import com.baro.ui.main.MainActivity
+import com.baroCCredentialsredentials.ui.splash.SplashLoggingFragment
 
 import org.json.JSONException
 import java.nio.file.Paths
@@ -49,7 +50,8 @@ class SplashActivity : AppCompatActivity() {
         userCredentialsTask.execute()
     }
 
-    // TODO Move this to Composition (over Static as will always call this)
+    // TODO __ASYNC_REFACTOR__ Move this to Composition (over Static as will always call this)
+    // TODO - Use similar logic here for the SplashLoggingFragment.kt to pass user to the MainAct
     private inner class UserCredentialsTask : AsyncTask<Void?, Void?, User?>() {
         @RequiresApi(api = Build.VERSION_CODES.O)
         override fun doInBackground(vararg voids: Void?): User? {
