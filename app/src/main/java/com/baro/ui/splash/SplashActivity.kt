@@ -27,19 +27,21 @@ import java.nio.file.Paths
 import java.util.*
 
 class SplashActivity : AppCompatActivity() {
+
     private var progressBar: ProgressBar? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         configureProgressBar()
         if (savedInstanceState == null) {
-            Handler().postDelayed(Runnable { getCurrentlyLoggingInUser() } as Runnable, SPLASH_TIME_OUT.toLong())
+            Handler().postDelayed(Runnable { getCurrentlyLoggingInUser() }, SPLASH_TIME_OUT.toLong())
         }
     }
 
 
     private fun configureProgressBar() {
-        progressBar = findViewById<ProgressBar?>(R.id.progress_bar)
+        progressBar = findViewById(R.id.progress_bar)
     }
 
     private fun getCurrentlyLoggingInUser() {
@@ -47,25 +49,42 @@ class SplashActivity : AppCompatActivity() {
         userCredentialsTask.execute()
     }
 
+    // TODO Move this to Composition (over Static as will always call this)
     private inner class UserCredentialsTask : AsyncTask<Void?, Void?, User?>() {
         @RequiresApi(api = Build.VERSION_CODES.O)
         override fun doInBackground(vararg voids: Void?): User? {
+
             val userMetaDataPath = Paths.get(getExternalFilesDir(null).toString(),
                     FileEnum.USER_DIRECTORY.key,
                     FileEnum.META_DATA_FILE.key)
+
+
+            val userThumbnailPath= Paths.get(getExternalFilesDir(null).toString(),
+                    FileEnum.USER_DIRECTORY.key,
+                    FileEnum.PHOTO_THUMBNAIL_FILE.key)
+
             val userMetaDataFile = FileHelper.getFileAtPath(userMetaDataPath)
+            val userThumbnailFile = FileHelper.getFileAtPath(userThumbnailPath)
+
+            var user : User? = null
+
             if (userMetaDataFile != null) {
                 val contentMetaData = FileHelper.readFile(userMetaDataFile)
                 val jsonMetaData = contentMetaData?.let { JSONHelper.createJSONFromString(it) }
-                return try {
+
+                user = if (userThumbnailFile != null && userThumbnailFile.length() > 0) {
+                    User(
+                            UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
+                            jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String,
+                            userThumbnailFile
+                    )
+                } else {
                     User(
                             UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
                             jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String)
-                } catch (e: JSONException) {
-                    null
                 }
             }
-            return null
+            return user
         }
 
         override fun onPostExecute(result: User?) {

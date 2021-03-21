@@ -6,12 +6,10 @@ import androidx.test.espresso.intent.Intents
 import androidx.test.espresso.intent.matcher.IntentMatchers
 import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
-import com.baro.AccountActivity
+import com.baro.ui.account.AccountActivity
 import com.baro.R
-import com.baro.ui.create.CreateActivity
 import com.baro.ui.learn.LearnActivity
 import com.baro.ui.share.ShareActivity
 import org.junit.Rule
