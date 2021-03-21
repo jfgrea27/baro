@@ -1,4 +1,4 @@
-package com.baroCCredentialsredentials.ui.splash
+package com.baro.ui.splash
 
 import android.Manifest
 import android.content.Intent

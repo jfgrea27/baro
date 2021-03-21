@@ -1,6 +1,5 @@
 package com.baro.ui.splash
 
-import android.app.Fragment
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Build
@@ -11,7 +10,6 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 
 import com.baro.R
 import com.baro.constants.AppTags
@@ -21,7 +19,6 @@ import com.baro.helpers.FileHelper
 import com.baro.helpers.JSONHelper
 import com.baro.models.User
 import com.baro.ui.main.MainActivity
-import com.baroCCredentialsredentials.ui.splash.SplashLoggingFragment
 
 import org.json.JSONException
 import java.nio.file.Paths
