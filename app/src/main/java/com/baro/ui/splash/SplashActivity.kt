@@ -55,7 +55,7 @@ class SplashActivity : AppCompatActivity() {
             val userMetaDataFile = FileHelper.getFileAtPath(userMetaDataPath)
             if (userMetaDataFile != null) {
                 val contentMetaData = FileHelper.readFile(userMetaDataFile)
-                val jsonMetaData = JSONHelper.createJSONFromString(contentMetaData)
+                val jsonMetaData = contentMetaData?.let { JSONHelper.createJSONFromString(it) }
                 return try {
                     User(
                             UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),

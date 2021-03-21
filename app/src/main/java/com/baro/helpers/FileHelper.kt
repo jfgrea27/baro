@@ -54,22 +54,6 @@ object FileHelper {
     }
 
     /**
-     * This method creates a directory at path/to/parentDirectory/directoryName.
-     * @param parentDirectory This is a File object of the parent directory.
-     * @param directoryName This is a String object of the desired directory name.
-     * @return boolean This returns true only if a directory at path/to/parentDirectory/directoryName.
-     * was successfully created/already exists.
-     */
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    fun createDirectory(parentDirectory: File?, directoryName: String?): Boolean {
-        val directoryPath = Paths.get(parentDirectory?.absolutePath, directoryName)
-        val directoryFile = File(directoryPath.toString())
-        return if (!directoryFile.exists()) {
-            directoryFile.mkdirs()
-        } else true
-    }
-
-    /**
      * This method writes data to file.
      * @param file This is the desire file the data will be written to.
      * @param data This is the data to be written to the file.
@@ -122,37 +106,41 @@ object FileHelper {
         return false
     }
 
-    fun writeUriToFile(destination: File?, uri: Uri?, content: ContentResolver?): File? {
+    fun writeUriToFile(destination: File?, uri: Uri?, content: ContentResolver?): Boolean? {
         val file = createFile(destination)
-        var `in`: InputStream? = null
-        `in` = try {
+        var `in`: InputStream? = try {
             uri?.let { content?.openInputStream(it) }
         } catch (e: FileNotFoundException) {
-            e.printStackTrace()
-            return null
+            return false
         }
         return try {
             saveInputStream(`in`, file?.absolutePath)
+            true
         } catch (e: IOException) {
-            e.printStackTrace()
-            null
+            false
         }
     }
 
-    @Throws(IOException::class)
-    private fun saveInputStream(`in`: InputStream?, desiredLocation: String?): File? {
+    private fun saveInputStream(`in`: InputStream?, desiredLocation: String?): Boolean {
         val outputFile = File(desiredLocation)
-        val fos = FileOutputStream(outputFile)
-        copyStream(`in`, fos)
-        return outputFile
+        return try {
+            val fos = FileOutputStream(outputFile)
+            copyStream(`in`, fos)
+        } catch (e: IOException) {
+            false
+        }
     }
 
-    @Throws(IOException::class)
-    private fun copyStream(input: InputStream?, output: OutputStream?) {
+    private fun copyStream(input: InputStream?, output: OutputStream?): Boolean {
         val buffer = ByteArray(1024)
         var bytesRead: Int
-        while (input?.read(buffer).also { bytesRead = it!! } != -1) {
-            output?.write(buffer, 0, bytesRead)
+        return try {
+            while (input?.read(buffer).also { bytesRead = it!! } != -1) {
+                output?.write(buffer, 0, bytesRead)
+            }
+            true
+        } catch (e: IOException) {
+            false
         }
     }
 

@@ -20,7 +20,6 @@ class JSONHelperTest {
     }
 
     @Test
-    @Throws(JSONException::class)
     fun createJSONFromStringShouldReturnJSONObjectWhenValidString() {
         val validJsonString = "{\"key1\": \"value\", \"key2\": 1}"
         val jsonTest = JSONHelper.createJSONFromString(validJsonString)
@@ -30,6 +29,7 @@ class JSONHelperTest {
     }
 
     @Test
+    @Throws(JSONException::class)
     fun createJSONFromStringShouldReturnNullWhenInvalidString() {
         val invalidJsonString = "\"key1\": "
         val jsonTest = JSONHelper.createJSONFromString(invalidJsonString)

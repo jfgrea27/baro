@@ -1,6 +1,8 @@
 package com.baro.helpers
 
+import android.content.ContentResolver
 import android.graphics.Bitmap
+import android.net.Uri
 import mockit.Expectations
 import mockit.Mocked
 import mockit.integration.junit4.JMockit
@@ -59,12 +61,6 @@ class FileHelperTest {
         Assert.assertEquals(outputFile?.absolutePath, "path/to/parent/filename")
     }
 
-    @Test
-    fun createDirectoryShouldReturnTrueIfDirectoryIsCreated() {
-        val parent = File("path/to/parent/directory")
-        val directoryName = "Directory Name"
-        Assert.assertTrue(FileHelper.createDirectory(parent, directoryName))
-    }
 
     @Test
     @Throws(IOException::class)
@@ -158,4 +154,31 @@ class FileHelperTest {
         }
         Assert.assertFalse(FileHelper.writeBitmapToFile(file, bitmap))
     }
+
+    @Test
+    fun writeUriToFileShouldReturnTrueWhenUriIsNotSavedToValidFilePath(
+            @Mocked contentResolver: ContentResolver,
+            @Mocked fis: FileInputStream) {
+
+        // TODO complete this - cannot seem to mock effectively
+    }
+
+    @Test
+    fun writeUriToFileShouldReturnTrueWhenUriIsSavedToInvalidFilePath(
+            @Mocked contentResolver: ContentResolver,
+            @Mocked fis: FileInputStream) {
+
+        // TODO complete this - cannot seem to mock effectively
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun writeUriToFileShouldReturnFalseWhenMethodThrowsIOException(
+            @Mocked contentResolver: ContentResolver,
+            @Mocked fis: FileInputStream) {
+
+        // TODO complete this - cannot seem to mock effectively
+    }
+
+
 }
