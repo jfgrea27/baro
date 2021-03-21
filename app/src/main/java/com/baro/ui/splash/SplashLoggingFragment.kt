@@ -161,6 +161,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         }
     }
 
+    //TODO - Refactor
     @VisibleForTesting
     private val requestPermissionLauncher: ActivityResultLauncher<Array<String?>?>? = registerForActivityResult(RequestMultiplePermissions()) { permissions: MutableMap<String?, Boolean?>? ->
         if (permissions != null) {
@@ -170,6 +171,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         }
     }
 
+    //TODO - Refactor
     private fun handlePermission(permission: String?, isGranted: Boolean) {
         when (permission) {
             Manifest.permission.READ_EXTERNAL_STORAGE -> if (!isGranted) {
@@ -187,12 +189,14 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
             } else {
                 cameraPermission = true
             }
+            // TODO - Remove?
             else -> {
             }
         }
     }
 
-
+    //TODO - Refactor - Check if internet exists - If it does - Can create an account - if not just ask for Image + Username
+    // LATER -- If internet exists - ++ Optional ask for Email and Pwd
     private inner class UserCredentialsSave : AsyncTask<Void?, Void?, Boolean?>() {
         @RequiresApi(api = Build.VERSION_CODES.P)
         override fun doInBackground(vararg voids: Void?): Boolean? {
