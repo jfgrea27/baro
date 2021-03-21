@@ -25,6 +25,7 @@ import org.json.JSONException
 import org.junit.*
 import org.junit.runner.RunWith
 import java.io.File
+import java.lang.Thread.sleep
 import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 
@@ -51,7 +52,7 @@ class ShareActivityNewLoggingTest {
     @Test
     @Throws(JSONException::class)
     fun createUserCredentialsShouldPassIfCredentialsWereSaved() {
-        mySleep(3)
+        sleep(SplashActivity.SPLASH_TIME_OUT.toLong())
         val appCompatEditText = Espresso.onView(
                 Matchers.allOf(ViewMatchers.withId(R.id.edit_text_username),
                         childAtPosition(
@@ -110,7 +111,7 @@ class ShareActivityNewLoggingTest {
     @Test
     @Throws(JSONException::class)
     fun createUserShouldNotCreateUserIfCredentialsAreNotStrongEnough() {
-        mySleep(3)
+        sleep(SplashActivity.SPLASH_TIME_OUT.toLong())
         val appCompatEditText = Espresso.onView(
                 Matchers.allOf(ViewMatchers.withId(R.id.edit_text_username),
                         childAtPosition(
@@ -175,14 +176,6 @@ class ShareActivityNewLoggingTest {
 //    }
 
     companion object {
-        @Ignore
-        fun mySleep(`val`: Int) {
-            try {
-                TimeUnit.SECONDS.sleep(`val`.toLong())
-            } catch (e: InterruptedException) {
-                Log.e("SleepError", "Thread interrupted")
-            }
-        }
 
         private fun childAtPosition(
                 parentMatcher: Matcher<View?>?, position: Int): Matcher<View?>? {

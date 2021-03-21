@@ -135,7 +135,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
     }
 
     // Permissions
-    fun checkCameraPermissions() {
+    private fun checkCameraPermissions() {
         val permissionsToBeGranted = ArrayList<String?>()
         if (ContextCompat.checkSelfPermission(
                         requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) !=
@@ -243,14 +243,6 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         }
     }
 
-    companion object {
-        fun newInstance(): SplashLoggingFragment? {
-            val fragment = SplashLoggingFragment()
-            val args = Bundle()
-            fragment.arguments = args
-            return fragment
-        }
-    }
 }
 
 
