@@ -6,13 +6,14 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.baro.AccountActivity
 import com.baro.R
+import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
 import com.baro.helpers.FileHelper
@@ -27,6 +28,7 @@ import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var welcomeTextView: TextView
     private lateinit var accountButton: ImageButton
     private lateinit var shareButton: ImageButton
     private lateinit var createButton: ImageButton
@@ -39,18 +41,27 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Gets user
+        user = intent.getParcelableExtra(AppTags.USER_OBJECT.name)
+
         configureAccountButton()
         configureShareButton()
         configureCreateButton()
         configureLearnButton()
-
+        configurWelcomeTextView()
         updateUserInfo()
     }
 
+    private fun configurWelcomeTextView() {
+        welcomeTextView = findViewById<TextView>(R.id.text_account)
+    }
+
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun updateUserInfo() {
-        var userCredentialsRetrieve = UserCredentialsRetrieve()
-        userCredentialsRetrieve.execute()
+        var userRetrieveThumbnail = UserCredentialsRetrieve()
+        userRetrieveThumbnail.execute()
     }
 
     private fun configureLearnButton() {
@@ -97,9 +108,6 @@ class MainActivity : AppCompatActivity() {
     private inner class UserCredentialsRetrieve : AsyncTask<Void?, Void?, Boolean?>() {
         @RequiresApi(api = Build.VERSION_CODES.O)
         override fun doInBackground(vararg voids: Void?): Boolean? {
-            // Retrieve the Meta information
-            user = retrieveUserCredentials()
-            // Retrieve Thumbnail URI
             val uri = retrieveThumbnailUri()
             if (uri != null) {
                 thumbnailUri = uri
@@ -114,6 +122,9 @@ class MainActivity : AppCompatActivity() {
                     val source = ImageDecoder.createSource(contentResolver, thumbnailUri!!)
                     val bitmap = ImageDecoder.decodeBitmap(source)
                     accountButton.setImageBitmap(bitmap)
+                }
+                if (user != null) {
+                    welcomeTextView.text = "Welcome "+ user!!.getUsername()
                 }
             } else {
                 Toast.makeText(this@MainActivity, R.string.error_retrieving_credentials, Toast.LENGTH_LONG).show()

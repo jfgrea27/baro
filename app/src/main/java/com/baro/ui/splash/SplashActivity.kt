@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 
 import com.baro.R
+import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
 import com.baro.helpers.FileHelper
@@ -69,13 +70,13 @@ class SplashActivity : AppCompatActivity() {
 
         override fun onPostExecute(result: User?) {
             if (result != null) {
-                Toast.makeText(this@SplashActivity,
-                        getString(R.string.toast_logging_in_user) + result.getUsername(),
-                        Toast.LENGTH_LONG)
-                        .show()
+                
                 val startMainActivity = Intent(
                         this@SplashActivity,
                         MainActivity::class.java)
+                
+                startMainActivity.putExtra(AppTags.USER_OBJECT.name, result)
+                
                 startActivity(startMainActivity)
                 finish()
             } else {

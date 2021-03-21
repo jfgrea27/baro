@@ -27,12 +27,12 @@ class AccountActivity : AppCompatActivity() {
     }
 
     private fun configureAccountButton() {
-        accountButton = findViewById<ImageButton?>(R.id.btn_account)
-        accountButton.setOnClickListener(View.OnClickListener { v: View? -> })
+        accountButton = findViewById(R.id.btn_account)
+        accountButton.setOnClickListener({ })
     }
 
     private fun configureFollowersButton() {
-        followersButton = findViewById<ImageButton?>(R.id.btn_followers)
+        followersButton = findViewById(R.id.btn_followers)
         followersButton.setOnClickListener(View.OnClickListener { v: View? -> })
     }
 
