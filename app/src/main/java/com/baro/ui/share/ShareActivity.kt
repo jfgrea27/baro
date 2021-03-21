@@ -2,7 +2,6 @@ package com.baro.ui.share
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 
@@ -20,19 +19,19 @@ class ShareActivity : AppCompatActivity() {
 
     private fun configureInternetButton() {
         internetButton = findViewById(R.id.btn_internet)
-        internetButton.setOnClickListener(View.OnClickListener { v: View? ->
-            val intentUploadActivity = Intent(this@ShareActivity,
-                    UploadActivity::class.java)
-            startActivity(intentUploadActivity)
-        })
+        internetButton.setOnClickListener{
+            val intent = Intent(this, UploadActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun configureLocalButton() {
-        localButton = findViewById<ImageButton?>(R.id.btn_local)
-        localButton.setOnClickListener(View.OnClickListener { v: View? ->
-            val intentSendReceiveActivity = Intent(this@ShareActivity,
-                    SendReceiveActivity::class.java)
-            startActivity(intentSendReceiveActivity)
-        })
+        localButton = findViewById(R.id.btn_local)
+        localButton.setOnClickListener{
+            val intent = Intent(this, SendReceiveActivity::class.java)
+            startActivity(intent)
+        }
+
+
     }
 }
