@@ -12,6 +12,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.rule.ActivityTestRule
 import com.baro.R
+import com.baro.ui.main.MainActivity
 import com.baro.ui.splash.SplashActivity
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -20,35 +21,28 @@ import org.hamcrest.TypeSafeMatcher
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.lang.Thread.sleep
 import java.util.concurrent.TimeUnit
 
 @LargeTest
 @RunWith(AndroidJUnit4ClassRunner::class)
 class ShareActivityTest {
     @get:Rule
-    var mActivityTestRule: ActivityTestRule<SplashActivity?>? = ActivityTestRule(SplashActivity::class.java)
+    var mActivityTestRule: ActivityTestRule<MainActivity?>? = ActivityTestRule(MainActivity::class.java)
 
     @Test
     fun shareActivityTest() {
-        var shareDoesNotExist = true
-        while (shareDoesNotExist) {
-            shareDoesNotExist = try {
-                mySleep(5)
-                val attemptClick = Espresso.onView(
-                        Matchers.allOf(ViewMatchers.withId(R.id.btn_share),
+
+        val attemptClick = Espresso.onView(
+                Matchers.allOf(ViewMatchers.withId(R.id.btn_share),
+                        childAtPosition(
                                 childAtPosition(
-                                        childAtPosition(
-                                                ViewMatchers.withId(android.R.id.content),
-                                                0),
-                                        1),
-                                ViewMatchers.isDisplayed()))
-                attemptClick.perform(ViewActions.click())
-                false
-            } catch (e: NoMatchingViewException) {
-                mySleep(1)
-                return
-            }
-        }
+                                        ViewMatchers.withId(android.R.id.content),
+                                        0),
+                                1),
+                        ViewMatchers.isDisplayed()))
+        attemptClick.perform(ViewActions.click())
+
         val imageButton = Espresso.onView(
                 Matchers.allOf(ViewMatchers.withId(R.id.btn_internet),
                         ViewMatchers.withParent(ViewMatchers.withParent(ViewMatchers.withId(android.R.id.content))),
@@ -98,7 +92,6 @@ class ShareActivityTest {
                         ViewMatchers.isDisplayed()))
         appCompatImageButton4.perform(ViewActions.click())
         Espresso.pressBack()
-        println("Reached Send")
         val appCompatImageButton5 = Espresso.onView(
                 Matchers.allOf(ViewMatchers.withId(R.id.btn_send),
                         childAtPosition(
@@ -111,13 +104,6 @@ class ShareActivityTest {
     }
 
     companion object {
-        fun mySleep(`val`: Int) {
-            try {
-                TimeUnit.SECONDS.sleep(`val`.toLong())
-            } catch (e: InterruptedException) {
-                Log.e("SleepError", "Thread interrupted")
-            }
-        }
 
         private fun childAtPosition(
                 parentMatcher: Matcher<View?>?, position: Int): Matcher<View?>? {
