@@ -78,7 +78,7 @@ class SplashActivityAlreadyLoggedInUserTest {
                 FileEnum.META_DATA_FILE.key)
         val userMetaFile = File(userDirectoryPath.toString())
         val content = FileHelper.readFile(userMetaFile)
-        val jsonObject = JSONHelper.createJSONFromString(content)
+        val jsonObject = content?.let { JSONHelper.createJSONFromString(it) }
         Assert.assertEquals(jsonObject!![JSONEnum.USER_NAME_KEY.key], "valid_username")
         Assert.assertEquals(jsonObject!![JSONEnum.USER_UUID_KEY.key], VALID_UUID)
     }

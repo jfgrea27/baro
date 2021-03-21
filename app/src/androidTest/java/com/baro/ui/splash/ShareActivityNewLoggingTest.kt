@@ -102,7 +102,7 @@ class ShareActivityNewLoggingTest {
                 FileEnum.META_DATA_FILE.key)
         val userMetaFile = File(userDirectoryPath.toString())
         val content = FileHelper.readFile(userMetaFile)
-        val jsonObject = JSONHelper.createJSONFromString(content)
+        val jsonObject = content?.let { JSONHelper.createJSONFromString(it) }
         Assert.assertEquals(jsonObject?.get(JSONEnum.USER_NAME_KEY.key), "valid_username")
         Assert.assertNotNull(jsonObject?.get(JSONEnum.USER_UUID_KEY.key))
     }
