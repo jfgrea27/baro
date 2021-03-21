@@ -31,7 +31,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var welcomeTextView: TextView
     private lateinit var accountButton: ImageButton
     private lateinit var shareButton: ImageButton
-    private lateinit var createButton: ImageButton
     private lateinit var learnButton: ImageButton
 
     private var user: User? = null
@@ -47,7 +46,6 @@ class MainActivity : AppCompatActivity() {
 
         configureAccountButton()
         configureShareButton()
-        configureCreateButton()
         configureLearnButton()
         configurWelcomeTextView()
         updateUserInfo()
@@ -82,16 +80,6 @@ class MainActivity : AppCompatActivity() {
                     this@MainActivity,
                     AccountActivity::class.java)
             startActivity(intentAccountActivity)
-        }
-    }
-
-    private fun configureCreateButton() {
-        createButton = findViewById(R.id.btn_create)
-        createButton.setOnClickListener {
-            val intentCreateCourse = Intent(
-                    this@MainActivity,
-                    CreateActivity::class.java)
-            startActivity(intentCreateCourse)
         }
     }
 

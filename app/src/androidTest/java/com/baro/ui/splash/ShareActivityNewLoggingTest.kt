@@ -90,11 +90,6 @@ class ShareActivityNewLoggingTest {
                         ViewMatchers.withParent(ViewMatchers.withParent(ViewMatchers.withId(android.R.id.content))),
                         ViewMatchers.isDisplayed()))
         imageButton2.check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
-        val imageButton3 = Espresso.onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.btn_create),
-                        ViewMatchers.withParent(ViewMatchers.withParent(ViewMatchers.withId(android.R.id.content))),
-                        ViewMatchers.isDisplayed()))
-        imageButton3.check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
 
         // File System
         val userDirectoryPath = Paths.get(
@@ -149,11 +144,7 @@ class ShareActivityNewLoggingTest {
                         ViewMatchers.withParent(ViewMatchers.withParent(ViewMatchers.withId(android.R.id.content))),
                         ViewMatchers.isDisplayed()))
         imageButton2.check(ViewAssertions.doesNotExist())
-        val imageButton3 = Espresso.onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.btn_create),
-                        ViewMatchers.withParent(ViewMatchers.withParent(ViewMatchers.withId(android.R.id.content))),
-                        ViewMatchers.isDisplayed()))
-        imageButton3.check(ViewAssertions.doesNotExist())
+
 
         // File System
         val userMetaFile = Paths.get(

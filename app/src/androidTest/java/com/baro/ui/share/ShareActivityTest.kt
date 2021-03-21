@@ -33,15 +33,7 @@ class ShareActivityTest {
     @Test
     fun shareActivityTest() {
 
-        val attemptClick = Espresso.onView(
-                Matchers.allOf(ViewMatchers.withId(R.id.btn_share),
-                        childAtPosition(
-                                childAtPosition(
-                                        ViewMatchers.withId(android.R.id.content),
-                                        0),
-                                1),
-                        ViewMatchers.isDisplayed()))
-        attemptClick.perform(ViewActions.click())
+        Espresso.onView(ViewMatchers.withId(R.id.btn_share)).perform(ViewActions.click())
 
         val imageButton = Espresso.onView(
                 Matchers.allOf(ViewMatchers.withId(R.id.btn_internet),
