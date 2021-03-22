@@ -41,6 +41,9 @@ dependencies {
     implementation "androidx.fragment:fragment:+"
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.activity:activity:+"
+    apply plugin: 'com.android.application'
+    apply plugin: 'kotlin-android'
+    apply plugin: 'kotlin-android-extensions'
     apply plugin: 'org.jetbrains.kotlin.android.extensions'
 
     testImplementation "junit:junit:4.+"
