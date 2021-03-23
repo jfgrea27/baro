@@ -2,6 +2,7 @@ package com.baro.constants
 
 
 enum class IntentEnum(val key: String?) {
-    USER("user");
+    USER("user"),
+    COURSE("course");
 
 }

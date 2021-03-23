@@ -10,6 +10,8 @@ enum class FileEnum(// TODO Add more Enums as required.
     COURSE_DIRECTORY("course"),
     META_DATA_FILE("meta-data.json"),
     PHOTO_THUMBNAIL_FILE("photo-thumbnail.jpeg"),
-    DOWNLOAD_DIRECTORY("download")
+    DOWNLOAD_DIRECTORY("download"),
+    VIDEO_EXTENSION(".3peg");
+
 
 }

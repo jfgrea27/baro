@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Baro">
-        <activity android:name=".ui.learn.LearnActivity"></activity>
+        <activity android:name=".ui.create.CreateSlideActivity"></activity>
+        <activity android:name=".ui.learn.LearnActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
