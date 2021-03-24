@@ -3,7 +3,6 @@ package com.baro.helpers
 import android.os.AsyncTask
 import android.os.Build
 import androidx.annotation.RequiresApi
-
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
 import com.baro.models.User
@@ -11,13 +10,15 @@ import java.io.File
 import java.nio.file.Paths
 import java.util.*
 
-class CredentialsHelper  {
+
+class AsyncHelpers {
     /**
      * With this class you can call the following methods:
      */
 
-    class VerifyUserCredentials : AsyncTask<File?, Void?, User?>() {
+    class VerifyUserCredentials(private var callback: OnUserCheckComplete) : AsyncTask<File?, Void?, User?>() {
         @RequiresApi(api = Build.VERSION_CODES.O)
+
 
         override fun doInBackground(vararg externalFilesDir: File?): User? {
 
@@ -52,6 +53,10 @@ class CredentialsHelper  {
                 }
             }
             return user
+        }
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun onPostExecute(result: User?) {
+            callback.onTaskDone(result)
         }
 
     }
