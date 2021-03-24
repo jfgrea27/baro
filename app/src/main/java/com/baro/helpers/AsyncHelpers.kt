@@ -1,11 +1,20 @@
 package com.baro.helpers
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.ImageDecoder
+import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import com.baro.R
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
+import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
+import com.baro.helpers.interfaces.OnUserLoginCheckComplete
 import com.baro.models.User
+import com.baro.ui.main.MainActivity
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
@@ -14,9 +23,10 @@ import java.util.*
 class AsyncHelpers {
     /**
      * With this class you can call the following methods:
+     * VerifyUserCredentials(callback)
      */
 
-    class VerifyUserCredentials(private var callback: OnUserCheckComplete) : AsyncTask<File?, Void?, User?>() {
+    class VerifyUserCredentials(private var callback: OnUserLoginCheckComplete) : AsyncTask<File?, Void?, User?>() {
         @RequiresApi(api = Build.VERSION_CODES.O)
 
 
@@ -56,8 +66,54 @@ class AsyncHelpers {
         }
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onPostExecute(result: User?) {
-            callback.onTaskDone(result)
+            callback.onUserLoginCheckDone(result)
         }
+
+    }
+    class UserCredentialsSave(private var callback: OnUserCredentialsSaveComplete) : AsyncTask<Context, Void?, Boolean?>() {
+        @RequiresApi(api = Build.VERSION_CODES.P)
+
+        override fun doInBackground(vararg context: Context): Boolean {
+            // Save the Meta information
+            saveCredentials(callback.getUsername(), callback.getPath())
+            // Save Photo URI
+            savePhotoUri(callback.getPhotoUri(), context[0])
+            return true
+        }
+
+
+        override fun onPostExecute(result: Boolean?) {
+            callback.onUserCredentialsSaveDone(result)
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        private fun saveCredentials(username: String, path: String) {
+            val credentialDetails = HashMap<String?, String?>()
+            val userUUID = UUID.randomUUID()
+            credentialDetails[JSONEnum.USER_NAME_KEY.key] = username
+            credentialDetails[JSONEnum.USER_UUID_KEY.key] = userUUID.toString()
+            val jsonCredentials = JSONHelper.createJSONFromHashMap(credentialDetails)
+            val userMetaDataPath = Paths.get(path,
+                    FileEnum.USER_DIRECTORY.key,
+                    FileEnum.META_DATA_FILE.key)
+            val userMetaDataFile = FileHelper.createFileAtPath(userMetaDataPath)
+            FileHelper.writeToFile(userMetaDataFile, jsonCredentials.toString())
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.P)
+        private fun savePhotoUri(photoUri:Uri?, context:Context) {
+            if (photoUri != null) {
+
+                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, photoUri))
+                val userThumbnailPicturePath = Paths.get(context.getExternalFilesDir(null).toString(),
+                        FileEnum.USER_DIRECTORY.key,
+                        FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                val file = File(userThumbnailPicturePath.toString())
+
+                FileHelper.writeBitmapToFile(file, bitmap)
+            }
+        }
+
 
     }
 

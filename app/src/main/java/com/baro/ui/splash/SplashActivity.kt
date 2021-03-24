@@ -11,12 +11,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.baro.R
 import com.baro.constants.AppTags
 import com.baro.helpers.*
+import com.baro.helpers.interfaces.OnUserLoginCheckComplete
 import com.baro.models.User
 import com.baro.ui.main.MainActivity
 
-import java.util.*
-
-class SplashActivity : AppCompatActivity(), OnUserCheckComplete {
+class SplashActivity : AppCompatActivity(), OnUserLoginCheckComplete {
 
     private var progressBar: ProgressBar? = null
 
@@ -44,7 +43,7 @@ class SplashActivity : AppCompatActivity(), OnUserCheckComplete {
     }
 
 
-    override fun onTaskDone(result: User?) {
+    override fun onUserLoginCheckDone(result: User?) {
         if (result != null) {
 
             val startMainActivity = Intent(
