@@ -1,4 +1,4 @@
-package com.baroCCredentialsredentials.ui.splash
+package com.baro.ui.splash
 
 import android.Manifest
 import android.content.Intent
@@ -80,6 +80,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         photoThumbnailButton.setImageURI(uri)
     }
 
+    //implement
     @RequiresApi(Build.VERSION_CODES.O)
     private var getCameraContent: ActivityResultLauncher<Uri?>? = registerForActivityResult(
             TakePicture()
