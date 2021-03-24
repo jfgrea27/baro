@@ -80,7 +80,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         photoThumbnailButton.setImageURI(uri)
     }
 
-    //implement
+    //TODO - Implement as Helper - Add Permission Check
     @RequiresApi(Build.VERSION_CODES.O)
     private var getCameraContent: ActivityResultLauncher<Uri?>? = registerForActivityResult(
             TakePicture()
