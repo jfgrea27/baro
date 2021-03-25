@@ -2,22 +2,18 @@ package com.baro.helpers
 
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
-import com.baro.R
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
 import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
 import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.helpers.interfaces.OnUserLoginCheckComplete
 import com.baro.models.User
-import com.baro.ui.main.MainActivity
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
@@ -131,7 +127,8 @@ class AsyncHelpers {
                 val imageBmp = ImageDecoder.decodeBitmap(source)
                 return LoadUserDataResponse(username, imageBmp)
             }
-            return LoadUserDataResponse(user?.getUsername(),null)
+            else if (user?.getUsername() != null){ return LoadUserDataResponse(user.getUsername(),null)}
+            else { return null }
         }
 
             @RequiresApi(Build.VERSION_CODES.P)

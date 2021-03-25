@@ -1,6 +1,5 @@
 package com.baro.ui.account
 
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ImageView

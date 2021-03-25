@@ -3,9 +3,7 @@ package com.baro.ui.splash
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,16 +24,13 @@ import com.baro.R
 import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
-import com.baro.constants.JSONEnum
 import com.baro.dialogs.ImageDialog
 import com.baro.dialogs.ImageDialog.OnInputListener
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
-import com.baro.helpers.JSONHelper
 import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
 import com.baro.ui.main.MainActivity
 
-import java.io.File
 import java.nio.file.Paths
 import java.util.*
 

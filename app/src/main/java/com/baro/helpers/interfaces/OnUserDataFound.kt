@@ -1,6 +1,5 @@
 package com.baro.helpers.interfaces
 
-import android.graphics.Bitmap
 import com.baro.helpers.AsyncHelpers
 
 interface OnUserDataFound {
