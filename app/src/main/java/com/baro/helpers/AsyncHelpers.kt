@@ -120,23 +120,26 @@ class AsyncHelpers {
 
 
     }
-    class LoadUserData(private var callback: OnUserDataFound) : AsyncTask<LoadUserData.TaskParams, Void?, Bitmap?>() {
+    class LoadUserData(private var callback: OnUserDataFound) : AsyncTask<LoadUserData.TaskParams, Void?, LoadUserData.LoadUserDataResponse?>() {
         @RequiresApi(Build.VERSION_CODES.P)
-        override fun doInBackground(vararg params: TaskParams?): Bitmap? {
+        override fun doInBackground(vararg params: TaskParams?): LoadUserDataResponse? {
             val user = params[0]?.user
             val contentResolver = params[0]?.contentResolver
             if (user?.getThumbnailFile() != null) {
                 val source = ImageDecoder.createSource(contentResolver!!, Uri.fromFile(user.getThumbnailFile()))
-                return ImageDecoder.decodeBitmap(source)
+                val username = user.getUsername()
+                val imageBmp = ImageDecoder.decodeBitmap(source)
+                return LoadUserDataResponse(username, imageBmp)
             }
             return null
         }
 
             @RequiresApi(Build.VERSION_CODES.P)
-            override fun onPostExecute(result: Bitmap?) {
+            override fun onPostExecute(result: LoadUserDataResponse?) {
                callback.onDataReturned(result)
             }
         class TaskParams(var user: User?, var contentResolver: ContentResolver)
+        class LoadUserDataResponse(var username: String?, var imageBmp: Bitmap?)
         }
 
 

@@ -76,8 +76,9 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound {
         // TODO Gridview that holds the Courses
     }
 
-    override fun onDataReturned(imageBmp: Bitmap?) {
+    override fun onDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
         if (user != null) {
+            val imageBmp = userData?.imageBmp
             if (imageBmp != null) {
                 userThumbnailImageView.setImageBitmap(imageBmp)
             }
