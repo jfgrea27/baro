@@ -131,7 +131,7 @@ class AsyncHelpers {
                 val imageBmp = ImageDecoder.decodeBitmap(source)
                 return LoadUserDataResponse(username, imageBmp)
             }
-            return null
+            return LoadUserDataResponse(user?.getUsername(),null)
         }
 
             @RequiresApi(Build.VERSION_CODES.P)
