@@ -1,7 +1,9 @@
 package com.baro.helpers
 
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.AsyncTask
@@ -12,6 +14,7 @@ import com.baro.R
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
 import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
+import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.helpers.interfaces.OnUserLoginCheckComplete
 import com.baro.models.User
 import com.baro.ui.main.MainActivity
@@ -25,6 +28,7 @@ class AsyncHelpers {
      * With this class you can call the following methods:
      * VerifyUserCredentials(callback)
      */
+
 
     class VerifyUserCredentials(private var callback: OnUserLoginCheckComplete) : AsyncTask<File?, Void?, User?>() {
         @RequiresApi(api = Build.VERSION_CODES.O)
@@ -116,5 +120,26 @@ class AsyncHelpers {
 
 
     }
+    class LoadUserData(private var callback: OnUserDataFound) : AsyncTask<LoadUserData.TaskParams, Void?, Bitmap?>() {
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun doInBackground(vararg params: TaskParams?): Bitmap? {
+            val user = params[0]?.user
+            val contentResolver = params[0]?.contentResolver
+            if (user?.getThumbnailFile() != null) {
+                val source = ImageDecoder.createSource(contentResolver!!, Uri.fromFile(user.getThumbnailFile()))
+                return ImageDecoder.decodeBitmap(source)
+            }
+            return null
+        }
 
-}
+            @RequiresApi(Build.VERSION_CODES.P)
+            override fun onPostExecute(result: Bitmap?) {
+               callback.onDataReturned(result)
+            }
+        class TaskParams(var user: User?, var contentResolver: ContentResolver)
+        }
+
+
+
+
+    }
