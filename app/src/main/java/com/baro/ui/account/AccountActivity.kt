@@ -1,24 +1,18 @@
 package com.baro.ui.account
 
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.AsyncTask
-import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.baro.R
 import com.baro.constants.AppTags
+import com.baro.helpers.AsyncHelpers
+import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.models.User
 
 
-class AccountActivity : AppCompatActivity() {
+class AccountActivity : AppCompatActivity(), OnUserDataFound {
     // UI
     private lateinit var userThumbnailImageView: ImageView
     private lateinit var followersButton: ImageButton
@@ -44,13 +38,11 @@ class AccountActivity : AppCompatActivity() {
         configureRecycleView()
 
         // Update UI with User Credentials
-        updateUserInfo()
+        val loadUserDataParams = AsyncHelpers.LoadUserData.TaskParams(user, this.contentResolver)
+        val userRetrieveThumbnail = AsyncHelpers.LoadUserData(this)
+        userRetrieveThumbnail.execute(loadUserDataParams)
     }
 
-    private fun updateUserInfo() {
-        var userRetrieveThumbnail = LoadUserData()
-        userRetrieveThumbnail.execute()
-    }
 
 
     private fun configureCreateButton() {
@@ -83,28 +75,14 @@ class AccountActivity : AppCompatActivity() {
         // TODO Gridview that holds the Courses
     }
 
-
-
-    // TODO __ASYNC_REFACTOR__
-    private inner class LoadUserData : AsyncTask<Void?, Void?, Bitmap?>() {
-        @RequiresApi(api = Build.VERSION_CODES.P)
-        override fun doInBackground(vararg voids: Void?): Bitmap? {
-            if (user?.getThumbnailFile() != null) {
-                val source = ImageDecoder.createSource(contentResolver, Uri.fromFile(user?.getThumbnailFile()))
-                return ImageDecoder.decodeBitmap(source)
+    override fun onDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
+        if (user != null) {
+            val imageBmp = userData?.imageBmp
+            if (imageBmp != null) {
+                userThumbnailImageView.setImageBitmap(imageBmp)
             }
-            return null
-        }
-
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(result: Bitmap?) {
-            if (user != null) {
-                if (result != null) {
-                    userThumbnailImageView.setImageBitmap(result)
-                }
-            }
-
         }
     }
+
 
 }

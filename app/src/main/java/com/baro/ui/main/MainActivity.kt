@@ -1,10 +1,7 @@
 package com.baro.ui.main
 
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.widget.ImageButton
@@ -15,13 +12,15 @@ import androidx.appcompat.app.AppCompatActivity
 import com.baro.ui.account.AccountActivity
 import com.baro.R
 import com.baro.constants.AppTags
+import com.baro.helpers.AsyncHelpers
+import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.models.User
 import com.baro.ui.learn.LearnActivity
 import com.baro.ui.share.ShareActivity
 import java.util.*
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), OnUserDataFound {
     private lateinit var welcomeTextView: TextView
     private lateinit var accountButton: ImageButton
     private lateinit var shareButton: ImageButton
@@ -45,7 +44,9 @@ class MainActivity : AppCompatActivity() {
         configurWelcomeTextView()
 
         // Update UI with User Credentials
-        updateUserInfo()
+        val loadUserDataParams = AsyncHelpers.LoadUserData.TaskParams(user, this.contentResolver)
+        val userRetrieveThumbnail = AsyncHelpers.LoadUserData(this)
+        userRetrieveThumbnail.execute(loadUserDataParams)
     }
 
     private fun configurWelcomeTextView() {
@@ -53,11 +54,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun updateUserInfo() {
-        var userRetrieveThumbnail = LoadUserData()
-        userRetrieveThumbnail.execute()
-    }
 
     private fun configureLearnButton() {
         learnButton = findViewById(R.id.btn_learn)
@@ -97,27 +93,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // TODO __ASYNC_REFACTOR__
-    private inner class LoadUserData : AsyncTask<Void?, Void?, Bitmap?>() {
-        @RequiresApi(api = Build.VERSION_CODES.P)
-        override fun doInBackground(vararg voids: Void?): Bitmap? {
-            if (user?.getThumbnailFile() != null) {
-                val source = ImageDecoder.createSource(contentResolver, Uri.fromFile(user?.getThumbnailFile()))
-                return ImageDecoder.decodeBitmap(source)
-            }
-            return null
-        }
 
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(result: Bitmap?) {
-            if (user != null) {
-                welcomeTextView.text = "Welcome "+ user!!.getUsername()
-                if (result != null) {
-                    accountButton.setImageBitmap(result)
-                }
-            } else {
-                Toast.makeText(this@MainActivity, R.string.error_retrieving_credentials, Toast.LENGTH_LONG).show()
+
+
+    override fun onDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
+        val username = userData?.username
+        val imageBmp = userData?.imageBmp
+        if (user != null) {
+            welcomeTextView.text = "Welcome "+ username
+            if (imageBmp != null) {
+                accountButton.setImageBitmap(imageBmp)
             }
+        } else {
+            Toast.makeText(this@MainActivity, R.string.error_retrieving_credentials, Toast.LENGTH_LONG).show()
         }
     }
 
