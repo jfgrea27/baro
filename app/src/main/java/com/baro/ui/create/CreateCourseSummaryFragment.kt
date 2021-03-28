@@ -1,5 +1,6 @@
 package com.baro.ui.create
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -20,15 +21,18 @@ import androidx.core.content.FileProvider
 import com.baro.R
 import com.baro.constants.*
 import com.baro.dialogs.ImageDialog
+import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
+import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.models.Course
 import java.io.File
+import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.time.LocalDate
 import java.util.*
 
 
-class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener {
+class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete {
 
     // UI
     private lateinit var courseTitleEditText: EditText
@@ -100,8 +104,10 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener {
                 course.setCourseCategory(CategoryEnum.AGRICULTURE)
                 course.setCourseLanguage(LanguageEnum.ENGLISH)
 
-                val saveCourseData = SaveCourseData()
-                saveCourseData.execute(course)
+                val weakContext = WeakReference<Context>(context)
+                val courseCredentialsSave = AsyncHelpers.CourseCredentialsSave(this, weakContext)
+                val taskParams = AsyncHelpers.CourseCredentialsSave.TaskParams(course, thumbnailUri)
+                courseCredentialsSave.execute(taskParams)
 
             } else {
                 Toast.makeText(context, getString(R.string.lenght_course_name_warning_toast), Toast.LENGTH_LONG).show()
@@ -158,69 +164,16 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener {
                 }
     }
 
+    override fun onDataReturned(result: Boolean?) {
+        if (result == true) {
+            val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
 
-    // TODO __ASYNC_REFACTOR__
-    private inner class SaveCourseData : AsyncTask<Course?, Void?, Course?>() {
-        @RequiresApi(api = Build.VERSION_CODES.P)
-        override fun doInBackground(vararg courses: Course?): Course? {
-            val course = courses[0]
+            intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
 
-            val courseMetadata = HashMap<String?, String?>()
-
-            courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUserUUID().toString()
-            courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
-            courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
-            courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course?.getCourseLanguage()?.name
-            courseMetadata[JSONEnum.COURSE_CATEGORY.key] = course?.getCourseCategory()?.name
-
-            val courseMetaDataPath = Paths.get(
-                    activity?.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.COURSE_DIRECTORY.key,
-                    course?.getCourseUUID().toString(),
-                    FileEnum.META_DATA_FILE.key
-            )
-
-            val courseMetaDataFile = FileHelper.createFileAtPath(courseMetaDataPath)
-
-
-            FileHelper.writeToFile(courseMetaDataFile, courseMetadata.toString())
-
-
-
-            if (thumbnailUri != null) {
-                val courseThumbanilPath = Paths.get(
-                        activity?.getExternalFilesDir(null).toString(),
-                        FileEnum.USER_DIRECTORY.key,
-                        FileEnum.COURSE_DIRECTORY.key,
-                        course?.getCourseUUID().toString(),
-                        FileEnum.PHOTO_THUMBNAIL_FILE.key
-                )
-
-
-                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(requireContext().contentResolver, thumbnailUri!!))
-                val file = File(courseThumbanilPath.toString())
-                FileHelper.writeBitmapToFile(file, bitmap)
-                course?.setThumbnailFile(file)
-            }
-
-            course?.setUpdateDate(LocalDate.now())
-            return course
-        }
-
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(result: Course?) {
-            if (result != null) {
-
-                val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
-
-                intentToSlideActivity.putExtra(IntentEnum.COURSE.key, result)
-
-                activity?.supportFragmentManager?.beginTransaction()
-                        ?.remove(this@CreateCourseSummaryFragment)
-                        ?.commit()
-                startActivity(intentToSlideActivity)
-            }
+            activity?.supportFragmentManager?.beginTransaction()
+                    ?.remove(this@CreateCourseSummaryFragment)
+                    ?.commit()
+            startActivity(intentToSlideActivity)
         }
     }
 }

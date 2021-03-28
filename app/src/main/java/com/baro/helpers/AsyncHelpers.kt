@@ -10,12 +10,14 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
-import com.baro.helpers.interfaces.OnUriSavedComplete
+import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
 import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.helpers.interfaces.OnUserLoginCheckComplete
+import com.baro.models.Course
 import com.baro.models.User
 import java.io.File
+import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
 
@@ -26,6 +28,7 @@ class AsyncHelpers {
      * VerifyUserCredentials(callback)
      */
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
 
     class VerifyUserCredentials(private var callback: OnUserLoginCheckComplete) : AsyncTask<File?, Void?, User?>() {
         @RequiresApi(api = Build.VERSION_CODES.O)
@@ -73,9 +76,10 @@ class AsyncHelpers {
 
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     class UserCredentialsSave(private var callback: OnUserCredentialsSaveComplete) : AsyncTask<Context, Void?, Boolean?>() {
         @RequiresApi(api = Build.VERSION_CODES.P)
-
         override fun doInBackground(vararg context: Context): Boolean {
             // Save the Meta information
             saveCredentials(callback.getUsername(), callback.getPath())
@@ -120,6 +124,8 @@ class AsyncHelpers {
 
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     class LoadUserData(private var callback: OnUserDataFound) : AsyncTask<LoadUserData.TaskParams, Void?, LoadUserData.LoadUserDataResponse?>() {
         @RequiresApi(Build.VERSION_CODES.P)
         override fun doInBackground(vararg params: TaskParams?): LoadUserDataResponse? {
@@ -146,21 +152,77 @@ class AsyncHelpers {
         class LoadUserDataResponse(var username: String?, var imageBmp: Bitmap?)
     }
 
-    class SaveUriToPath(private var callback: OnUriSavedComplete) : AsyncTask<SaveUriToPath.TaskParams, Void?, SaveUriToPath.OnUriSaved?>() {
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun doInBackground(vararg params: TaskParams?): OnUriSaved {
-            val imageFile = params[0]?.imageFile
-            val uri = params[0]?.uri
-            val contentResolver = params[0]?.contentResolver
 
-            return OnUriSaved(FileHelper.writeUriToFile(imageFile, uri, contentResolver)!!)
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    class CourseCredentialsSave(private var callback: OnCourseCredentialsSaveComplete, private var context: WeakReference<Context>) : AsyncTask<CourseCredentialsSave.TaskParams, Void?, Boolean?>() {
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun doInBackground(vararg params: TaskParams?): Boolean? {
+            // Save the Meta information
+            val course = params[0]?.course
+            val imageUri = params[0]?.imageUri
+
+            if (course != null) {
+                saveCredentials(course)
+            }
+
+            // Save Photo URI
+            savePhotoUri(imageUri, course)
+
+            return true
         }
 
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(result: OnUriSaved?) {
-            callback.onUriSaved(result)
+        @RequiresApi(api = Build.VERSION_CODES.O)
+        private fun saveCredentials(course: Course) {
+
+            val course = course
+
+            val courseMetadata = HashMap<String?, String?>()
+
+            courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUserUUID().toString()
+            courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
+            courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
+            courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course?.getCourseLanguage()?.name
+            courseMetadata[JSONEnum.COURSE_CATEGORY.key] = course?.getCourseCategory()?.name
+
+            val courseMetaDataPath = Paths.get(
+                    context.get()?.getExternalFilesDir(null).toString(),
+                    FileEnum.USER_DIRECTORY.key,
+                    FileEnum.COURSE_DIRECTORY.key,
+                    course?.getCourseUUID().toString(),
+                    FileEnum.META_DATA_FILE.key
+            )
+
+            val courseMetaDataFile = FileHelper.createFileAtPath(courseMetaDataPath)
+
+
+            FileHelper.writeToFile(courseMetaDataFile, courseMetadata.toString())
         }
-        class OnUriSaved(var result: Boolean)
-        class TaskParams(var uri: Uri, var imageFile: File, var contentResolver: ContentResolver)
+
+        @RequiresApi(api = Build.VERSION_CODES.P)
+        private fun savePhotoUri(photoUri: Uri?, course: Course?) {
+            if (photoUri != null) {
+
+                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.get()?.contentResolver!!, photoUri))
+                val userThumbnailPicturePath = Paths.get(context.get()?.getExternalFilesDir(null).toString(),
+                        FileEnum.USER_DIRECTORY.key,
+                        FileEnum.COURSE_DIRECTORY.key,
+                        course?.getCourseUUID().toString(),
+                        FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                val file = File(userThumbnailPicturePath.toString())
+
+                FileHelper.writeBitmapToFile(file, bitmap)
+            }
+        }
+
+
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun onPostExecute(result: Boolean?) {
+            callback.onDataReturned(result)
+        }
+
+        class TaskParams(var course: Course?, var imageUri: Uri?)
+
     }
+
 }
