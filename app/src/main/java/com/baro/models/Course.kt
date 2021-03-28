@@ -10,6 +10,7 @@ import java.io.File
 import java.net.URI
 import java.time.LocalDate
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Parcelize
 data class
@@ -19,8 +20,7 @@ Course // TODO discuss properties
     private var languageEnum: LanguageEnum? = null
     private var categoryEnum: CategoryEnum? = null
     private var updateDate: LocalDate? = null
-    private var photoThumbnail: File? = null
-    private val slides: ArrayList<Slide?>? = null
+    internal var slides: ArrayList<Slide?>? = null
 
     fun getCourseUUID(): UUID? {
         return courseUUID
@@ -53,12 +53,11 @@ Course // TODO discuss properties
         categoryEnum = category
     }
 
-    fun setThumbnailFile(file: File) {
-        photoThumbnail = file
-    }
-
-    fun setUpdateDate(date: LocalDate) {
-        updateDate = date
+    fun getSlides(): ArrayList<Slide?>? {
+        if(slides == null) {
+            slides = ArrayList()
+        }
+        return slides
     }
 
 }
