@@ -3,9 +3,7 @@ package com.baro.ui.splash
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -26,19 +24,18 @@ import com.baro.R
 import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
-import com.baro.constants.JSONEnum
 import com.baro.dialogs.ImageDialog
 import com.baro.dialogs.ImageDialog.OnInputListener
+import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
-import com.baro.helpers.JSONHelper
+import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
 import com.baro.ui.main.MainActivity
 
-import java.io.File
 import java.nio.file.Paths
 import java.util.*
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-class SplashLoggingFragment : Fragment(), OnInputListener {
+class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSaveComplete {
 
     private lateinit var photoThumbnailButton: ImageButton
     private lateinit var usernameEditText: EditText
@@ -80,6 +77,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         photoThumbnailButton.setImageURI(uri)
     }
 
+    //TODO - Implement as Helper - Add Permission Check
     @RequiresApi(Build.VERSION_CODES.O)
     private var getCameraContent: ActivityResultLauncher<Uri?>? = registerForActivityResult(
             TakePicture()
@@ -110,8 +108,8 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
 
         nextButton.setOnClickListener { v: View? ->
             if (usernameEditText.text.length > 5) {
-                val userCredentialsSave = UserCredentialsSave()
-                userCredentialsSave.execute()
+                val userCredentialsSave = AsyncHelpers.UserCredentialsSave(this)
+                userCredentialsSave.execute(context)
             } else {
                 // TODO discuss if we need a username..
                 Toast.makeText(
@@ -186,57 +184,29 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         }
     }
 
-    // TODO __ASYNC_REFACTOR__
-    private inner class UserCredentialsSave : AsyncTask<Void?, Void?, Boolean?>() {
-        @RequiresApi(api = Build.VERSION_CODES.P)
-        override fun doInBackground(vararg voids: Void?): Boolean? {
-            // Save the Meta information
-            saveCredentials()
-            // Save Photo URI
-            savePhotoUri()
-            return true
+    override fun onUserCredentialsSaveDone(result: Boolean?) {
+        if (result == true) {
+            val startMainActivity = Intent(
+                    activity,
+                    MainActivity::class.java)
+            // Perhaps use UserCredentialsTask From SplashActivity to get the credentials once created
+            startActivity(startMainActivity)
+            requireActivity().finish()
+        } else {
+            Toast.makeText(context, R.string.error_saving_credentials, Toast.LENGTH_LONG).show()
         }
+    }
 
-        override fun onPostExecute(result: Boolean?) {
-            if (result == true) {
-                val startMainActivity = Intent(
-                        activity,
-                        MainActivity::class.java)
-                // Perhaps use UserCredentialsTask From SplashActivity to get the credentials once created
-                startActivity(startMainActivity)
-                activity!!.finish()
-            } else {
-                Toast.makeText(context, R.string.error_saving_credentials, Toast.LENGTH_LONG).show()
-            }
-        }
+    override fun getUsername(): String {
+        return usernameEditText.getText().toString()
+    }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
-        private fun saveCredentials() {
-            val credentialDetails = HashMap<String?, String?>()
-            val userUUID = UUID.randomUUID()
-            credentialDetails[JSONEnum.USER_NAME_KEY.key] = usernameEditText.getText().toString()
-            credentialDetails[JSONEnum.USER_UUID_KEY.key] = userUUID.toString()
-            val jsonCredentials = JSONHelper.createJSONFromHashMap(credentialDetails)
-            val userMetaDataPath = Paths.get(activity!!.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.META_DATA_FILE.key)
-            val userMetaDataFile = FileHelper.createFileAtPath(userMetaDataPath)
-            FileHelper.writeToFile(userMetaDataFile, jsonCredentials.toString())
-        }
+    override fun getPath(): String {
+        return requireContext().getExternalFilesDir(null).toString()
+    }
 
-        @RequiresApi(api = Build.VERSION_CODES.P)
-        private fun savePhotoUri() {
-            if (photoUri != null) {
-
-                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(requireContext().contentResolver, photoUri!!))
-                val userThumbnailPicturePath = Paths.get(context!!.getExternalFilesDir(null).toString(),
-                        FileEnum.USER_DIRECTORY.key,
-                        FileEnum.PHOTO_THUMBNAIL_FILE.key)
-                val file = File(userThumbnailPicturePath.toString())
-
-                FileHelper.writeBitmapToFile(file, bitmap)
-            }
-        }
+    override fun getPhotoUri(): Uri? {
+        return photoUri
     }
 
 }
