@@ -156,6 +156,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener {
         }
     }
 
+    //TODO - Refactor
     @VisibleForTesting
     private val requestPermissionLauncher: ActivityResultLauncher<Array<String?>?>? = registerForActivityResult(RequestMultiplePermissions()) { permissions: MutableMap<String?, Boolean?>? ->
         if (permissions != null) {
