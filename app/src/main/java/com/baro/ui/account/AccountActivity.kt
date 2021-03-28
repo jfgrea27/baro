@@ -9,7 +9,10 @@ import com.baro.R
 import com.baro.constants.AppTags
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.interfaces.OnUserDataFound
+import com.baro.models.Course
 import com.baro.models.User
+import com.baro.ui.create.CreateCourseSummaryFragment
+import java.util.*
 
 
 class AccountActivity : AppCompatActivity(), OnUserDataFound {
@@ -31,7 +34,7 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound {
         user = intent.getParcelableExtra(AppTags.USER_OBJECT.name)
 
         // Configure UI
-        configureUserThumbnailImageview()
+        configureUserThumbnailImageView()
         configureFollowersButton()
         configureSettingsButton()
         configureCreateButton()
@@ -50,10 +53,19 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound {
 
         createButton.setOnClickListener {
             // TODO __PERMISSION_REFACTOR__
+
+            var course = Course(UUID.randomUUID(), user)
+            val createCourseSummaryFragment: CreateCourseSummaryFragment = CreateCourseSummaryFragment.newInstance(course)
+
+            supportFragmentManager.beginTransaction()
+                    .add(R.id.fragment_container_view, createCourseSummaryFragment, null)
+                    .addToBackStack(AppTags.CREATE_COURSE_SUMMARY_FRAGMENT.name)
+                    .setReorderingAllowed(true)
+                    .commit()
         }
     }
 
-    private fun configureUserThumbnailImageview() {
+    private fun configureUserThumbnailImageView() {
         userThumbnailImageView = findViewById(R.id.im_account)
     }
 

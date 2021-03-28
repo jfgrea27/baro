@@ -4,5 +4,6 @@ package com.baro.constants
 enum class AppTags {
     THUMBNAIL_SELECTION,
     USER_OBJECT,
+    COURSE_OBJECT,
     CREATE_COURSE_SUMMARY_FRAGMENT;
 }

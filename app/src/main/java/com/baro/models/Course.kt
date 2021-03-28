@@ -14,7 +14,10 @@ import java.util.*
 @Parcelize
 data class
 Course // TODO discuss properties
-(private val courseName: String?, private val courseUUID: UUID?, private val creator: User?, private val languageEnum: LanguageEnum?, private val categoryEnum: CategoryEnum?) : Parcelable{
+(private val courseUUID: UUID?, private val creator: User?, ) : Parcelable{
+    private var courseName: String? = null
+    private var languageEnum: LanguageEnum? = null
+    private var categoryEnum: CategoryEnum? = null
     private var updateDate: LocalDate? = null
     private var photoThumbnail: File? = null
     private val slides: ArrayList<Slide?>? = null
@@ -31,12 +34,23 @@ Course // TODO discuss properties
         return courseName
     }
 
+    fun setCourseName(name: String) {
+        courseName = name
+    }
+
     fun getCourseLanguage(): LanguageEnum? {
         return languageEnum
     }
 
+    fun setCourseLanguage(language :LanguageEnum) {
+        languageEnum = language
+    }
     fun getCourseCategory(): CategoryEnum? {
         return categoryEnum
+    }
+
+    fun setCourseCategory(category :CategoryEnum) {
+        categoryEnum = category
     }
 
     fun setThumbnailFile(file: File) {
@@ -46,4 +60,5 @@ Course // TODO discuss properties
     fun setUpdateDate(date: LocalDate) {
         updateDate = date
     }
+
 }

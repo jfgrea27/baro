@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
+import com.baro.helpers.interfaces.OnUriSavedComplete
 import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
 import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.helpers.interfaces.OnUserLoginCheckComplete
@@ -37,14 +38,14 @@ class AsyncHelpers {
                     FileEnum.META_DATA_FILE.key)
 
 
-            val userThumbnailPath= Paths.get(externalFilesDir[0].toString(),
+            val userThumbnailPath = Paths.get(externalFilesDir[0].toString(),
                     FileEnum.USER_DIRECTORY.key,
                     FileEnum.PHOTO_THUMBNAIL_FILE.key)
 
             val userMetaDataFile = FileHelper.getFileAtPath(userMetaDataPath)
             val userThumbnailFile = FileHelper.getFileAtPath(userThumbnailPath)
 
-            var user : User? = null
+            var user: User? = null
 
             if (userMetaDataFile != null) {
                 val contentMetaData = FileHelper.readFile(userMetaDataFile)
@@ -64,12 +65,14 @@ class AsyncHelpers {
             }
             return user
         }
+
         @RequiresApi(Build.VERSION_CODES.O)
         override fun onPostExecute(result: User?) {
             callback.onUserLoginCheckDone(result)
         }
 
     }
+
     class UserCredentialsSave(private var callback: OnUserCredentialsSaveComplete) : AsyncTask<Context, Void?, Boolean?>() {
         @RequiresApi(api = Build.VERSION_CODES.P)
 
@@ -101,7 +104,7 @@ class AsyncHelpers {
         }
 
         @RequiresApi(api = Build.VERSION_CODES.P)
-        private fun savePhotoUri(photoUri:Uri?, context:Context) {
+        private fun savePhotoUri(photoUri: Uri?, context: Context) {
             if (photoUri != null) {
 
                 val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, photoUri))
@@ -116,6 +119,7 @@ class AsyncHelpers {
 
 
     }
+
     class LoadUserData(private var callback: OnUserDataFound) : AsyncTask<LoadUserData.TaskParams, Void?, LoadUserData.LoadUserDataResponse?>() {
         @RequiresApi(Build.VERSION_CODES.P)
         override fun doInBackground(vararg params: TaskParams?): LoadUserDataResponse? {
@@ -126,20 +130,37 @@ class AsyncHelpers {
                 val username = user.getUsername()
                 val imageBmp = ImageDecoder.decodeBitmap(source)
                 return LoadUserDataResponse(username, imageBmp)
+            } else if (user?.getUsername() != null) {
+                return LoadUserDataResponse(user.getUsername(), null)
+            } else {
+                return null
             }
-            else if (user?.getUsername() != null){ return LoadUserDataResponse(user.getUsername(),null)}
-            else { return null }
         }
 
-            @RequiresApi(Build.VERSION_CODES.P)
-            override fun onPostExecute(result: LoadUserDataResponse?) {
-               callback.onDataReturned(result)
-            }
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun onPostExecute(result: LoadUserDataResponse?) {
+            callback.onDataReturned(result)
+        }
+
         class TaskParams(var user: User?, var contentResolver: ContentResolver)
         class LoadUserDataResponse(var username: String?, var imageBmp: Bitmap?)
+    }
+
+    class SaveUriToPath(private var callback: OnUriSavedComplete) : AsyncTask<SaveUriToPath.TaskParams, Void?, SaveUriToPath.OnUriSaved?>() {
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun doInBackground(vararg params: TaskParams?): OnUriSaved {
+            val imageFile = params[0]?.imageFile
+            val uri = params[0]?.uri
+            val contentResolver = params[0]?.contentResolver
+
+            return OnUriSaved(FileHelper.writeUriToFile(imageFile, uri, contentResolver)!!)
         }
 
-
-
-
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun onPostExecute(result: OnUriSaved?) {
+            callback.onUriSaved(result)
+        }
+        class OnUriSaved(var result: Boolean)
+        class TaskParams(var uri: Uri, var imageFile: File, var contentResolver: ContentResolver)
     }
+}
