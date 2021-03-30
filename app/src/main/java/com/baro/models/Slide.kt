@@ -12,4 +12,8 @@ class Slide(val slideUUID: UUID, val course: Course) {
     fun getVideoUri() : Uri? {
         return video
     }
+
+    fun setVideoUri(uri: Uri?) {
+        video = uri
+    }
 }
