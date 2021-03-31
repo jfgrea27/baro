@@ -27,12 +27,12 @@ import java.util.*
 class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
 
 
-
     // UI
     private lateinit var nextButton: ImageButton
     private lateinit var previousButton: ImageButton
     private lateinit var playButton: ImageButton
     private lateinit var addDeleteVideoButton: ImageButton
+    private lateinit var deleteSlide: ImageButton
     private lateinit var videoView: VideoView
 
     // Model
@@ -62,7 +62,24 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
         configurePlayButton()
         configureDeleteButton()
         configureVideoView()
+        configureDeleteSlide()
     }
+
+    private fun configureDeleteSlide() {
+        deleteSlide = findViewById(R.id.btn_delete_slide)
+
+        deleteSlide.setOnClickListener {
+            if (slideCounter > 0) {
+                deleteSlide()
+                course.slides?.remove(course.slides!!.get(slideCounter))
+            }
+            if (slideCounter == course.slides!!.size) {
+                slideCounter -= 1
+            }
+            updateUI()
+        }
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun configureDeleteButton() {
@@ -100,6 +117,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
         videoHasStarted = false
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun configurePreviousButton() {
         previousButton = findViewById(R.id.btn_previous)
 
@@ -107,6 +125,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
         previousButton.visibility = View.INVISIBLE
 
         previousButton.setOnClickListener {
+            saveCurrentSlide()
 
             if (videoUri == null && slideCounter == course.getSlides()?.size?.minus(1) && slideCounter > 0) {
                 course.getSlides()?.remove(course.getSlides()?.size?.minus(1))
@@ -149,7 +168,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
     }
 
     private fun updateClickable() {
-        if(videoHasStarted && !isPaused) {
+        if (videoHasStarted && !isPaused) {
             nextButton.isClickable = false
             previousButton.isClickable = false
             playButton.isClickable = false
@@ -170,7 +189,11 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
             videoView.visibility = View.VISIBLE
         } else if (!videoHasStarted && !isPaused) {
             videoView.setVideoURI(videoUri)
-            videoView.seekTo(100)
+
+            if (videoUri != null) {
+                videoView.seekTo(100)
+
+            }
         }
     }
 
@@ -188,8 +211,11 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
             0 -> {
                 if (videoUri != null) {
                     nextButton.visibility = View.VISIBLE
+                } else {
+                    nextButton.visibility = View.INVISIBLE
                 }
                 previousButton.visibility = View.INVISIBLE
+
             }
             course.getSlides()?.size?.minus(1) -> {
                 if (videoUri != null) {
@@ -221,18 +247,22 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun saveCurrentSlide() {
         if (!byCamera) {
-            val slideVideoPath = Paths.get(
-                    this@CreateSlideActivity.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.COURSE_DIRECTORY.key,
-                    course.getCourseUUID().toString(),
-                    FileEnum.SLIDE_DIRECTORY.key,
-                    course.slides?.get(slideCounter)?.slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
-            )
+            if (videoUri != null) {
+                val slideVideoPath = Paths.get(
+                        this@CreateSlideActivity.getExternalFilesDir(null).toString(),
+                        FileEnum.USER_DIRECTORY.key,
+                        FileEnum.COURSE_DIRECTORY.key,
+                        course.getCourseUUID().toString(),
+                        FileEnum.SLIDE_DIRECTORY.key,
+                        course.slides?.get(slideCounter)?.slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
+                )
 
-            val slideVideoFile = FileHelper.createFileAtPath(slideVideoPath)
-            FileHelper.writeUriToFile(slideVideoFile, videoUri, contentResolver)
+                val slideVideoFile = FileHelper.createFileAtPath(slideVideoPath)
+                FileHelper.writeUriToFile(slideVideoFile, videoUri, contentResolver)
+            }
+
         }
+
 
         course.slides?.get(slideCounter)?.setVideoUri(videoUri)
     }
@@ -282,6 +312,8 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
     ) { uri ->
         videoUri = uri
 
+        videoView.setVideoURI(videoUri)
+        videoView.seekTo(100)
 
         // UI
         updateUI()

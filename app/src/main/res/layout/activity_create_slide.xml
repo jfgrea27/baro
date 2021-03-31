@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".ui.create.CreateSlideActivity">
 
+
+
+    <ImageButton
+        android:id="@+id/btn_delete_slide"
+        android:layout_width="@dimen/smaller_icon_width"
+        android:layout_height="@dimen/smaller_icon_width"
+        android:alpha="0.5"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:tint="@color/green"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close" />
+
     <VideoView
         android:id="@+id/video_view_slide"
         android:layout_width="match_parent"
@@ -66,6 +80,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_create" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
