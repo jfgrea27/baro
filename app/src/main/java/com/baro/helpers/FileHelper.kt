@@ -4,12 +4,12 @@ import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.provider.MediaStore
 import androidx.annotation.RequiresApi
-
 import java.io.*
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.*
+
 
 object FileHelper {
     /**
@@ -150,4 +150,54 @@ object FileHelper {
         }
         file?.delete()
     }
+
+    //For saving Video...
+
+//    fun saveGalleryVideo(oldFile: File, newFile: File?) {
+//        try {
+//            if (oldFile.exists()) {
+//                val `in`: InputStream = FileInputStream(oldFile)
+//                val out: OutputStream = FileOutputStream(newFile)
+//
+//                // Copy the bits from instream to outstream
+//                val buf = ByteArray(1024)
+//                var len: Int
+//                while (`in`.read(buf).also { len = it } > 0) {
+//                    out.write(buf, 0, len)
+//                }
+//                `in`.close()
+//                out.close()
+//                Log.v("", "Video file saved successfully.")
+//            } else {
+//                Log.v("", "Video saving failed. Source file missing.")
+//            }
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//    }
+
+    fun copyVideoToFile(outputAddress: File, originalUri: Uri, content: ContentResolver?): File? {
+        var `in`: InputStream? = null
+        `in` = try {
+            content?.openInputStream(originalUri)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            return null
+        }
+        return try {
+            copyFile(`in`, outputAddress)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    @Throws(IOException::class)
+    fun copyFile(`in`: InputStream?, outputFile: File?): File? {
+        val fos = FileOutputStream(outputFile)
+        copyStream(`in`, fos)
+        return outputFile
+    }
+
+
 }

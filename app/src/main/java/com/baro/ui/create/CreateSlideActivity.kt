@@ -3,14 +3,15 @@ package com.baro.ui.create
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.widget.ImageButton
 import android.widget.VideoView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.baro.R
 import com.baro.constants.AppCodes
@@ -18,13 +19,13 @@ import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
 import com.baro.constants.IntentEnum
 import com.baro.dialogs.ImageDialog
-import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.models.Course
 import com.baro.models.Slide
 import java.io.File
 import java.nio.file.Paths
 import java.util.*
+
 
 class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
 
@@ -82,7 +83,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
 
         deleteSlide.setOnClickListener {
             if (slideCounter > 0) {
-                deleteSlide()
+                deleteVideo()
                 course.slides?.remove(course.slides!!.get(slideCounter))
             }
             if (slideCounter == course.slides!!.size) {
@@ -104,26 +105,25 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
                 imageDialog.show(supportFragmentManager, AppTags.THUMBNAIL_SELECTION.toString())
                 updateUI()
             } else {
-                deleteSlide()
+                deleteVideo()
                 // UI
                 updateUI()
             }
         }
     }
 
-    private fun deleteSlide() {
+    private fun deleteVideo() {
         // Model
-        if (slideCounter == course.getSlides()?.size?.minus(1) && slideCounter > 0) {
-            course.getSlides()?.remove(course.getSlides()?.size?.minus(1))
-            slideCounter -= 1
-        }
+//        if (slideCounter == course.getSlides()?.size?.minus(1) && slideCounter > 0) {
+//            course.getSlides()?.remove(course.getSlides()?.size?.minus(1))
+//            slideCounter -= 1
+//        }
 
         // File
         var file = File(videoUri?.path)
         FileHelper.deleteFile(file)
 
         videoUri = null
-        videoView.setVideoURI(null)
 
         isPaused = true
 
@@ -171,7 +171,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
         updateDeleteCreateButton()
     }
 
-    private fun updateClickable(allUnclickable : Boolean= false) {
+    private fun updateClickable(allUnclickable: Boolean = false) {
 
         if (allUnclickable){
             nextButton.isClickable = false
@@ -319,11 +319,25 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.P)
     private var getGalleryContent: ActivityResultLauncher<String?>? = registerForActivityResult(ActivityResultContracts.GetContent()
     ) { uri ->
-        videoUri = uri
 
+        val slideVideoPath = Paths.get(
+                this@CreateSlideActivity.getExternalFilesDir(null).toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.COURSE_DIRECTORY.key,
+                course.getCourseUUID().toString(),
+                FileEnum.SLIDE_DIRECTORY.key,
+                course.slides?.get(slideCounter)?.slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
+        )
+
+        val slideVideoFile = FileHelper.createFileAtPath(slideVideoPath)
+        //val weakReference = WeakReference<ContentResolver>(contentResolver)
+        if (slideVideoFile != null) {
+            FileHelper.copyVideoToFile(slideVideoFile, uri, contentResolver)
+        }
+        videoUri = Uri.fromFile(slideVideoFile)
         videoView.setVideoURI(videoUri)
         videoView.seekTo(100)
 
@@ -332,6 +346,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
         updateUI()
 
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private var getCameraContent: ActivityResultLauncher<Uri?>? = registerForActivityResult(
@@ -345,7 +360,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
         updateUI()
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.P)
     override fun sendInput(choice: Int) {
         if (choice == AppCodes.CAMERA_ROLL_SELECTION.code) {
             byCamera = true
@@ -395,4 +410,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
 
 
     }
+
+
 }
