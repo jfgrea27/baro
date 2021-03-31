@@ -8,6 +8,16 @@
 
 
 
+
+
+    <VideoView
+        android:id="@+id/video_view_slide"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageButton
         android:id="@+id/btn_delete_slide"
         android:layout_width="@dimen/smaller_icon_width"
@@ -19,14 +29,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_close" />
-
-    <VideoView
-        android:id="@+id/video_view_slide"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/btn_previous"
@@ -77,9 +79,23 @@
         android:scaleType="fitCenter"
         android:tint="@color/green"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_finish"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_create" />
+
+    <ImageButton
+        android:id="@+id/btn_finish"
+        android:layout_width="@dimen/smaller_icon_width"
+        android:layout_height="@dimen/smaller_icon_width"
+        android:alpha="0.5"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        android:tint="@color/green"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_add_delete"
+        app:srcCompat="@drawable/ic_book" />
+
 
 
 
