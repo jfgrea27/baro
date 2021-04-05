@@ -1,5 +1,6 @@
 package com.baro.ui.create
 
+import android.content.ContentResolver
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -7,6 +8,7 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.ImageButton
+import android.widget.Toast
 import android.widget.VideoView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -19,15 +21,18 @@ import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
 import com.baro.constants.IntentEnum
 import com.baro.dialogs.ImageDialog
+import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
+import com.baro.helpers.interfaces.OnVideoUriSaved
 import com.baro.models.Course
 import com.baro.models.Slide
 import java.io.File
+import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
 
 
-class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
+class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, OnVideoUriSaved{
 
 
     // UI
@@ -150,7 +155,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
         nextButton.visibility = View.INVISIBLE
 
         nextButton.setOnClickListener {
-            //saveCurrentSlide()
             updateClickable(allUnclickable = true)
             SetVideoURI().execute(AppCodes.Forward_Slide)
 
@@ -158,10 +162,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
 
         }
     }
-
-    //private fun setVideoHandler(Looper.myLooper())
-
-
 
     private fun updateUI() {
         updateClickable()
@@ -258,29 +258,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun saveCurrentSlide() {
-        if (!byCamera) {
-            if (videoUri != null) {
-                val slideVideoPath = Paths.get(
-                        this@CreateSlideActivity.getExternalFilesDir(null).toString(),
-                        FileEnum.USER_DIRECTORY.key,
-                        FileEnum.COURSE_DIRECTORY.key,
-                        course.getCourseUUID().toString(),
-                        FileEnum.SLIDE_DIRECTORY.key,
-                        course.slides?.get(slideCounter)?.slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
-                )
-
-                val slideVideoFile = FileHelper.createFileAtPath(slideVideoPath)
-                FileHelper.writeUriToFile(slideVideoFile, videoUri, contentResolver)
-            }
-
-        }
-
-
-        course.slides?.get(slideCounter)?.setVideoUri(videoUri)
-    }
-
     private fun configurePlayButton() {
         playButton = findViewById(R.id.btn_play)
         playButton.visibility = View.INVISIBLE
@@ -333,19 +310,24 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
         )
 
         val slideVideoFile = FileHelper.createFileAtPath(slideVideoPath)
-        //val weakReference = WeakReference<ContentResolver>(contentResolver)
-        if (slideVideoFile != null) {
-            FileHelper.copyVideoToFile(slideVideoFile, uri, contentResolver)
-        }
-        videoUri = Uri.fromFile(slideVideoFile)
-        videoView.setVideoURI(videoUri)
-        videoView.seekTo(100)
+        val contentResolverReference = WeakReference<ContentResolver>(contentResolver)
+        val videoUriSave = AsyncHelpers.VideoUriSave(this, contentResolverReference)
+        val taskParams = AsyncHelpers.VideoUriSave.TaskParams(slideVideoFile, uri)
+        videoUriSave.execute(taskParams)
 
-        // UI
-        saveCurrentSlide()
-        updateUI()
 
     }
+
+    override fun onVideoUriSaved(outputFile: File?) {
+        if (outputFile != null) {
+            videoUri = Uri.fromFile(outputFile)
+        } else {
+            Toast.makeText(this, getString(R.string.video_not_saved), Toast.LENGTH_LONG).show()
+        }
+
+        updateUI()
+    }
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -410,6 +392,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
 
 
     }
+
 
 
 }

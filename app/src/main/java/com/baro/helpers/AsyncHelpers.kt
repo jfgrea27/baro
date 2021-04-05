@@ -10,10 +10,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
-import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
-import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
-import com.baro.helpers.interfaces.OnUserDataFound
-import com.baro.helpers.interfaces.OnUserLoginCheckComplete
+import com.baro.helpers.interfaces.*
 import com.baro.models.Course
 import com.baro.models.User
 import java.io.File
@@ -225,4 +222,27 @@ class AsyncHelpers {
 
     }
 
+
+    class VideoUriSave(private var callback: OnVideoUriSaved, private var weakReferenceContentResolver: WeakReference<ContentResolver>) : AsyncTask<VideoUriSave.TaskParams, Void?, File?>() {
+        override fun doInBackground(vararg params: TaskParams?): File? {
+            val outputFile = params[0]?.outputFile
+            val videoUri = params[0]?.videoUri
+
+            if (outputFile != null && outputFile.exists()) {
+                if (videoUri != null) {
+                    return FileHelper.copyVideoToFile(outputFile, videoUri, weakReferenceContentResolver.get())
+                }
+            }
+            return null
+
+        }
+
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun onPostExecute(result: File?) {
+            callback.onVideoUriSaved(result)
+        }
+
+        class TaskParams(var outputFile: File?, var videoUri: Uri?)
+
+    }
 }

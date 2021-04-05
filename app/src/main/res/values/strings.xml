@@ -24,4 +24,5 @@
     <string name="text_choose_category">Choose Category</string>
     <string name="text_choose_thumbnail">Choose Thumbnail</string>
     <string name="lenght_course_name_warning_toast">Course should have a longer name.</string>
+    <string name="video_not_saved">Video was not saved correctly</string>
 </resources>
