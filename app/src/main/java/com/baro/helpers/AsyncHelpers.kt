@@ -245,4 +245,23 @@ class AsyncHelpers {
         class TaskParams(var outputFile: File?, var videoUri: Uri?)
 
     }
+
+
+    class DeleteFile(private var callback: OnDeleteFile) : AsyncTask<DeleteFile.TaskParams, Boolean?, Boolean?>() {
+        override fun doInBackground(vararg params: TaskParams?): Boolean? {
+            val deleteFile = params[0]?.deleteFile
+            val deleteSlide = params[0]?.deleteSlide
+            FileHelper.deleteFile(deleteFile)
+            return deleteSlide
+        }
+
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun onPostExecute(result: Boolean?) {
+            callback.onDeleteFile(result)
+        }
+
+        class TaskParams(var deleteFile: File?, var deleteSlide: Boolean?)
+
+    }
+
 }

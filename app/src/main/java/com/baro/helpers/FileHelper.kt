@@ -151,30 +151,6 @@ object FileHelper {
         file?.delete()
     }
 
-    //For saving Video...
-
-//    fun saveGalleryVideo(oldFile: File, newFile: File?) {
-//        try {
-//            if (oldFile.exists()) {
-//                val `in`: InputStream = FileInputStream(oldFile)
-//                val out: OutputStream = FileOutputStream(newFile)
-//
-//                // Copy the bits from instream to outstream
-//                val buf = ByteArray(1024)
-//                var len: Int
-//                while (`in`.read(buf).also { len = it } > 0) {
-//                    out.write(buf, 0, len)
-//                }
-//                `in`.close()
-//                out.close()
-//                Log.v("", "Video file saved successfully.")
-//            } else {
-//                Log.v("", "Video saving failed. Source file missing.")
-//            }
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
-//    }
 
     fun copyVideoToFile(outputAddress: File, originalUri: Uri, content: ContentResolver?): File? {
         var `in`: InputStream? = null
