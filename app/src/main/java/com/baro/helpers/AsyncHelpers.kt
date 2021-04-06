@@ -17,6 +17,7 @@ import java.io.File
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
+import kotlin.collections.HashMap
 
 
 class AsyncHelpers {
@@ -264,4 +265,29 @@ class AsyncHelpers {
 
     }
 
+
+    class UpdateJSONFile(private var callback: OnUpdatedJSONFile) : AsyncTask<UpdateJSONFile.TaskParams, Boolean?, Boolean?>() {
+        override fun doInBackground(vararg params: UpdateJSONFile.TaskParams?): Boolean? {
+            val fileToUpdate = params[0]?.fileToUpdate
+            val hashMapData = params[0]?.hashMapData
+
+            var contents = FileHelper.readFile(fileToUpdate)
+
+            var jsonContents = JSONHelper.createJSONFromString(contents!!)
+
+            for ((key, value) in hashMapData!!) {
+                jsonContents!!.put(key, value)
+            }
+
+            return FileHelper.writeToFile(fileToUpdate, jsonContents.toString())
+        }
+
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun onPostExecute(result: Boolean?) {
+            callback.onUpdatedJSONFile(result)
+        }
+
+        class TaskParams(var fileToUpdate: File?, var hashMapData: HashMap<String, ArrayList<String>>?)
+
+    }
 }

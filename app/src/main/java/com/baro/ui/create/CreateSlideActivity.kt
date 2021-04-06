@@ -2,6 +2,7 @@ package com.baro.ui.create
 
 import android.content.ContentResolver
 import android.net.Uri
+import android.opengl.Visibility
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
@@ -23,6 +24,7 @@ import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnDeleteFile
+import com.baro.helpers.interfaces.OnUpdatedJSONFile
 import com.baro.helpers.interfaces.OnVideoUriSaved
 import com.baro.models.Course
 import com.baro.models.Slide
@@ -30,9 +32,11 @@ import java.io.File
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 
-class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, OnVideoUriSaved, OnDeleteFile {
+class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, OnVideoUriSaved, OnDeleteFile, OnUpdatedJSONFile {
 
 
     // UI
@@ -75,13 +79,41 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         configureFinishButton()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun configureFinishButton() {
         finishSlide = findViewById(R.id.btn_finish)
 
         finishSlide.setOnClickListener {
-            //Todo implement finish
+
+            var courseMetaPath = Paths.get(
+                    this@CreateSlideActivity.getExternalFilesDir(null).toString(),
+                    FileEnum.USER_DIRECTORY.key,
+                    FileEnum.COURSE_DIRECTORY.key,
+                    course.getCourseUUID().toString(),
+                    FileEnum.META_DATA_FILE.key
+            )
+
+            var courseMetaFile = courseMetaPath.toFile()
+
+            var slideHashMap = HashMap<String, ArrayList<String>>()
+
+            var slideUUIDArrayList = ArrayList<String>()
+            for (slide in course.slides!!) {
+                slideUUIDArrayList.add(slide!!.slideUUID.toString())
+            }
+            slideHashMap[FileEnum.SLIDE_DIRECTORY.key.toString()] = slideUUIDArrayList
+
+            val updateJSONFile = AsyncHelpers.UpdateJSONFile(this)
+            var params = AsyncHelpers.UpdateJSONFile.TaskParams(courseMetaFile, slideHashMap)
+            updateJSONFile.execute(params)
+
         }
     }
+
+    override fun onUpdatedJSONFile(result: Boolean?) {
+        finish()
+    }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun configureDeleteSlide() {
@@ -99,6 +131,8 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
             videoUri = course.slides?.get(slideCounter)?.getVideoUri()
             SetVideoURI().execute(AppCodes.NO_CHANGE_SLIDE)
         }
+
+        deleteSlide.visibility = View.INVISIBLE
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -170,7 +204,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
             updateClickable(allUnclickable = true)
             SetVideoURI().execute(AppCodes.FORWARD_SLIDE)
 
-
         }
     }
 
@@ -180,6 +213,16 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         updatePlayButtonUI()
         updateSlideCountUI()
         updateDeleteCreateButton()
+        updateDeleteSlideButton()
+    }
+
+    private fun updateDeleteSlideButton() {
+        if (slideCounter == 0) {
+            deleteSlide.visibility = View.INVISIBLE
+        } else {
+            deleteSlide.visibility = View.VISIBLE
+        }
+
     }
 
     private fun updateClickable(allUnclickable: Boolean = false) {
@@ -406,6 +449,8 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         }
 
     }
+
+
 
 
 }
