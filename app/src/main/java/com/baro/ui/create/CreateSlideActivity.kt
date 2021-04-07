@@ -28,6 +28,7 @@ import com.baro.helpers.interfaces.OnUpdatedJSONFile
 import com.baro.helpers.interfaces.OnVideoUriSaved
 import com.baro.models.Course
 import com.baro.models.Slide
+import kotlinx.android.synthetic.main.dialog_image_chooser.*
 import java.io.File
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
@@ -77,7 +78,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         configureVideoView()
         configureDeleteSlide()
         configureFinishButton()
-        R.drawable.flag_afghanistan
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -123,7 +123,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         deleteSlide.setOnClickListener {
             deleteVideo(deleteSlide = true)
 
-            if (slideCounter > 0 || course.getSlides().size > 1 ) {
+            if (slideCounter > 0 || course.getSlides().size > 1) {
                 course.getSlides().remove(course.getSlides()[slideCounter])
                 if (slideCounter == course.getSlides().size) {
                     slideCounter -= 1
@@ -215,6 +215,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         updateSlideCountUI()
         updateDeleteCreateButton()
         updateDeleteSlideButton()
+
     }
 
     private fun updateDeleteSlideButton() {
@@ -277,6 +278,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         } else {
             playButton.visibility = View.VISIBLE
         }
+
     }
 
     private fun updateSlideCountUI() {

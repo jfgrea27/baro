@@ -26,4 +26,257 @@
     <string name="video_not_saved">Video was not saved correctly</string>
     <string name="choose_language">Choose Language</string>
     <string name="flag_name">Flag Name</string>
+
+    <string-array name="Flags" >
+        <item>flag_afghanistan.png, Afghanistan</item>
+        <item>flag_aland_islands.png, Aland Islands</item>
+        <item>flag_albania.png, Albania</item>
+        <item>flag_algeria.png, Algeria</item>
+        <item>flag_american_samoa.png, American Samoa</item>
+        <item>flag_andorra.png, Andorra</item>
+        <item>flag_angola.png, Angola</item>
+        <item>flag_anguilla.png, Anguilla</item>
+        <item>flag_antarctica.png, Antarctica</item>
+        <item>flag_antigua_barbuda.png, Antigua Barbuda</item>
+        <item>flag_argentina.png, Argentina</item>
+        <item>flag_armenia.png, Armenia</item>
+        <item>flag_aruba.png, Aruba</item>
+        <item>flag_ascension_island.png, Ascension Island</item>
+        <item>flag_australia.png, Australia</item>
+        <item>flag_austria.png, Austria</item>
+        <item>flag_azerbaijan.png, Azerbaijan</item>
+        <item>flag_bahamas.png, Bahamas</item>
+        <item>flag_bahrain.png, Bahrain</item>
+        <item>flag_bangladesh.png, Bangladesh</item>
+        <item>flag_barbados.png, Barbados</item>
+        <item>flag_belarus.png, Belarus</item>
+        <item>flag_belgium.png, Belgium</item>
+        <item>flag_belize.png, Belize</item>
+        <item>flag_benin.png, Benin</item>
+        <item>flag_bermuda.png, Bermuda</item>
+        <item>flag_bhutan.png, Bhutan</item>
+        <item>flag_bolivia.png, Bolivia</item>
+        <item>flag_bosnia_herzegovina.png, Bosnia Herzegovina</item>
+        <item>flag_botswana.png, Botswana</item>
+        <item>flag_bouvet_island.png, Bouvet Island</item>
+        <item>flag_brazil.png, Brazil</item>
+        <item>flag_british_indian_ocean_territory.png, British Indian Ocean Territory</item>
+        <item>flag_british_virgin_islands.png, British Virgin Islands</item>
+        <item>flag_brunei.png, Brunei</item>
+        <item>flag_bulgaria.png, Bulgaria</item>
+        <item>flag_burkina_faso.png, Burkina Faso</item>
+        <item>flag_burundi.png, Burundi</item>
+        <item>flag_cambodia.png, Cambodia</item>
+        <item>flag_cameroon.png, Cameroon</item>
+        <item>flag_canada.png, Canada</item>
+        <item>flag_canary_islands.png, Canary Islands</item>
+        <item>flag_cape_verde.png, Cape Verde</item>
+        <item>flag_caribbean_netherlands.png, Caribbean Netherlands</item>
+        <item>flag_cayman_islands.png, Cayman Islands</item>
+        <item>flag_central_african_republic.png, Central African Republic</item>
+        <item>flag_chad.png, Chad</item>
+        <item>flag_chile.png, Chile</item>
+        <item>flag_china.png, China</item>
+        <item>flag_christmas_island.png, Christmas Island</item>
+        <item>flag_clipperton_island.png, Clipperton Island</item>
+        <item>flag_cocos_keeling_islands.png, Cocos Keeling Islands</item>
+        <item>flag_colombia.png, Colombia</item>
+        <item>flag_comoros.png, Comoros</item>
+        <item>flag_congo_brazzaville.png, Congo Brazzaville</item>
+        <item>flag_congo_kinshasa.png, Congo Kinshasa</item>
+        <item>flag_cook_islands.png, Cook Islands</item>
+        <item>flag_costa_rica.png, Costa Rica</item>
+        <item>flag_cote_divoire.png, Cote Divoire</item>
+        <item>flag_croatia.png, Croatia</item>
+        <item>flag_cuba.png, Cuba</item>
+        <item>flag_curacao.png, Curacao</item>
+        <item>flag_cyprus.png, Cyprus</item>
+        <item>flag_czechia.png, Czechia</item>
+        <item>flag_denmark.png, Denmark</item>
+        <item>flag_djibouti.png, Djibouti</item>
+        <item>flag_dominica.png, Dominica</item>
+        <item>flag_dominican_republic.png, Dominican Republic</item>
+        <item>flag_ecuador.png, Ecuador</item>
+        <item>flag_egypt.png, Egypt</item>
+        <item>flag_el_salvador.png, El Salvador</item>
+        <item>flag_england.png, England</item>
+        <item>flag_equatorial_guinea.png, Equatorial Guinea</item>
+        <item>flag_eritrea.png, Eritrea</item>
+        <item>flag_estonia.png, Estonia</item>
+        <item>flag_eswatini.png, Eswatini</item>
+        <item>flag_ethiopia.png, Ethiopia</item>
+        <item>flag_european_union.png, European Union</item>
+        <item>flag_faroe_islands.png, Faroe Islands</item>
+        <item>flag_fiji.png, Fiji</item>
+        <item>flag_finland.png, Finland</item>
+        <item>flag_france.png, France</item>
+        <item>flag_french_polynesia.png, French Polynesia</item>
+        <item>flag_french_southern_territories.png, French Southern Territories</item>
+        <item>flag_gabon.png, Gabon</item>
+        <item>flag_gambia.png, Gambia</item>
+        <item>flag_georgia.png, Georgia</item>
+        <item>flag_germany.png, Germany</item>
+        <item>flag_ghana.png, Ghana</item>
+        <item>flag_gibraltar.png, Gibraltar</item>
+        <item>flag_greece.png, Greece</item>
+        <item>flag_greenland.png, Greenland</item>
+        <item>flag_grenada.png, Grenada</item>
+        <item>flag_guam.png, Guam</item>
+        <item>flag_guatemala.png, Guatemala</item>
+        <item>flag_guernsey.png, Guernsey</item>
+        <item>flag_guinea.png, Guinea</item>
+        <item>flag_guinea_bissau.png, Guinea Bissau</item>
+        <item>flag_guyana.png, Guyana</item>
+        <item>flag_haiti.png, Haiti</item>
+        <item>flag_heard_mcdonald_islands.png, Heard Mcdonald Islands</item>
+        <item>flag_honduras.png, Honduras</item>
+        <item>flag_hong_kong_sar_china.png, Hong Kong Sar China</item>
+        <item>flag_hungary.png, Hungary</item>
+        <item>flag_iceland.png, Iceland</item>
+        <item>flag_india.png, India</item>
+        <item>flag_indonesia.png, Indonesia</item>
+        <item>flag_in_hole.png, In Hole</item>
+        <item>flag_iran.png, Iran</item>
+        <item>flag_iraq.png, Iraq</item>
+        <item>flag_ireland.png, Ireland</item>
+        <item>flag_isle_of_man.png, Isle Of Man</item>
+        <item>flag_israel.png, Israel</item>
+        <item>flag_italy.png, Italy</item>
+        <item>flag_jamaica.png, Jamaica</item>
+        <item>flag_japan.png, Japan</item>
+        <item>flag_jersey.png, Jersey</item>
+        <item>flag_jordan.png, Jordan</item>
+        <item>flag_kazakhstan.png, Kazakhstan</item>
+        <item>flag_kenya.png, Kenya</item>
+        <item>flag_kiribati.png, Kiribati</item>
+        <item>flag_kosovo.png, Kosovo</item>
+        <item>flag_kuwait.png, Kuwait</item>
+        <item>flag_kyrgyzstan.png, Kyrgyzstan</item>
+        <item>flag_laos.png, Laos</item>
+        <item>flag_latvia.png, Latvia</item>
+        <item>flag_lebanon.png, Lebanon</item>
+        <item>flag_lesotho.png, Lesotho</item>
+        <item>flag_liberia.png, Liberia</item>
+        <item>flag_libya.png, Libya</item>
+        <item>flag_liechtenstein.png, Liechtenstein</item>
+        <item>flag_lithuania.png, Lithuania</item>
+        <item>flag_luxembourg.png, Luxembourg</item>
+        <item>flag_macao_sar_china.png, Macao Sar China</item>
+        <item>flag_madagascar.png, Madagascar</item>
+        <item>flag_malawi.png, Malawi</item>
+        <item>flag_malaysia.png, Malaysia</item>
+        <item>flag_maldives.png, Maldives</item>
+        <item>flag_mali.png, Mali</item>
+        <item>flag_malta.png, Malta</item>
+        <item>flag_marshall_islands.png, Marshall Islands</item>
+        <item>flag_martinique.png, Martinique</item>
+        <item>flag_mauritania.png, Mauritania</item>
+        <item>flag_mauritius.png, Mauritius</item>
+        <item>flag_mexico.png, Mexico</item>
+        <item>flag_micronesia.png, Micronesia</item>
+        <item>flag_moldova.png, Moldova</item>
+        <item>flag_monaco.png, Monaco</item>
+        <item>flag_mongolia.png, Mongolia</item>
+        <item>flag_montenegro.png, Montenegro</item>
+        <item>flag_montserrat.png, Montserrat</item>
+        <item>flag_morocco.png, Morocco</item>
+        <item>flag_mozambique.png, Mozambique</item>
+        <item>flag_myanmar_burma.png, Myanmar Burma</item>
+        <item>flag_namibia.png, Namibia</item>
+        <item>flag_nauru.png, Nauru</item>
+        <item>flag_nepal.png, Nepal</item>
+        <item>flag_netherlands.png, Netherlands</item>
+        <item>flag_new_zealand.png, New Zealand</item>
+        <item>flag_nicaragua.png, Nicaragua</item>
+        <item>flag_niger.png, Niger</item>
+        <item>flag_nigeria.png, Nigeria</item>
+        <item>flag_niue.png, Niue</item>
+        <item>flag_norfolk_island.png, Norfolk Island</item>
+        <item>flag_northern_mariana_islands.png, Northern Mariana Islands</item>
+        <item>flag_north_korea.png, North Korea</item>
+        <item>flag_north_macedonia.png, North Macedonia</item>
+        <item>flag_norway.png, Norway</item>
+        <item>flag_oman.png, Oman</item>
+        <item>flag_pakistan.png, Pakistan</item>
+        <item>flag_palau.png, Palau</item>
+        <item>flag_palestinian_territories.png, Palestinian Territories</item>
+        <item>flag_panama.png, Panama</item>
+        <item>flag_papua_new_guinea.png, Papua New Guinea</item>
+        <item>flag_paraguay.png, Paraguay</item>
+        <item>flag_peru.png, Peru</item>
+        <item>flag_philippines.png, Philippines</item>
+        <item>flag_pitcairn_islands.png, Pitcairn Islands</item>
+        <item>flag_poland.png, Poland</item>
+        <item>flag_portugal.png, Portugal</item>
+        <item>flag_puerto_rico.png, Puerto Rico</item>
+        <item>flag_qatar.png, Qatar</item>
+        <item>flag_reunion.png, Reunion</item>
+        <item>flag_romania.png, Romania</item>
+        <item>flag_russia.png, Russia</item>
+        <item>flag_rwanda.png, Rwanda</item>
+        <item>flag_samoa.png, Samoa</item>
+        <item>flag_san_marino.png, San Marino</item>
+        <item>flag_sao_tome_principe.png, Sao Tome Principe</item>
+        <item>flag_saudi_arabia.png, Saudi Arabia</item>
+        <item>flag_scotland.png, Scotland</item>
+        <item>flag_senegal.png, Senegal</item>
+        <item>flag_serbia.png, Serbia</item>
+        <item>flag_seychelles.png, Seychelles</item>
+        <item>flag_sierra_leone.png, Sierra Leone</item>
+        <item>flag_singapore.png, Singapore</item>
+        <item>flag_sint_maarten.png, Sint Maarten</item>
+        <item>flag_slovakia.png, Slovakia</item>
+        <item>flag_slovenia.png, Slovenia</item>
+        <item>flag_solomon_islands.png, Solomon Islands</item>
+        <item>flag_somalia.png, Somalia</item>
+        <item>flag_south_africa.png, South Africa</item>
+        <item>flag_south_korea.png, South Korea</item>
+        <item>flag_south_sudan.png, South Sudan</item>
+        <item>flag_spain.png, Spain</item>
+        <item>flag_sri_lanka.png, Sri Lanka</item>
+        <item>flag_st_barthelemy.png, St Barthelemy</item>
+        <item>flag_st_helena.png, St Helena</item>
+        <item>flag_st_kitts_nevis.png, St Kitts Nevis</item>
+        <item>flag_st_lucia.png, St Lucia</item>
+        <item>flag_st_vincent_grenadines.png, St Vincent Grenadines</item>
+        <item>flag_sudan.png, Sudan</item>
+        <item>flag_suriname.png, Suriname</item>
+        <item>flag_svalbard_jan_mayen.png, </item>
+        <item>Svalbard Jan Mayen</item>
+        <item>flag_sweden.png, Sweden</item>
+        <item>flag_switzerland.png, Switzerland</item>
+        <item>flag_syria.png, Syria</item>
+        <item>flag_taiwan.png, Taiwan</item>
+        <item>flag_tajikistan.png, Tajikistan</item>
+        <item>flag_tanzania.png, Tanzania</item>
+        <item>flag_thailand.png, Thailand</item>
+        <item>flag_timor_leste.png, Timor Leste</item>
+        <item>flag_togo.png, Togo</item>
+        <item>flag_tokelau.png, Tokelau</item>
+        <item>flag_tonga.png, Tonga</item>
+        <item>flag_trinidad_tobago.png, Trinidad Tobago</item>
+        <item>flag_tristan_da_cunha.png, Tristan Da Cunha</item>
+        <item>flag_tunisia.png, Tunisia</item>
+        <item>flag_turkey.png, Turkey</item>
+        <item>flag_turkmenistan.png, Turkmenistan</item>
+        <item>flag_turks_caicos_islands.png, Turks Caicos Islands</item>
+        <item>flag_tuvalu.png, Tuvalu</item>
+        <item>flag_uganda.png, Uganda</item>
+        <item>flag_ukraine.png, Ukraine</item>
+        <item>flag_united_arab_emirates.png, United Arab Emirates</item>
+        <item>flag_united_kingdom.png, United Kingdom</item>
+        <item>flag_united_nations.png, United Nations</item>
+        <item>flag_united_states.png, United States</item>
+        <item>flag_uruguay.png, Uruguay</item>
+        <item>flag_us_virgin_islands.png, Us Virgin Islands</item>
+        <item>flag_uzbekistan.png, Uzbekistan</item>
+        <item>flag_vanuatu.png, Vanuatu</item>
+        <item>flag_vatican_city.png, Vatican City</item>
+        <item>flag_venezuela.png, Venezuela</item>
+        <item>flag_vietnam.png, Vietnam</item>
+        <item>flag_wales.png, Wales</item>
+        <item>flag_yemen.png, Yemen</item>
+        <item>flag_zambia.png, Zambia</item>
+        <item>flag_zimbabwe.png, Zimbabwe</item>
+    </string-array>
 </resources>

@@ -44,6 +44,8 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound {
         val loadUserDataParams = AsyncHelpers.LoadUserData.TaskParams(user, this.contentResolver)
         val userRetrieveThumbnail = AsyncHelpers.LoadUserData(this)
         userRetrieveThumbnail.execute(loadUserDataParams)
+
+
     }
 
 
