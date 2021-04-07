@@ -20,7 +20,7 @@ Course // TODO discuss properties
     private var languageEnum: LanguageEnum? = null
     private var categoryEnum: CategoryEnum? = null
     private var updateDate: LocalDate? = null
-    internal var slides: ArrayList<Slide?>? = null
+    internal var slides: ArrayList<Slide> = ArrayList()
 
     fun getCourseUUID(): UUID? {
         return courseUUID
@@ -53,10 +53,7 @@ Course // TODO discuss properties
         categoryEnum = category
     }
 
-    fun getSlides(): ArrayList<Slide?>? {
-        if(slides == null) {
-            slides = ArrayList()
-        }
+    fun getSlides(): ArrayList<Slide> {
         return slides
     }
 

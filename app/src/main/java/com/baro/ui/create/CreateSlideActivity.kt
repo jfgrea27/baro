@@ -66,8 +66,8 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
 
         // Create First Slide
         val slide = Slide(UUID.randomUUID(), course)
-        course.getSlides()?.add(slide)
-        videoUri = course.slides?.get(slideCounter)?.getVideoUri()
+        course.getSlides().add(slide)
+        videoUri = course.getSlides()[slideCounter].getVideoUri()
 
         // Configure UI
         configureNextButton()
@@ -77,6 +77,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         configureVideoView()
         configureDeleteSlide()
         configureFinishButton()
+        R.drawable.flag_afghanistan
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -98,8 +99,8 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
             var slideHashMap = HashMap<String, ArrayList<String>>()
 
             var slideUUIDArrayList = ArrayList<String>()
-            for (slide in course.slides!!) {
-                slideUUIDArrayList.add(slide!!.slideUUID.toString())
+            for (slide in course.getSlides()) {
+                slideUUIDArrayList.add(slide.slideUUID.toString())
             }
             slideHashMap[FileEnum.SLIDE_DIRECTORY.key.toString()] = slideUUIDArrayList
 
@@ -120,15 +121,15 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         deleteSlide = findViewById(R.id.btn_delete_slide)
 
         deleteSlide.setOnClickListener {
-            deleteVideo(deleteSlide=true)
+            deleteVideo(deleteSlide = true)
 
-            if (slideCounter > 0) {
-                course.slides?.remove(course.slides!!.get(slideCounter))
-                if (slideCounter == course.getSlides()?.size) {
+            if (slideCounter > 0 || course.getSlides().size > 1 ) {
+                course.getSlides().remove(course.getSlides()[slideCounter])
+                if (slideCounter == course.getSlides().size) {
                     slideCounter -= 1
                 }
             }
-            videoUri = course.slides?.get(slideCounter)?.getVideoUri()
+            videoUri = course.getSlides()[slideCounter].getVideoUri()
             SetVideoURI().execute(AppCodes.NO_CHANGE_SLIDE)
         }
 
@@ -143,7 +144,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
                 FileEnum.COURSE_DIRECTORY.key,
                 course.getCourseUUID().toString(),
                 FileEnum.SLIDE_DIRECTORY.key,
-                course.slides?.get(slideCounter)?.slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
+                course.getSlides()[slideCounter].slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
         )
 
         var file = File(slideVideoPath.toString())
@@ -217,7 +218,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
     }
 
     private fun updateDeleteSlideButton() {
-        if (slideCounter == 0) {
+        if (course.getSlides().size == 1) {
             deleteSlide.visibility = View.INVISIBLE
         } else {
             deleteSlide.visibility = View.VISIBLE
@@ -282,16 +283,15 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
 
         when (slideCounter) {
             0 -> {
-                if (course.slides?.size!! > 1 || videoUri != null) {
+                if (course.getSlides().size > 1 || videoUri != null) {
                     nextButton.visibility = View.VISIBLE
-                }
-                else if (videoUri == null) {
+                } else if (videoUri == null) {
                     nextButton.visibility = View.INVISIBLE
                 }
                 previousButton.visibility = View.INVISIBLE
 
             }
-            course.getSlides()?.size?.minus(1) -> {
+            course.getSlides().size.minus(1) -> {
                 if (videoUri != null) {
                     nextButton.visibility = View.VISIBLE
                 } else {
@@ -366,7 +366,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
                 FileEnum.COURSE_DIRECTORY.key,
                 course.getCourseUUID().toString(),
                 FileEnum.SLIDE_DIRECTORY.key,
-                course.slides?.get(slideCounter)?.slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
+                course.getSlides()[slideCounter].slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
         )
 
         val slideVideoFile = FileHelper.createFileAtPath(slideVideoPath)
@@ -381,21 +381,39 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
     override fun onVideoUriSaved(outputFile: File?) {
         if (outputFile != null) {
             videoUri = Uri.fromFile(outputFile)
-        } else {
-            Toast.makeText(this, getString(R.string.video_not_saved), Toast.LENGTH_LONG).show()
         }
-
         updateUI()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun removeEmptyFileAndReturnIsEmpty(): Boolean {
+        val slideVideoPath = Paths.get(
+                this@CreateSlideActivity.getExternalFilesDir(null).toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.COURSE_DIRECTORY.key,
+                course.getCourseUUID().toString(),
+                FileEnum.SLIDE_DIRECTORY.key,
+                course.getSlides()[slideCounter].slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
+        )
+        val slideVideoFile = slideVideoPath.toFile()
+        if (slideVideoFile.length().toInt() == 0) {
+            FileHelper.deleteFile(slideVideoFile)
+            return true
+        } else {
+            return false
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     private var getCameraContent: ActivityResultLauncher<Uri?>? = registerForActivityResult(
             ActivityResultContracts.TakeVideo()
     ) {
-        // TODO Fix bug: Go to recording video but go back before recording one -> UI displayed is wrong
-        videoView.setVideoURI(videoUri)
-        videoView.seekTo(100)
+        if (!removeEmptyFileAndReturnIsEmpty()) {
+            videoView.setVideoURI(videoUri)
+            videoView.seekTo(100)
+        } else {
+            videoUri = null
+        }
 
         // UI
         updateUI()
@@ -411,7 +429,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
                     FileEnum.COURSE_DIRECTORY.key,
                     course.getCourseUUID().toString(),
                     FileEnum.SLIDE_DIRECTORY.key,
-                    course.slides?.get(slideCounter)?.slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
+                    course.getSlides()[slideCounter].slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
             )
             val slideVideoFile = FileHelper.createFileAtPath(slideVideoPath)
             videoUri = FileProvider.getUriForFile(applicationContext!!, applicationContext!!.packageName + ".fileprovider", slideVideoFile!!)
@@ -424,33 +442,31 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
 
     inner class SetVideoURI : AsyncTask<AppCodes, Void?, AppCodes>() {
         override fun doInBackground(vararg directions: AppCodes): AppCodes {
-            course.slides?.get(slideCounter)?.setVideoUri(videoUri)
+            course.getSlides()[slideCounter].setVideoUri(videoUri)
             return directions[0]
         }
 
         override fun onPostExecute(direction: AppCodes?) {
             if (direction == AppCodes.FORWARD_SLIDE) {
                 slideCounter += 1
-                if (course.getSlides()?.size == slideCounter) {
+                if (course.getSlides().size == slideCounter) {
                     val slide = Slide(UUID.randomUUID(), course)
-                    course.getSlides()?.add(slide)
+                    course.getSlides().add(slide)
                 }
 
-                videoUri = course.slides?.get(slideCounter)?.getVideoUri()
+                videoUri = course.getSlides().get(slideCounter).getVideoUri()
             } else if (direction == AppCodes.BACKWARDS_SLIDE) {
-                if (videoUri == null && slideCounter == course.getSlides()?.size?.minus(1) && slideCounter > 0) {
-                    course.getSlides()?.remove(course.getSlides()?.size?.minus(1))
+                if (videoUri == null && slideCounter == course.getSlides().size.minus(1) && slideCounter > 0) {
+                    course.getSlides().removeAt(course.getSlides().size.minus(1))
                 }
 
                 slideCounter -= 1
-                videoUri = course.getSlides()?.get(slideCounter)?.getVideoUri()
+                videoUri = course.getSlides()[slideCounter].getVideoUri()
             }
             updateUI()
         }
 
     }
-
-
 
 
 }
