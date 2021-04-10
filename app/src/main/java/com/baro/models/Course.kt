@@ -1,13 +1,9 @@
 package com.baro.models
 
 
-import android.os.Parcel
 import android.os.Parcelable
 import com.baro.constants.CategoryEnum
-import com.baro.constants.LanguageEnum
 import kotlinx.android.parcel.Parcelize
-import java.io.File
-import java.net.URI
 import java.time.LocalDate
 import java.util.*
 import kotlin.collections.ArrayList
@@ -17,10 +13,10 @@ data class
 Course // TODO discuss properties
 (private val courseUUID: UUID?, private val creator: User?, ) : Parcelable{
     private var courseName: String? = null
-    private var languageEnum: LanguageEnum? = null
+    private var country: Country? = null
     private var categoryEnum: CategoryEnum? = null
     private var updateDate: LocalDate? = null
-    internal var slides: ArrayList<Slide> = ArrayList()
+    private var slides: ArrayList<Slide> = ArrayList()
 
     fun getCourseUUID(): UUID? {
         return courseUUID
@@ -38,13 +34,14 @@ Course // TODO discuss properties
         courseName = name
     }
 
-    fun getCourseLanguage(): LanguageEnum? {
-        return languageEnum
+    fun getCourseCountry(): Country? {
+        return country
     }
 
-    fun setCourseLanguage(language :LanguageEnum) {
-        languageEnum = language
+    fun setCourseCountry(country :Country?) {
+        this.country = country
     }
+
     fun getCourseCategory(): CategoryEnum? {
         return categoryEnum
     }

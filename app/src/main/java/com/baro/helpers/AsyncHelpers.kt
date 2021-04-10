@@ -180,7 +180,7 @@ class AsyncHelpers {
             courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUserUUID().toString()
             courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
             courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
-            courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course?.getCourseLanguage()?.name
+            courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course?.getCourseCountry()?.getIsoCode()
             courseMetadata[JSONEnum.COURSE_CATEGORY.key] = course?.getCourseCategory()?.name
 
             val courseMetaDataPath = Paths.get(

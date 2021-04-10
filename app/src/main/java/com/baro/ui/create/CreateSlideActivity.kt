@@ -2,13 +2,11 @@ package com.baro.ui.create
 
 import android.content.ContentResolver
 import android.net.Uri
-import android.opengl.Visibility
 import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
-import android.widget.Toast
 import android.widget.VideoView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,7 +18,7 @@ import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
 import com.baro.constants.IntentEnum
-import com.baro.dialogs.ImageDialog
+import com.baro.ui.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnDeleteFile

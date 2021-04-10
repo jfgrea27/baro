@@ -18,8 +18,10 @@
         android:layout_height="wrap_content"
         android:text="@string/choose_language"
         android:textColor="@color/green"
+        android:textAlignment="center"
         android:textSize="@dimen/large_text"
         app:layout_constraintBottom_toTopOf="@+id/language_grid"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:gravity="center_horizontal" />
 </androidx.constraintlayout.widget.ConstraintLayout>

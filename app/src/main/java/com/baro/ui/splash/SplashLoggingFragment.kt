@@ -24,8 +24,8 @@ import com.baro.R
 import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
-import com.baro.dialogs.ImageDialog
-import com.baro.dialogs.ImageDialog.OnInputListener
+import com.baro.ui.dialogs.ImageDialog
+import com.baro.ui.dialogs.ImageDialog.OnInputListener
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
