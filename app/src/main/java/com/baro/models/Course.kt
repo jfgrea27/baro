@@ -14,8 +14,8 @@ Course // TODO discuss properties
 (private val courseUUID: UUID?, private val creator: User?, ) : Parcelable{
     private var courseName: String? = null
     private var country: Country? = null
-    private var categoryEnum: CategoryEnum? = null
-    private var updateDate: LocalDate? = null
+    private var categories = ArrayList<String>()
+    private var updateDate: LocalDate? = null // TODO Complete this part
     private var slides: ArrayList<Slide> = ArrayList()
 
     fun getCourseUUID(): UUID? {
@@ -42,12 +42,12 @@ Course // TODO discuss properties
         this.country = country
     }
 
-    fun getCourseCategory(): CategoryEnum? {
-        return categoryEnum
+    fun getCourseCategory(): ArrayList<String> {
+        return categories
     }
 
-    fun setCourseCategory(category :CategoryEnum) {
-        categoryEnum = category
+    fun setCourseCategory(category :ArrayList<String> ) {
+        categories = category
     }
 
     fun getSlides(): ArrayList<Slide> {

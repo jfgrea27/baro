@@ -1,6 +1,7 @@
 package com.baro.ui.create
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -9,10 +10,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.view.textclassifier.TextClassifierEvent.CATEGORY_SELECTION
+import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -26,16 +25,19 @@ import com.baro.helpers.IconSelector
 import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.models.Country
 import com.baro.models.Course
+import com.baro.ui.dialogs.CategoryDialog
 import com.baro.ui.dialogs.CountryDialog
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector {
+class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected{
 
     // UI
     private lateinit var courseTitleEditText: EditText
+    private lateinit var categoriesEditText: Button
     private lateinit var thumbnailButton: ImageButton
     private lateinit var languageButton: ImageButton
     private lateinit var categoryButton: ImageButton
@@ -67,8 +69,15 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
         configureLanguageButton(view)
         configureCategoryButton(view)
         configureCreateButton(view)
+        configureEditTextCategories(view)
 
         return view
+    }
+
+    private fun configureEditTextCategories(view: View) {
+        categoriesEditText = view.findViewById(R.id.edit_text_categories)
+
+
     }
 
     private fun configureCountryTextView(view: View) {
@@ -90,8 +99,19 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
 
     private fun configureCategoryButton(view: View) {
         categoryButton = view.findViewById(R.id.btn_category)
-        // TODO Set the Course Category
+
+        categoryButton.setOnClickListener{
+            val categoryButton = CategoryDialog(this)
+            categoryButton.show(parentFragmentManager, AppTags.CATEGORY_SELECTION.toString())
+        }
+
+
     }
+
+    override fun onCategorySelected(chosenCategories: ArrayList<String>) {
+        course.setCourseCategory(chosenCategories)
+    }
+
 
 
     private fun configureLanguageButton(view: View) {
@@ -99,8 +119,7 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
 
         languageButton.setOnClickListener{
             val countryDialog = CountryDialog(this)
-
-            countryDialog.show(parentFragmentManager, AppTags.COUNTRY_SELECTION.toString())
+            countryDialog.show(parentFragmentManager, AppTags.THUMBNAIL_SELECTION.toString())
         }
     }
 
@@ -118,7 +137,6 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
             val courseName = courseTitleEditText.text.toString()
             if (courseName.length > 3) {
                 course.setCourseName(courseName)
-                course.setCourseCategory(CategoryEnum.AGRICULTURE)
                 val weakContext = WeakReference<Context>(context)
                 val courseCredentialsSave = AsyncHelpers.CourseCredentialsSave(this, weakContext)
                 val taskParams = AsyncHelpers.CourseCredentialsSave.TaskParams(course, thumbnailUri)
@@ -189,6 +207,7 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
             startActivity(intentToSlideActivity)
         }
     }
+
 
 
 }

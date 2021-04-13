@@ -8,14 +8,6 @@
     android:background="@color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="0.5"
-        android:background="@color/gray">
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_marginBottom="@dimen/fragment_side_margin"
         android:layout_marginLeft="@dimen/fragment_side_margin"
         android:layout_marginRight="@dimen/fragment_side_margin"
@@ -24,8 +16,6 @@
         android:alpha="1"
         android:background="@color/white"
         android:layout_width="match_parent">
-
-
 
 
         <EditText
@@ -83,7 +73,20 @@
             app:layout_constraintTop_toTopOf="@+id/btn_language"
             app:srcCompat="@drawable/ic_account" />
 
+
+        <Button
+            android:id="@+id/edit_text_categories"
+            android:layout_width="@dimen/medium_icon_width"
+            android:layout_height="@dimen/medium_icon_width"
+            android:visibility="invisible"
+            android:backgroundTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_category"
+            app:layout_constraintEnd_toEndOf="@+id/btn_category"
+            app:layout_constraintStart_toStartOf="@+id/btn_category"
+            app:layout_constraintTop_toTopOf="@+id/btn_category" />
+
         <TextView
+            android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/text_choose_category"
