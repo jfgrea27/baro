@@ -5,7 +5,7 @@
 
     <ImageButton
         android:id="@+id/im_account"
-        android:layout_width="@dimen/large_logo_width"
+        android:layout_width="@dimen/largest_logo_width"
         android:layout_height="@dimen/large_logo_height"
         android:scaleType="fitCenter"
         android:backgroundTint="@color/white"

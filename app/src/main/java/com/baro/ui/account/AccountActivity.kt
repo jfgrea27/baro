@@ -1,21 +1,32 @@
 package com.baro.ui.account
 
+import android.content.Context
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.baro.R
+import com.baro.adapters.CourseAdapter
 import com.baro.constants.AppTags
+import com.baro.constants.FileEnum
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.interfaces.OnUserDataFound
+import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
 import com.baro.models.Course
 import com.baro.models.User
 import com.baro.ui.create.CreateCourseSummaryFragment
+import java.lang.ref.WeakReference
+import java.nio.file.Paths
 import java.util.*
+import kotlin.collections.ArrayList
 
 
-class AccountActivity : AppCompatActivity(), OnUserDataFound {
+class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad {
     // UI
     private lateinit var userThumbnailImageView: ImageView
     private lateinit var followersButton: ImageButton
@@ -25,7 +36,9 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound {
 
     // Model
     private var user: User? = null
+    private lateinit var courses: ArrayList<Pair<Course, Uri>>
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_account)
@@ -44,7 +57,6 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound {
         val loadUserDataParams = AsyncHelpers.LoadUserData.TaskParams(user, this.contentResolver)
         val userRetrieveThumbnail = AsyncHelpers.LoadUserData(this)
         userRetrieveThumbnail.execute(loadUserDataParams)
-
 
     }
 
@@ -85,8 +97,20 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun configureRecycleView() {
-        // TODO Gridview that holds the Courses
+        courseRecycleView = findViewById(R.id.grid_courses)
+
+
+        courseRecycleView.layoutManager = GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
+
+        var courseFile = Paths.get(getExternalFilesDir(null).toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.COURSE_DIRECTORY.key).toFile()
+        var params = AsyncHelpers.CreatorCourseCredentialsLoad.TaskParams(courseFile, user)
+        AsyncHelpers.CreatorCourseCredentialsLoad(this).execute(params)
+
+
     }
 
     override fun onDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
@@ -96,6 +120,18 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound {
                 userThumbnailImageView.setImageBitmap(imageBmp)
             }
         }
+    }
+
+    override fun onCreatorCourseCredentialsLoad(courses: ArrayList<Pair<Course, Uri>>) {
+        this.courses = courses
+
+        updateRecycleView()
+    }
+
+    private fun updateRecycleView() {
+        var weakReference = WeakReference<Context>(this)
+        var adapter = CourseAdapter(weakReference, this.courses)
+        courseRecycleView.adapter = adapter
     }
 
 

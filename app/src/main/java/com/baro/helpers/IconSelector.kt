@@ -37,7 +37,7 @@ object IconSelector {
                 val key = iter.next()
                 try {
                     val value = jsonCountries[key] as String
-                    countries.add(Country(key, value))
+                    countries.add(Country(key))
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }

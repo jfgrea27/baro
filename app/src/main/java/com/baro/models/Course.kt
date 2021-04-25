@@ -9,8 +9,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 @Parcelize
-data class
-Course // TODO discuss properties
+data class Course
 (private val courseUUID: UUID?, private val creator: User?, ) : Parcelable{
     private var courseName: String? = null
     private var country: Country? = null

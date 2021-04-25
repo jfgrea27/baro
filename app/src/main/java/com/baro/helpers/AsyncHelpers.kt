@@ -8,15 +8,20 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.baro.constants.CategoryEnum
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
 import com.baro.helpers.interfaces.*
+import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
+import com.baro.models.Country
 import com.baro.models.Course
 import com.baro.models.User
+import org.json.JSONArray
 import java.io.File
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
@@ -224,6 +229,58 @@ class AsyncHelpers {
     }
 
 
+    class CreatorCourseCredentialsLoad(private var callback: OnCreatorCourseCredentialsLoad) : AsyncTask<CreatorCourseCredentialsLoad.TaskParams, Void?, ArrayList<Pair<Course, Uri>>>() {
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun doInBackground(vararg params: TaskParams?): ArrayList<Pair<Course, Uri>> {
+            var courses = ArrayList<Pair<Course, Uri>>()
+
+            val coursesFile = params[0]?.coursesFile
+            val user = params[0]?.user
+
+            for (courseFolder in coursesFile?.listFiles()!!) {
+
+                if (courseFolder.isDirectory) {
+                    var jsonFilePath = Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
+
+                    var jsonFile = jsonFilePath.toFile()
+
+
+                    var contents = FileHelper.readFile(jsonFile)
+
+                    var jsonContents = JSONHelper.createJSONFromString(contents!!)
+
+                    var courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
+                    var courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
+                    var category = jsonContents?.get(JSONEnum.COURSE_CATEGORY.key)
+                    var language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
+
+                    var course = Course(UUID.fromString(courseUUID as String?), user)
+                    course.setCourseName(courseName as String)
+                    course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(category as JSONArray))
+                    course.setCourseCountry(Country(language as String))
+
+                    var imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                    var imageFile = imagePath.toFile()
+                    var imageUri = Uri.fromFile(imageFile)
+
+                    var pair = Pair<Course, Uri>(course, imageUri)
+                    courses.add(pair)
+                }
+            }
+
+            return courses
+        }
+
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun onPostExecute(result: ArrayList<Pair<Course, Uri>>) {
+            callback.onCreatorCourseCredentialsLoad(result)
+        }
+
+        class TaskParams(var coursesFile: File?, var user: User?)
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     class VideoUriSave(private var callback: OnVideoUriSaved, private var weakReferenceContentResolver: WeakReference<ContentResolver>) : AsyncTask<VideoUriSave.TaskParams, Void?, File?>() {
         override fun doInBackground(vararg params: TaskParams?): File? {
             val outputFile = params[0]?.outputFile
@@ -290,4 +347,7 @@ class AsyncHelpers {
         class TaskParams(var fileToUpdate: File?, var hashMapData: HashMap<String, ArrayList<String>>?)
 
     }
+
+
+
 }

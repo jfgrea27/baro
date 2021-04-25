@@ -7,7 +7,7 @@ import com.baro.helpers.IconSelector
 import java.lang.ref.WeakReference
 import java.util.*
 
-class Country(var isoCountryCode: String, var dialingNumber: String) {
+class Country(var isoCountryCode: String) {
     fun getIsoCode(): String? {
         return isoCountryCode
     }

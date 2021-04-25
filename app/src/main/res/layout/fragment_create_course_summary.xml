@@ -34,7 +34,7 @@
 
         <ImageButton
             android:id="@+id/btn_course_thumbnail"
-            android:layout_width="@dimen/large_logo_width"
+            android:layout_width="@dimen/largest_logo_width"
             android:layout_height="@dimen/large_logo_height"
             android:background="@color/white"
             android:scaleType="fitCenter"
