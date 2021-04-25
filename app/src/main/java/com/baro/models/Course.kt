@@ -14,7 +14,7 @@ Course // TODO discuss properties
 (private val courseUUID: UUID?, private val creator: User?, ) : Parcelable{
     private var courseName: String? = null
     private var country: Country? = null
-    private var categories = ArrayList<String>()
+    private var categories = ArrayList<Category>()
     private var updateDate: LocalDate? = null // TODO Complete this part
     private var slides: ArrayList<Slide> = ArrayList()
 
@@ -42,11 +42,11 @@ Course // TODO discuss properties
         this.country = country
     }
 
-    fun getCourseCategory(): ArrayList<String> {
+    fun getCourseCategory(): ArrayList<Category> {
         return categories
     }
 
-    fun setCourseCategory(category :ArrayList<String> ) {
+    fun setCourseCategory(category :ArrayList<Category> ) {
         categories = category
     }
 

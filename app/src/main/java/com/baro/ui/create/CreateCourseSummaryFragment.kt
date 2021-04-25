@@ -1,7 +1,6 @@
 package com.baro.ui.create
 
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -10,7 +9,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.textclassifier.TextClassifierEvent.CATEGORY_SELECTION
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,8 +19,8 @@ import com.baro.constants.*
 import com.baro.ui.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
-import com.baro.helpers.IconSelector
 import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
+import com.baro.models.Category
 import com.baro.models.Country
 import com.baro.models.Course
 import com.baro.ui.dialogs.CategoryDialog
@@ -31,13 +29,14 @@ import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashSet
 
 
 class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected{
 
     // UI
     private lateinit var courseTitleEditText: EditText
-    private lateinit var categoriesEditText: Button
+    private lateinit var categoryTextView: TextView
     private lateinit var thumbnailButton: ImageButton
     private lateinit var languageButton: ImageButton
     private lateinit var categoryButton: ImageButton
@@ -57,6 +56,7 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
@@ -75,9 +75,7 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
     }
 
     private fun configureEditTextCategories(view: View) {
-        categoriesEditText = view.findViewById(R.id.edit_text_categories)
-
-
+        categoryTextView = view.findViewById(R.id.txt_category)
     }
 
     private fun configureCountryTextView(view: View) {
@@ -97,6 +95,7 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun configureCategoryButton(view: View) {
         categoryButton = view.findViewById(R.id.btn_category)
 
@@ -104,14 +103,23 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
             val categoryButton = CategoryDialog(this)
             categoryButton.show(parentFragmentManager, AppTags.CATEGORY_SELECTION.toString())
         }
-
-
     }
 
-    override fun onCategorySelected(chosenCategories: ArrayList<String>) {
-        course.setCourseCategory(chosenCategories)
+    override fun onCategorySelected(chosenCategories: HashSet<Category>) {
+        var arrayListCategories = ArrayList<Category>(chosenCategories)
+        course.setCourseCategory(arrayListCategories)
+
+
+        updateCategoryTextView()
     }
 
+    private fun updateCategoryTextView() {
+        var string = ""
+        for (category in course.getCourseCategory()){
+            string += category.emoji + " "
+        }
+        categoryTextView.text = string
+    }
 
 
     private fun configureLanguageButton(view: View) {

@@ -11,7 +11,7 @@
     <string name="share_online">Share Online</string>
     <string name="receive">Receive</string>
     <string name="send">Send</string>
-    <string name="toast_no_username_found">\"No username found. \"</string>
+    <string name="toast_no_username_found">No username found.</string>
     <string name="please_enter_valid_username_toast">Please enter a valid username</string>
     <string name="need_camera_access_toast">Need camera access</string>
     <string name="write_storage_permission">Need write external storage access</string>
@@ -27,29 +27,4 @@
     <string name="choose_language">Choose Language</string>
     <string name="flag_name">Flag Name</string>
     <string name="choose_Categories">Choose Categories</string>
-
-    <string-array name="Categories" >
-        <!--HEALTH-->
-        <item>😷 Mask</item>
-        <item>\uD83D\uDC89</item> <!--Syringe-->
-        <item>\uD83E\uDE79</item> <!--Bandage-->
-        <item>\uD83E\uDDFC</item> <!--Soap-->
-        <item>\uD83D\uDEB0</item> <!--Drinkable Water-->
-        <item>\uD83C\uDFE5</item> <!--Hospital-->
-        <!--HOUSE-->
-        <item>\uD83D\uDC6A</item> <!--Family-->
-        <item>\uD83C\uDFD8</item> <!--House-->
-        <item>\uD83E\uDDF1</item> <!--Brick-->
-        <!--AGRICULTURE-->
-        <item>\uD83C\uDF3E</item> <!--Wheat-->
-        <item>\uD83D\uDC04</item> <!--Cow-->
-        <item>\uD83C\uDF3F</item> <!--Herb-->
-        <!--MECHANICS-->
-        <item>\uD83D\uDEE0</item> <!--Tools-->
-        <item>\uD83D\uDEF5</item> <!--Motorbike-->
-        <item>\uD83D\uDE97</item> <!--Car-->
-        <!--OTHER-->
-        <item>uD83D\uDD8C</item> <!--Art-->
-        <item>uD83D\uDED0</item> <!--Pray-->
-    </string-array>
 </resources>

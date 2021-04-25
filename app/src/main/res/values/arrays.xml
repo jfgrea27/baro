@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="Categories" >
+        <!--HEALTH-->
+        <item name="Mask">😷</item>
+        <item name="Syringe">\uD83D\uDC89</item>
+        <item name="Bandage">\uD83E\uDE79</item>
+        <item name="Soap">\uD83E\uDDFC</item>
+        <item name="Drinkable Water">\uD83D\uDEB0</item>
+        <item name="Hospital">\uD83C\uDFE5</item>
+        <!--HOUSE-->
+        <item name="Family">\uD83D\uDC6A</item>
+        <item name="House"></item>
+        <item name="Brick">\uD83E\uDDF1</item>
+        <!--AGRICULTURE-->
+        <item name="Wheat">\uD83C\uDF3E</item>
+        <item name="Cow">\uD83D\uDC04</item>
+        <item name="Herb">\uD83C\uDF3F</item>
+        <!--MECHANICS-->
+        <item name="Tools">\uD83D\uDEE0</item>
+        <item name="Motorbike">\uD83D\uDEF5</item>
+        <item name="Car">\uD83D\uDE97</item>
+        <!--OTHER-->
+        <item name="Art">\uD83D\uDD8C</item>
+        <item name="Pray">\uD83D\uDED0</item>
+    </string-array>
+</resources>
