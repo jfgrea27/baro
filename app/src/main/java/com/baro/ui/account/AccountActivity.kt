@@ -104,10 +104,10 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
 
         courseRecycleView.layoutManager = GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
 
-        var courseFile = Paths.get(getExternalFilesDir(null).toString(),
+        var coursePath = Paths.get(getExternalFilesDir(null).toString(),
                 FileEnum.USER_DIRECTORY.key,
-                FileEnum.COURSE_DIRECTORY.key).toFile()
-        var params = AsyncHelpers.CreatorCourseCredentialsLoad.TaskParams(courseFile, user)
+                FileEnum.COURSE_DIRECTORY.key)
+        var params = AsyncHelpers.CreatorCourseCredentialsLoad.TaskParams(coursePath, user)
         AsyncHelpers.CreatorCourseCredentialsLoad(this).execute(params)
 
 

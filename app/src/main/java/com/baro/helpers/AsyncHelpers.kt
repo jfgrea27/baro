@@ -19,6 +19,7 @@ import com.baro.models.User
 import org.json.JSONArray
 import java.io.File
 import java.lang.ref.WeakReference
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import kotlin.collections.ArrayList
@@ -234,39 +235,42 @@ class AsyncHelpers {
         override fun doInBackground(vararg params: TaskParams?): ArrayList<Pair<Course, Uri>> {
             var courses = ArrayList<Pair<Course, Uri>>()
 
-            val coursesFile = params[0]?.coursesFile
+            val path = params[0]?.path
+            val coursesFile = FileHelper.createDirAtPath(path)
             val user = params[0]?.user
+            if (coursesFile?.listFiles() != null) {
+                for (courseFolder in coursesFile.listFiles()) {
 
-            for (courseFolder in coursesFile?.listFiles()!!) {
+                    if (courseFolder.isDirectory) {
+                        var jsonFilePath = Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
 
-                if (courseFolder.isDirectory) {
-                    var jsonFilePath = Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
-
-                    var jsonFile = jsonFilePath.toFile()
+                        var jsonFile = jsonFilePath.toFile()
 
 
-                    var contents = FileHelper.readFile(jsonFile)
+                        var contents = FileHelper.readFile(jsonFile)
 
-                    var jsonContents = JSONHelper.createJSONFromString(contents!!)
+                        var jsonContents = JSONHelper.createJSONFromString(contents!!)
 
-                    var courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
-                    var courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
-                    var category = jsonContents?.get(JSONEnum.COURSE_CATEGORY.key)
-                    var language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
+                        var courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
+                        var courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
+                        var category = jsonContents?.get(JSONEnum.COURSE_CATEGORY.key)
+                        var language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
 
-                    var course = Course(UUID.fromString(courseUUID as String?), user)
-                    course.setCourseName(courseName as String)
-                    course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(category as JSONArray))
-                    course.setCourseCountry(Country(language as String))
+                        var course = Course(UUID.fromString(courseUUID as String?), user)
+                        course.setCourseName(courseName as String)
+                        course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(category as JSONArray))
+                        course.setCourseCountry(Country(language as String))
 
-                    var imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
-                    var imageFile = imagePath.toFile()
-                    var imageUri = Uri.fromFile(imageFile)
+                        var imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                        var imageFile = imagePath.toFile()
+                        var imageUri = Uri.fromFile(imageFile)
 
-                    var pair = Pair<Course, Uri>(course, imageUri)
-                    courses.add(pair)
+                        var pair = Pair<Course, Uri>(course, imageUri)
+                        courses.add(pair)
+                    }
                 }
             }
+
 
             return courses
         }
@@ -276,7 +280,7 @@ class AsyncHelpers {
             callback.onCreatorCourseCredentialsLoad(result)
         }
 
-        class TaskParams(var coursesFile: File?, var user: User?)
+        class TaskParams(var path: Path?, var user: User?)
     }
 
 
@@ -347,7 +351,6 @@ class AsyncHelpers {
         class TaskParams(var fileToUpdate: File?, var hashMapData: HashMap<String, ArrayList<String>>?)
 
     }
-
 
 
 }

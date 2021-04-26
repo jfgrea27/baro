@@ -43,6 +43,15 @@ object FileHelper {
         }
     }
 
+    fun createDirAtPath(path: Path?): File {
+        val file = File(path.toString())
+        if (!file.exists()) {
+            file.mkdirs()
+        }
+
+        return file
+    }
+
     private fun createFile(file: File?): File? {
         file?.parentFile?.mkdirs()
         try {
