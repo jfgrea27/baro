@@ -186,6 +186,7 @@ class AsyncHelpers {
             courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUserUUID().toString()
             courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
             courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
+            courseMetadata[JSONEnum.COURSE_CREATION_DATETIME.key] = course.getCreationDate()?.toString()
             courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course?.getCourseCountry()?.getIsoCode()
             courseMetadata[JSONEnum.COURSE_CATEGORY.key] = course?.getCourseCategory().toString()
 
@@ -232,47 +233,62 @@ class AsyncHelpers {
 
     class CreatorCourseCredentialsLoad(private var callback: OnCreatorCourseCredentialsLoad) : AsyncTask<CreatorCourseCredentialsLoad.TaskParams, Void?, ArrayList<Pair<Course, Uri>>>() {
         @RequiresApi(Build.VERSION_CODES.P)
-        override fun doInBackground(vararg params: TaskParams?): ArrayList<Pair<Course, Uri>> {
+        override fun doInBackground(vararg params: TaskParams?): ArrayList<Pair<Course, Uri>>? {
             var courses = ArrayList<Pair<Course, Uri>>()
 
             val path = params[0]?.path
             val coursesFile = FileHelper.createDirAtPath(path)
             val user = params[0]?.user
-            if (coursesFile?.listFiles() != null) {
+            if (coursesFile.listFiles() != null) {
                 for (courseFolder in coursesFile.listFiles()) {
 
                     if (courseFolder.isDirectory) {
-                        var jsonFilePath = Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
+                        val jsonFilePath = Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
 
-                        var jsonFile = jsonFilePath.toFile()
+                        val jsonFile = jsonFilePath.toFile()
 
 
-                        var contents = FileHelper.readFile(jsonFile)
+                        val contents = FileHelper.readFile(jsonFile)
 
-                        var jsonContents = JSONHelper.createJSONFromString(contents!!)
+                        val jsonContents = JSONHelper.createJSONFromString(contents!!)
 
-                        var courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
-                        var courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
-                        var category = jsonContents?.get(JSONEnum.COURSE_CATEGORY.key)
-                        var language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
-
-                        var course = Course(UUID.fromString(courseUUID as String?), user)
+                        val courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
+                        val courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
+                        val category = jsonContents?.get(JSONEnum.COURSE_CATEGORY.key)
+                        val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
+                        val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key) as Long
+                        val course = Course(UUID.fromString(courseUUID as String?), user)
                         course.setCourseName(courseName as String)
                         course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(category as JSONArray))
-                        course.setCourseCountry(Country(language as String))
+                        if (language.toString() == "null") {
+                            course.setCourseCountry(Country(null))
+                        } else {
+                            course.setCourseCountry(Country(language.toString()))
 
-                        var imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
-                        var imageFile = imagePath.toFile()
-                        var imageUri = Uri.fromFile(imageFile)
+                        }
 
-                        var pair = Pair<Course, Uri>(course, imageUri)
+                        course.setCreationDate(courseCreationTimestamp)
+
+                        val imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                        val imageFile = imagePath.toFile()
+                        val imageUri = Uri.fromFile(imageFile)
+
+                        val pair = Pair<Course, Uri>(course, imageUri)
                         courses.add(pair)
                     }
                 }
             }
 
+            var arrayListResults = ArrayList<Pair<Course, Uri>>()
 
-            return courses
+            if (courses.size > 1) {
+                courses.sortedBy { it.first }
+            }
+            for (course in courses) {
+                arrayListResults.add(course)
+            }
+            return arrayListResults
+
         }
 
         @RequiresApi(Build.VERSION_CODES.P)

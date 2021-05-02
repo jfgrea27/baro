@@ -7,7 +7,7 @@ import com.baro.helpers.IconSelector
 import java.lang.ref.WeakReference
 import java.util.*
 
-class Country(var isoCountryCode: String) {
+class Country(var isoCountryCode: String?) {
     fun getIsoCode(): String? {
         return isoCountryCode
     }
@@ -21,5 +21,9 @@ class Country(var isoCountryCode: String) {
     fun getImageResource(context: WeakReference<Context>): Int {
         val drawableName = isoCountryCode?.toLowerCase(Locale.ENGLISH) + "_flag"
         return IconSelector.getMipmapResId(context.get(), drawableName)
+    }
+    fun getImageResource(context: Context): Int {
+        val drawableName = isoCountryCode?.toLowerCase(Locale.ENGLISH) + "_flag"
+        return IconSelector.getMipmapResId(context, drawableName)
     }
 }

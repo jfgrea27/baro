@@ -15,4 +15,5 @@
     <dimen name="medium_large_icon_width">150dp</dimen>
     <dimen name="smallest_icon_height">40dp</dimen>
     <dimen name="large_logo_width">180dp</dimen>
+    <dimen name="small_text">15dp</dimen>
 </resources>

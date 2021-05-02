@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="@dimen/large_logo_width"
-    android:layout_height="@dimen/large_logo_width"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:orientation="horizontal"
-        android:padding="@dimen/small_padding"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:padding="@dimen/small_padding">
 
         <ImageButton
             android:id="@+id/btn_course_thumbnail"
             android:layout_width="@dimen/medium_large_icon_width"
             android:layout_height="@dimen/medium_large_icon_width"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             android:background="@color/white"
             android:scaleType="fitCenter"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_course_title"
             app:srcCompat="@drawable/ic_book" />
 
         <ImageView
@@ -27,11 +28,11 @@
             android:layout_height="@dimen/smallest_icon_height"
             android:background="@color/white"
             android:gravity="center"
-            app:srcCompat="@drawable/ic_flag"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/btn_language"
             app:layout_constraintStart_toStartOf="@+id/btn_language"
-            app:layout_constraintTop_toBottomOf="@+id/btn_course_thumbnail" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_course_thumbnail"
+            app:srcCompat="@drawable/ic_flag" />
 
         <TextView
             android:id="@+id/txt_category"
@@ -43,6 +44,18 @@
             app:layout_constraintStart_toStartOf="@+id/btn_course_thumbnail"
             app:layout_constraintTop_toBottomOf="@+id/btn_course_thumbnail" />
 
+        <TextView
+            android:id="@+id/txt_course_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="Course Name"
+            android:textSize="@dimen/small_text"
+            android:background="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:gravity="center_horizontal" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>    
 </LinearLayout>

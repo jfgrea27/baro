@@ -11,13 +11,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
+import androidx.core.net.toFile
 import androidx.recyclerview.widget.RecyclerView
 import com.baro.R
-import com.baro.models.Category
 import com.baro.models.Course
 import java.lang.ref.WeakReference
 
-class CourseAdapter internal constructor(var context: WeakReference<Context>, var courses: ArrayList<Pair<Course, Uri>>) : RecyclerView.Adapter<CourseAdapter.ViewHolder>() {
+class CourseAdapter internal constructor(var context: WeakReference<Context>, var courses: ArrayList<Pair<Course, Uri>>, var onCourseSelected: OnCourseSelected) : RecyclerView.Adapter<CourseAdapter.ViewHolder>() {
     private val mInflater: LayoutInflater = LayoutInflater.from(context.get())
 
     @NonNull
@@ -31,31 +31,36 @@ class CourseAdapter internal constructor(var context: WeakReference<Context>, va
 
         val courseLanguage = courses[position].first.getCourseCountry()
         val courseCategory = courses[position].first.getCourseCategory()
+        val courseTitle = courses[position].first.getCourseName()
 
         val courseImage = courses[position].second
+        val courseImageFile = courseImage.toFile()
+        if (courseImageFile.length() > 0) {
+            holder.courseButton.setImageURI(courseImage)
+        }
 
-        holder.courseCountry.setImageResource(courseLanguage?.getImageResource(context)!!)
+        if (courseLanguage?.getIsoCode() == null) {
+            holder.courseCountry.setImageResource(R.drawable.ic_flag)
+        } else {
+            holder.courseCountry.setImageResource(courseLanguage.getImageResource(context)!!)
 
-        var string = ""
+        }
+
+        var categories = ""
 
         for (category in courseCategory) {
-            string += "$category "
+            categories += "$category "
         }
-        holder.courseCategory.text = string
-        holder.courseButton.setImageURI(courseImage)
 
+        if (categories == "") {
+            holder.courseCategory.text = context.get()?.resources?.getString(R.string.no_category)
+        } else {
+            holder.courseCategory.text = categories
+        }
+
+        holder.courseTitle.text = courseTitle
         holder.courseButton.setOnClickListener(View.OnClickListener {
-//            .isSelected = !category.isSelected
-//
-//            if (category.isSelected) {
-//                selectedCategories.add(category)
-//                holder.categoryText.setBackgroundResource(R.color.light_green)
-//            } else {
-//                selectedCategories.remove(category)
-//                holder.categoryText.setBackgroundResource(R.color.white)
-//            }
-
-
+            onCourseSelected.notifyCourseSelected(courses[position].first)
         })
     }
 
@@ -68,12 +73,12 @@ class CourseAdapter internal constructor(var context: WeakReference<Context>, va
     }
 
 
-
-
     inner class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var courseTitle: TextView = itemView.findViewById(R.id.txt_course_title)
         var courseButton: ImageButton = itemView.findViewById(R.id.btn_course_thumbnail)
         var courseCountry: ImageView = itemView.findViewById(R.id.ic_language)
         var courseCategory: TextView = itemView.findViewById(R.id.txt_category)
     }
 
+    public interface OnCourseSelected { fun notifyCourseSelected(course: Course)}
 }

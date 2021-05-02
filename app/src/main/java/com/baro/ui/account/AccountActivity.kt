@@ -20,13 +20,14 @@ import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
 import com.baro.models.Course
 import com.baro.models.User
 import com.baro.ui.create.CreateCourseSummaryFragment
+import com.baro.ui.create.EditCourseSummaryFragment
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad {
+class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad, CourseAdapter.OnCourseSelected {
     // UI
     private lateinit var userThumbnailImageView: ImageView
     private lateinit var followersButton: ImageButton
@@ -68,7 +69,8 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
         createButton.setOnClickListener {
             // TODO __PERMISSION_REFACTOR__
 
-            var course = Course(UUID.randomUUID(), user)
+            val course = Course(UUID.randomUUID(), user)
+            course.setCreationDate(System.currentTimeMillis())
             val createCourseSummaryFragment: CreateCourseSummaryFragment = CreateCourseSummaryFragment.newInstance(course)
 
             supportFragmentManager.beginTransaction()
@@ -130,8 +132,20 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
 
     private fun updateRecycleView() {
         var weakReference = WeakReference<Context>(this)
-        var adapter = CourseAdapter(weakReference, this.courses)
+        var adapter = CourseAdapter(weakReference, this.courses, this)
         courseRecycleView.adapter = adapter
+    }
+
+    override fun notifyCourseSelected(course: Course) {
+        // TODO __PERMISSION_REFACTOR__
+
+        val editCourseSummaryFragment: EditCourseSummaryFragment = EditCourseSummaryFragment.newInstance(course)
+
+        supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container_view, editCourseSummaryFragment, null)
+                .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)
+                .setReorderingAllowed(true)
+                .commit()
     }
 
 

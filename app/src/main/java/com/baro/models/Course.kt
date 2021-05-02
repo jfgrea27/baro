@@ -10,15 +10,21 @@ import kotlin.collections.ArrayList
 
 @Parcelize
 data class Course
-(private val courseUUID: UUID?, private val creator: User?, ) : Parcelable{
+(private val courseUUID: UUID?, private val creator: User?, ) : Parcelable, Comparable<Course>{
     private var courseName: String? = null
     private var country: Country? = null
     private var categories = ArrayList<Category>()
-    private var updateDate: LocalDate? = null // TODO Complete this part
+    private var creationDate: Long? = null
     private var slides: ArrayList<Slide> = ArrayList()
 
     fun getCourseUUID(): UUID? {
         return courseUUID
+    }
+    fun getCreationDate(): Long? {
+        return creationDate
+    }
+    fun setCreationDate(timestamp: Long) {
+        creationDate = timestamp
     }
 
     fun getCreator(): User? {
@@ -51,6 +57,10 @@ data class Course
 
     fun getSlides(): ArrayList<Slide> {
         return slides
+    }
+
+    override fun compareTo(other: Course): Int {
+        return getCreationDate()!!.compareTo(other.getCreationDate()!!)
     }
 
 }
