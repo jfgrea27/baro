@@ -6,8 +6,10 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.baro.R
@@ -15,6 +17,7 @@ import com.baro.adapters.CourseAdapter
 import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
 import com.baro.helpers.AsyncHelpers
+import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
 import com.baro.models.Course
@@ -24,10 +27,10 @@ import com.baro.ui.create.EditCourseSummaryFragment
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
-import kotlin.collections.ArrayList
 
 
-class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad, CourseAdapter.OnCourseSelected {
+class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad, CourseAdapter.OnCourseSelected, OnCourseCredentialsSaveComplete {
+
     // UI
     private lateinit var userThumbnailImageView: ImageView
     private lateinit var followersButton: ImageButton
@@ -61,7 +64,19 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
 
     }
 
+    override fun onBackPressed() {
+        tellFragments()
+        super.onBackPressed()
+    }
 
+    private fun tellFragments() {
+        val fragments: List<Fragment> = supportFragmentManager.fragments
+        for (f in fragments) {
+            if (f != null && f is EditCourseSummaryFragment) {
+                f.onBackPressed()
+            }
+        }
+    }
 
     private fun configureCreateButton() {
         createButton = findViewById(R.id.btn_create)
@@ -148,5 +163,10 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
                 .commit()
     }
 
+    override fun onDataReturned(result: Boolean?) {
+        if (result == true) {
+            Toast.makeText(this, "DEV - Course meta data updated", Toast.LENGTH_LONG).show()
+        }
+    }
 
 }

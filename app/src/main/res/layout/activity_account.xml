@@ -23,6 +23,9 @@
         app:layout_constraintBottom_toTopOf="@+id/text_account"
         app:layout_constraintEnd_toStartOf="@+id/btn_settings"
         app:layout_constraintStart_toEndOf="@+id/im_account"
+        app:srcCompat="@drawable/ic_people"
+        android:scaleType="fitCenter"
+        android:backgroundTint="@color/white"
         app:layout_constraintTop_toTopOf="@+id/im_account" />
 
     <ImageButton
@@ -100,6 +103,7 @@
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

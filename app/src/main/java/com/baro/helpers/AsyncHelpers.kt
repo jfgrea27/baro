@@ -187,8 +187,13 @@ class AsyncHelpers {
             courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
             courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
             courseMetadata[JSONEnum.COURSE_CREATION_DATETIME.key] = course.getCreationDate()?.toString()
-            courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course?.getCourseCountry()?.getIsoCode()
-            courseMetadata[JSONEnum.COURSE_CATEGORY.key] = course?.getCourseCategory().toString()
+            val isoCode = course.getCourseCountry()?.getIsoCode()
+            if (isoCode == null) {
+                courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = "null"
+            } else {
+                courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course.getCourseCountry()?.getIsoCode()
+            }
+            courseMetadata[JSONEnum.COURSE_CATEGORY.key] = JSONArray(course.getCourseCategory().toString()).toString()
 
             val courseMetaDataPath = Paths.get(
                     context.get()?.getExternalFilesDir(null).toString(),
@@ -199,9 +204,10 @@ class AsyncHelpers {
             )
 
             val courseMetaDataFile = FileHelper.createFileAtPath(courseMetaDataPath)
+            val courseJSONMeta = JSONHelper.createJSONFromHashMap(courseMetadata)
 
 
-            FileHelper.writeToFile(courseMetaDataFile, courseMetadata.toString())
+            FileHelper.writeToFile(courseMetaDataFile, courseJSONMeta.toString())
         }
 
         @RequiresApi(api = Build.VERSION_CODES.P)
@@ -254,12 +260,12 @@ class AsyncHelpers {
 
                         val courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
                         val courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
-                        val category = jsonContents?.get(JSONEnum.COURSE_CATEGORY.key)
+                        val categoryJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString())
                         val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
-                        val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key) as Long
+                        val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString().toLong()
                         val course = Course(UUID.fromString(courseUUID as String?), user)
                         course.setCourseName(courseName as String)
-                        course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(category as JSONArray))
+                        course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(categoryJSON as JSONArray))
                         if (language.toString() == "null") {
                             course.setCourseCountry(Country(null))
                         } else {
@@ -365,6 +371,24 @@ class AsyncHelpers {
         }
 
         class TaskParams(var fileToUpdate: File?, var hashMapData: HashMap<String, ArrayList<String>>?)
+
+    }
+
+    class DeleteCourse(private var context: WeakReference<Context>) : AsyncTask<DeleteCourse.TaskParams, Boolean?, Boolean?>() {
+
+        class TaskParams(var course: Course)
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun doInBackground(vararg params: TaskParams?): Boolean? {
+            val course = params[0]?.course
+            val coursePath = Paths.get(context.get()?.getExternalFilesDir(null).toString(),
+                    FileEnum.USER_DIRECTORY.key,
+                    FileEnum.COURSE_DIRECTORY.key,
+                    course?.getCourseUUID().toString())
+            val courseFile = coursePath.toFile()
+            FileHelper.deleteFile(courseFile)
+            return true
+        }
 
     }
 

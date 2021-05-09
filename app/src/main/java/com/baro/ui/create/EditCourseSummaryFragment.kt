@@ -22,16 +22,18 @@ import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.models.Category
 import com.baro.models.Country
 import com.baro.models.Course
+import com.baro.ui.account.AccountActivity
 import com.baro.ui.dialogs.CategoryDialog
 import com.baro.ui.dialogs.CountryDialog
 import com.baro.ui.dialogs.ImageDialog
+import com.baro.ui.interfaces.OnBackPressed
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected{
+class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected, OnBackPressed{
 
     // UI
     private lateinit var courseTitleEditText: EditText
@@ -56,6 +58,7 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
         }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -77,17 +80,18 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
     }
 
     private fun configureDeleteButton(view: View) {
-    }
+        deleteButton = view.findViewById(R.id.btn_delete)
 
+        deleteButton.setOnClickListener{
+            val weakContext = WeakReference<Context>(context)
+            val asyncHelpers = AsyncHelpers.DeleteCourse(weakContext)
+            val params = AsyncHelpers.DeleteCourse.TaskParams(course)
+            asyncHelpers.execute(params)
 
-    fun onBackPressed(): Boolean {
-        return if (openedLine < 0) {
-            false
-        } else {
-            closeDetail()
-            true
+            activity?.onBackPressed();
         }
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun updateUI() {
@@ -270,18 +274,16 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
     }
 
     override fun onDataReturned(result: Boolean?) {
-        if (result == true) {
-            val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
 
-            intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
-
-            activity?.supportFragmentManager?.beginTransaction()
-                    ?.remove(this@EditCourseSummaryFragment)
-                    ?.commit()
-            startActivity(intentToSlideActivity)
-        }
     }
 
-
-
+    override fun onBackPressed() {
+        val courseName = courseTitleEditText.text.toString()
+        course.setCourseName(courseName)
+        val weakContext = WeakReference<Context>(context)
+        val  accountActivity = activity as OnCourseCredentialsSaveComplete
+        val courseCredentialsSave = AsyncHelpers.CourseCredentialsSave(accountActivity, weakContext)
+        val taskParams = AsyncHelpers.CourseCredentialsSave.TaskParams(course, thumbnailUri)
+        courseCredentialsSave.execute(taskParams)
+    }
 }

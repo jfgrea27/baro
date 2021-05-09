@@ -215,7 +215,4 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
             startActivity(intentToSlideActivity)
         }
     }
-
-
-
 }
