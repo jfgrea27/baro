@@ -21,7 +21,6 @@ import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
 import com.baro.models.Course
-import com.baro.models.Slide
 import com.baro.models.User
 import com.baro.ui.create.CreateCourseSummaryFragment
 import com.baro.ui.create.EditCourseSummaryFragment
@@ -30,7 +29,8 @@ import java.nio.file.Paths
 import java.util.*
 
 
-class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad, CourseAdapter.OnCourseSelected, OnCourseCredentialsSaveComplete, OnDeleteCourse {
+class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad,
+    CourseAdapter.OnCourseSelected, OnCourseCredentialsSaveComplete, OnDeleteCourse{
     // UI
     private lateinit var userThumbnailImageView: ImageView
     private lateinit var followersButton: ImageButton
@@ -88,13 +88,14 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
 
             val course = Course(UUID.randomUUID(), user)
             course.setCreationDate(System.currentTimeMillis())
-            val createCourseSummaryFragment: CreateCourseSummaryFragment = CreateCourseSummaryFragment.newInstance(course)
+            val createCourseSummaryFragment: CreateCourseSummaryFragment =
+                CreateCourseSummaryFragment.newInstance(course)
 
             supportFragmentManager.beginTransaction()
-                    .add(R.id.fragment_container_view, createCourseSummaryFragment, null)
-                    .addToBackStack(AppTags.CREATE_COURSE_SUMMARY_FRAGMENT.name)
-                    .setReorderingAllowed(true)
-                    .commit()
+                .add(R.id.fragment_container_view, createCourseSummaryFragment, null)
+                .addToBackStack(AppTags.CREATE_COURSE_SUMMARY_FRAGMENT.name)
+                .setReorderingAllowed(true)
+                .commit()
         }
     }
 
@@ -119,17 +120,21 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
     @RequiresApi(Build.VERSION_CODES.O)
     private fun configureRecycleView() {
         courseRecycleView = findViewById(R.id.grid_courses)
+        courseRecycleView.layoutManager =
+            GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
 
+        getCoursesFromFiles()
+    }
 
-        courseRecycleView.layoutManager = GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)
-
-        var coursePath = Paths.get(getExternalFilesDir(null).toString(),
-                FileEnum.USER_DIRECTORY.key,
-                FileEnum.COURSE_DIRECTORY.key)
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getCoursesFromFiles() {
+        var coursePath = Paths.get(
+            getExternalFilesDir(null).toString(),
+            FileEnum.USER_DIRECTORY.key,
+            FileEnum.COURSE_DIRECTORY.key
+        )
         var params = AsyncHelpers.CreatorCourseCredentialsLoad.TaskParams(coursePath, user)
         AsyncHelpers.CreatorCourseCredentialsLoad(this).execute(params)
-
-
     }
 
     override fun onDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
@@ -156,19 +161,25 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
     override fun notifyCourseSelected(course: Course) {
         // TODO __PERMISSION_REFACTOR__
 
-        val editCourseSummaryFragment: EditCourseSummaryFragment = EditCourseSummaryFragment.newInstance(course)
+        val editCourseSummaryFragment: EditCourseSummaryFragment =
+            EditCourseSummaryFragment.newInstance(course)
 
         supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container_view, editCourseSummaryFragment, null)
-                .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)
-                .setReorderingAllowed(true)
-                .commit()
+            .add(R.id.fragment_container_view, editCourseSummaryFragment, null)
+            .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)
+            .setReorderingAllowed(true)
+            .commit()
     }
 
     override fun onDataReturned(result: Boolean?) {
-        if (result == true) {
-            Toast.makeText(this, "DEV - Course meta data updated", Toast.LENGTH_LONG).show()
-        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onResume() {
+        super.onResume()
+        getCoursesFromFiles()
+        courseAdapter?.notifyDataSetChanged()
     }
 
     override fun onDeleteCourse(course: Course) {
@@ -179,6 +190,4 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
         }
         courseAdapter?.notifyDataSetChanged()
     }
-
-
 }

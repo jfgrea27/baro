@@ -210,6 +210,8 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
 
             intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
 
+            activity?.supportFragmentManager?.popBackStack()
+
             activity?.supportFragmentManager?.beginTransaction()
                     ?.remove(this@CreateCourseSummaryFragment)
                     ?.commit()
