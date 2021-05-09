@@ -2,12 +2,27 @@ package com.baro.models
 
 
 import android.net.Uri
-import java.net.URI
+import android.os.Parcel
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 import java.util.*
 
-class Slide(val slideUUID: UUID, val course: Course) {
-    private var video: Uri? = null
 
+@Parcelize
+data class Slide(val slideUUID: UUID) : Parcelable {
+    private var video: Uri? = null
+    private var course: Course? = null
+
+    fun setCourse(course: Course) {
+        this.course = course
+    }
+    fun getCourse() : Course? {
+        return this.course
+    }
+
+    override fun toString(): String {
+        return slideUUID.toString()
+    }
 
     fun getVideoUri() : Uri? {
         return video

@@ -274,19 +274,19 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
                     }
                 }
     }
-//
-//    override fun onDataReturned(result: Boolean?) {
-//        if (result == true) {
-//            val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
-//
-//            intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
-//
-//            activity?.supportFragmentManager?.beginTransaction()
-//                ?.remove(this@CreateCourseSummaryFragment)
-//                ?.commit()
-//            startActivity(intentToSlideActivity)
-//        }
-//    }
+
+    override fun onDataReturned(result: Boolean?) {
+        if (result == true) {
+            val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
+
+            intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
+
+            activity?.supportFragmentManager?.beginTransaction()
+                ?.remove(this@EditCourseSummaryFragment)
+                ?.commit()
+            startActivity(intentToSlideActivity)
+        }
+    }
 
 
     override fun onBackPressed() {

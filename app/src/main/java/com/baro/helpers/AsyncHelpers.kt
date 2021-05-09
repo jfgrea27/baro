@@ -194,6 +194,7 @@ class AsyncHelpers {
                 courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course.getCourseCountry()?.getIsoCode()
             }
             courseMetadata[JSONEnum.COURSE_CATEGORY.key] = JSONArray(course.getCourseCategory().toString()).toString()
+            courseMetadata[JSONEnum.COURSE_SLIDES.key] = JSONArray(course.getSlides().toString()).toString()
 
             val courseMetaDataPath = Paths.get(
                     context.get()?.getExternalFilesDir(null).toString(),
@@ -253,28 +254,44 @@ class AsyncHelpers {
 
                         val jsonFile = jsonFilePath.toFile()
 
-
+                        // Retrieve content file
                         val contents = FileHelper.readFile(jsonFile)
-
                         val jsonContents = JSONHelper.createJSONFromString(contents!!)
 
+                        // Course UUID
                         val courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
+                        // Course Name
                         val courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
+                        // Category
                         val categoryJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString())
+                        // Language
                         val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
+                        // Timestamp
                         val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString().toLong()
+                        // Slides
+                        val slidesJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())
+
+                        // Creation course
                         val course = Course(UUID.fromString(courseUUID as String?), user)
+
+                        //  Adding course name
                         course.setCourseName(courseName as String)
+                        // Adding Course Category
                         course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(categoryJSON as JSONArray))
+                        // Adding Course language
                         if (language.toString() == "null") {
                             course.setCourseCountry(Country(null))
                         } else {
                             course.setCourseCountry(Country(language.toString()))
 
                         }
-
+                        // Adding timestamp
                         course.setCreationDate(courseCreationTimestamp)
 
+                        // Adding Slides
+                        course.setSlidesFromJSONArray(slidesJSON)
+
+                        // Thumbnail
                         val imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
                         val imageFile = imagePath.toFile()
                         val imageUri = Uri.fromFile(imageFile)

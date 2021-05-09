@@ -9,6 +9,7 @@ enum class JSONEnum(// TODO add more as needed
     USER_NAME_KEY("user-name"),
     COURSE_LANGUAGE("course-language"),
     COURSE_CREATION_DATETIME("course-creation-datetime"),
-    COURSE_CATEGORY("course-category");
+    COURSE_CATEGORY("course-category"),
+    COURSE_SLIDES("slide");
 
 }

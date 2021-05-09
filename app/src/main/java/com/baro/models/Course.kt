@@ -2,20 +2,18 @@ package com.baro.models
 
 
 import android.os.Parcelable
-import com.baro.constants.CategoryEnum
 import kotlinx.android.parcel.Parcelize
-import java.time.LocalDate
+import org.json.JSONArray
 import java.util.*
 import kotlin.collections.ArrayList
 
 @Parcelize
 data class Course
-(private val courseUUID: UUID?, private val creator: User?, ) : Parcelable, Comparable<Course>{
+(private val courseUUID: UUID?, private val creator: User?, private val slides: ArrayList<Slide> = ArrayList()) : Parcelable, Comparable<Course>{
     private var courseName: String? = null
     private var country: Country? = null
     private var categories = ArrayList<Category>()
     private var creationDate: Long? = null
-    private var slides: ArrayList<Slide> = ArrayList()
 
     fun getCourseUUID(): UUID? {
         return courseUUID
@@ -58,7 +56,15 @@ data class Course
     fun getSlides(): ArrayList<Slide> {
         return slides
     }
+    fun setSlidesFromJSONArray(jsonArray: JSONArray) {
 
+        for (i in 0 until jsonArray.length()) {
+            val slideUUID = UUID.fromString(jsonArray.getString(i))
+            val slide = Slide(slideUUID)
+            slide.setCourse(this)
+            slides.add(slide)
+        }
+    }
     override fun compareTo(other: Course): Int {
         return getCreationDate()!!.compareTo(other.getCreationDate()!!)
     }

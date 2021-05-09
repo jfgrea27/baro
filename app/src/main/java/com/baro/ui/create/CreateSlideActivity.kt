@@ -64,8 +64,13 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         course = intent.getParcelableExtra(IntentEnum.COURSE.key)
 
         // Create First Slide
-        val slide = Slide(UUID.randomUUID(), course)
-        course.getSlides().add(slide)
+        if (course.getSlides().size == 0) {
+            val slide = Slide(UUID.randomUUID())
+            slide.setCourse(course)
+            course.getSlides().add(slide)
+        } else {
+            populateSlideVideoUri()
+        }
         videoUri = course.getSlides()[slideCounter].getVideoUri()
 
         // Configure UI
@@ -76,6 +81,22 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         configureVideoView()
         configureDeleteSlide()
         configureFinishButton()
+        updateUI()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun populateSlideVideoUri() {
+        for (slide in course.getSlides()) {
+            var slidePath = Paths.get(
+                this@CreateSlideActivity.getExternalFilesDir(null).toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.COURSE_DIRECTORY.key,
+                course.getCourseUUID().toString(),
+                FileEnum.SLIDE_DIRECTORY.key,
+                slide.slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
+            )
+            slide.setVideoUri(Uri.fromFile(slidePath.toFile()))
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -450,7 +471,8 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
             if (direction == AppCodes.FORWARD_SLIDE) {
                 slideCounter += 1
                 if (course.getSlides().size == slideCounter) {
-                    val slide = Slide(UUID.randomUUID(), course)
+                    val slide = Slide(UUID.randomUUID())
+                    slide.setCourse(course)
                     course.getSlides().add(slide)
                 }
 
