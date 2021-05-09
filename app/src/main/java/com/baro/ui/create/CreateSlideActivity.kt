@@ -100,38 +100,40 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateJsonCourse() {
+        var courseMetaPath = Paths.get(
+            this@CreateSlideActivity.getExternalFilesDir(null).toString(),
+            FileEnum.USER_DIRECTORY.key,
+            FileEnum.COURSE_DIRECTORY.key,
+            course.getCourseUUID().toString(),
+            FileEnum.META_DATA_FILE.key
+        )
+
+        var courseMetaFile = courseMetaPath.toFile()
+
+        var slideHashMap = HashMap<String, ArrayList<String>>()
+
+        var slideUUIDArrayList = ArrayList<String>()
+        for (slide in course.getSlides()) {
+            slideUUIDArrayList.add(slide.slideUUID.toString())
+        }
+        slideHashMap[FileEnum.SLIDE_DIRECTORY.key.toString()] = slideUUIDArrayList
+
+        val updateJSONFile = AsyncHelpers.UpdateJSONFile(this)
+        var params = AsyncHelpers.UpdateJSONFile.TaskParams(courseMetaFile, slideHashMap)
+        updateJSONFile.execute(params)
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun configureFinishButton() {
         finishSlide = findViewById(R.id.btn_finish)
 
         finishSlide.setOnClickListener {
-
-            var courseMetaPath = Paths.get(
-                    this@CreateSlideActivity.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.COURSE_DIRECTORY.key,
-                    course.getCourseUUID().toString(),
-                    FileEnum.META_DATA_FILE.key
-            )
-
-            var courseMetaFile = courseMetaPath.toFile()
-
-            var slideHashMap = HashMap<String, ArrayList<String>>()
-
-            var slideUUIDArrayList = ArrayList<String>()
-            for (slide in course.getSlides()) {
-                slideUUIDArrayList.add(slide.slideUUID.toString())
-            }
-            slideHashMap[FileEnum.SLIDE_DIRECTORY.key.toString()] = slideUUIDArrayList
-
-            val updateJSONFile = AsyncHelpers.UpdateJSONFile(this)
-            var params = AsyncHelpers.UpdateJSONFile.TaskParams(courseMetaFile, slideHashMap)
-            updateJSONFile.execute(params)
-
+            updateJsonCourse()
+            finish()
         }
     }
 
     override fun onUpdatedJSONFile(result: Boolean?) {
-        finish()
     }
 
 
@@ -150,6 +152,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
             }
             videoUri = course.getSlides()[slideCounter].getVideoUri()
             SetVideoURI().execute(AppCodes.NO_CHANGE_SLIDE)
+            updateJsonCourse()
         }
 
         deleteSlide.visibility = View.INVISIBLE
@@ -166,10 +169,10 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
                 course.getSlides()[slideCounter].slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
         )
 
-        var file = File(slideVideoPath.toString())
-        val deleteFile = AsyncHelpers.DeleteFile(this)
-        val taskParams = AsyncHelpers.DeleteFile.TaskParams(file, deleteSlide)
-        deleteFile.execute(taskParams)
+        var videoFile = File(slideVideoPath.toString())
+        val deleteVideoFile = AsyncHelpers.DeleteFile(this)
+        val taskParams = AsyncHelpers.DeleteFile.TaskParams(videoFile, deleteSlide)
+        deleteVideoFile.execute(taskParams)
 
     }
 
