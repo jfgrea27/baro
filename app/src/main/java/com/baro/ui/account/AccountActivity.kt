@@ -21,6 +21,7 @@ import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
 import com.baro.models.Course
+import com.baro.models.Slide
 import com.baro.models.User
 import com.baro.ui.create.CreateCourseSummaryFragment
 import com.baro.ui.create.EditCourseSummaryFragment
@@ -29,8 +30,7 @@ import java.nio.file.Paths
 import java.util.*
 
 
-class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad, CourseAdapter.OnCourseSelected, OnCourseCredentialsSaveComplete {
-
+class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad, CourseAdapter.OnCourseSelected, OnCourseCredentialsSaveComplete, OnDeleteCourse {
     // UI
     private lateinit var userThumbnailImageView: ImageView
     private lateinit var followersButton: ImageButton
@@ -41,6 +41,7 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
     // Model
     private var user: User? = null
     private lateinit var courses: ArrayList<Pair<Course, Uri>>
+    private var courseAdapter: CourseAdapter? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -77,6 +78,7 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
             }
         }
     }
+
 
     private fun configureCreateButton() {
         createButton = findViewById(R.id.btn_create)
@@ -147,8 +149,8 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
 
     private fun updateRecycleView() {
         var weakReference = WeakReference<Context>(this)
-        var adapter = CourseAdapter(weakReference, this.courses, this)
-        courseRecycleView.adapter = adapter
+        courseAdapter = CourseAdapter(weakReference, this.courses, this)
+        courseRecycleView.adapter = courseAdapter
     }
 
     override fun notifyCourseSelected(course: Course) {
@@ -168,5 +170,15 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
             Toast.makeText(this, "DEV - Course meta data updated", Toast.LENGTH_LONG).show()
         }
     }
+
+    override fun onDeleteCourse(course: Course) {
+        for (i in 0 until courses.size) {
+            if (courses[i].first.getCourseUUID() == course.getCourseUUID()) {
+                courses.remove(courses[i])
+            }
+        }
+        courseAdapter?.notifyDataSetChanged()
+    }
+
 
 }

@@ -24,10 +24,12 @@ import com.baro.models.Category
 import com.baro.models.Country
 import com.baro.models.Course
 import com.baro.ui.account.AccountActivity
+import com.baro.ui.account.OnDeleteCourse
 import com.baro.ui.dialogs.CategoryDialog
 import com.baro.ui.dialogs.CountryDialog
 import com.baro.ui.dialogs.ImageDialog
 import com.baro.ui.interfaces.OnBackPressed
+import kotlinx.android.synthetic.main.dialog_image_chooser.view.*
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
@@ -85,10 +87,12 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
 
         deleteButton.setOnClickListener{
             val weakContext = WeakReference<Context>(context)
-//            val asyncHelpers = AsyncHelpers.DeleteCourse(weakCallback, weakContext)
             val asyncHelpers = AsyncHelpers.DeleteCourse(weakContext)
             val params = AsyncHelpers.DeleteCourse.TaskParams(course)
             asyncHelpers.execute(params)
+
+            (activity as OnDeleteCourse).onDeleteCourse(course)
+
 
             activity?.supportFragmentManager?.popBackStack()
         }

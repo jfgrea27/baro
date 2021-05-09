@@ -33,7 +33,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 
-class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected, OnCourseDeleted{
+class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected{
 
     // UI
     private lateinit var courseTitleEditText: EditText
@@ -215,9 +215,5 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
                     ?.commit()
             startActivity(intentToSlideActivity)
         }
-    }
-
-    override fun onCourseDeleted(result: Boolean?) {
-        TODO("Not yet implemented")
     }
 }
