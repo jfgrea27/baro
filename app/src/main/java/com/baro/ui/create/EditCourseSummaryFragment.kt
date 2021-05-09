@@ -19,6 +19,7 @@ import com.baro.constants.*
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
+import com.baro.helpers.interfaces.OnCourseDeleted
 import com.baro.models.Category
 import com.baro.models.Country
 import com.baro.models.Course
@@ -84,11 +85,12 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
 
         deleteButton.setOnClickListener{
             val weakContext = WeakReference<Context>(context)
+//            val asyncHelpers = AsyncHelpers.DeleteCourse(weakCallback, weakContext)
             val asyncHelpers = AsyncHelpers.DeleteCourse(weakContext)
             val params = AsyncHelpers.DeleteCourse.TaskParams(course)
             asyncHelpers.execute(params)
 
-            activity?.onBackPressed();
+            activity?.supportFragmentManager?.popBackStack()
         }
     }
 
@@ -272,10 +274,20 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
                     }
                 }
     }
+//
+//    override fun onDataReturned(result: Boolean?) {
+//        if (result == true) {
+//            val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
+//
+//            intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
+//
+//            activity?.supportFragmentManager?.beginTransaction()
+//                ?.remove(this@CreateCourseSummaryFragment)
+//                ?.commit()
+//            startActivity(intentToSlideActivity)
+//        }
+//    }
 
-    override fun onDataReturned(result: Boolean?) {
-
-    }
 
     override fun onBackPressed() {
         val courseName = courseTitleEditText.text.toString()

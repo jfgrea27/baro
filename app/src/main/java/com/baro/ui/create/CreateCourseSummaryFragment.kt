@@ -20,6 +20,7 @@ import com.baro.ui.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
+import com.baro.helpers.interfaces.OnCourseDeleted
 import com.baro.models.Category
 import com.baro.models.Country
 import com.baro.models.Course
@@ -32,7 +33,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 
-class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected{
+class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected, OnCourseDeleted{
 
     // UI
     private lateinit var courseTitleEditText: EditText
@@ -214,5 +215,9 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
                     ?.commit()
             startActivity(intentToSlideActivity)
         }
+    }
+
+    override fun onCourseDeleted(result: Boolean?) {
+        TODO("Not yet implemented")
     }
 }

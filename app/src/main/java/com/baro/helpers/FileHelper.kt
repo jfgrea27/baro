@@ -155,7 +155,7 @@ object FileHelper {
 
     fun deleteFile(file: File?) {
         if (file?.isDirectory == true) {
-            for (child in file.listFiles()) deleteFile(child)
+            file.deleteRecursively()
         }
         file?.delete()
     }

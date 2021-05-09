@@ -390,6 +390,11 @@ class AsyncHelpers {
             return true
         }
 
+//        @RequiresApi(Build.VERSION_CODES.P)
+//        override fun onPostExecute(result: Boolean?) {
+//            callback.onCourseDeleted(result)
+//        }
+
     }
 
 
