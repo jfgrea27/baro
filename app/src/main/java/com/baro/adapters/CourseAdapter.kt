@@ -17,7 +17,7 @@ import com.baro.R
 import com.baro.models.Course
 import java.lang.ref.WeakReference
 
-class CourseAdapter internal constructor(var context: WeakReference<Context>, var courses: ArrayList<Pair<Course, Uri>>, var onCourseSelected: OnCourseSelected) : RecyclerView.Adapter<CourseAdapter.ViewHolder>() {
+class CourseAdapter internal constructor(var context: WeakReference<Context>, var courses: ArrayList<Pair<Course, Uri?>>, var onCourseSelected: OnCourseSelected) : RecyclerView.Adapter<CourseAdapter.ViewHolder>() {
     private val mInflater: LayoutInflater = LayoutInflater.from(context.get())
 
     @NonNull
@@ -34,9 +34,11 @@ class CourseAdapter internal constructor(var context: WeakReference<Context>, va
         val courseTitle = courses[position].first.getCourseName()
 
         val courseImage = courses[position].second
-        val courseImageFile = courseImage.toFile()
-        if (courseImageFile.length() > 0) {
-            holder.courseButton.setImageURI(courseImage)
+        if (courseImage != null) {
+            val courseImageFile = courseImage.toFile()
+            if (courseImageFile.length() > 0) {
+                holder.courseButton.setImageURI(courseImage)
+            }
         }
 
         if (courseLanguage?.getIsoCode() == null) {
@@ -68,7 +70,7 @@ class CourseAdapter internal constructor(var context: WeakReference<Context>, va
         return courses.size
     }
 
-    fun getItem(id: Int): Pair<Course, Uri> {
+    fun getItem(id: Int): Pair<Course, Uri?> {
         return courses[id]
     }
 

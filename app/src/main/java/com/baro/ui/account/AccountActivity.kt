@@ -6,7 +6,6 @@ import android.os.Build
 import android.os.Bundle
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -17,7 +16,9 @@ import com.baro.adapters.CourseAdapter
 import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
 import com.baro.helpers.AsyncHelpers
+import com.baro.helpers.interfaces.OnCourseCreate
 import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
+import com.baro.helpers.interfaces.OnCourseDeleted
 import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
 import com.baro.models.Course
@@ -27,10 +28,11 @@ import com.baro.ui.create.EditCourseSummaryFragment
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad,
-    CourseAdapter.OnCourseSelected, OnCourseCredentialsSaveComplete, OnDeleteCourse{
+    CourseAdapter.OnCourseSelected, OnCourseCredentialsSaveComplete, OnCourseDeleted, OnCourseCreate{
     // UI
     private lateinit var userThumbnailImageView: ImageView
     private lateinit var followersButton: ImageButton
@@ -40,7 +42,7 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
 
     // Model
     private var user: User? = null
-    private lateinit var courses: ArrayList<Pair<Course, Uri>>
+    private lateinit var courses: ArrayList<Pair<Course, Uri?>>
     private var courseAdapter: CourseAdapter? = null
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -137,29 +139,31 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
         AsyncHelpers.CreatorCourseCredentialsLoad(this).execute(params)
     }
 
-    override fun onDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
+    override fun onUserDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
         if (user != null) {
             val imageBmp = userData?.imageBmp
             if (imageBmp != null) {
                 userThumbnailImageView.setImageBitmap(imageBmp)
             }
         }
+
     }
 
-    override fun onCreatorCourseCredentialsLoad(courses: ArrayList<Pair<Course, Uri>>) {
+    override fun onCreatorCourseCredentialsLoad(courses: ArrayList<Pair<Course, Uri?>>) {
         this.courses = courses
-
         updateRecycleView()
     }
 
     private fun updateRecycleView() {
+        courseAdapter?.notifyDataSetChanged()
+
         var weakReference = WeakReference<Context>(this)
         courseAdapter = CourseAdapter(weakReference, this.courses, this)
         courseRecycleView.adapter = courseAdapter
     }
 
     override fun notifyCourseSelected(course: Course) {
-        // TODO __PERMISSION_REFACTOR__
+        // TODO __PERMISSION_REFACTOR_holder_
 
         val editCourseSummaryFragment: EditCourseSummaryFragment =
             EditCourseSummaryFragment.newInstance(course)
@@ -171,23 +175,33 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
             .commit()
     }
 
-    override fun onDataReturned(result: Boolean?) {
-    }
-
-
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun onResume() {
-        super.onResume()
+    override fun onCourseDataReturned(result: Boolean?) {
         getCoursesFromFiles()
         courseAdapter?.notifyDataSetChanged()
     }
 
-    override fun onDeleteCourse(course: Course) {
-        for (i in 0 until courses.size) {
-            if (courses[i].first.getCourseUUID() == course.getCourseUUID()) {
-                courses.remove(courses[i])
+    override fun onCourseDeleted(courseDeleted: Course?) {
+        var position = -1
+
+        for (course in courses) {
+            if (courseDeleted?.getCourseUUID() == course.first.getCourseUUID()) {
+                position = courses.indexOf(course)
             }
         }
-        courseAdapter?.notifyDataSetChanged()
+
+        if (position != -1) {
+            courses.removeAt(position)
+            courseAdapter?.notifyItemRemoved(position)
+            courseAdapter?.notifyItemRangeChanged(position, courses.size)
+
+        }
+
+        supportFragmentManager.popBackStack()
+    }
+
+    override fun onCourseCreate(course: Pair<Course, Uri?>) {
+        courses.add(course)
+        courseAdapter?.notifyItemInserted(courses.size - 1)
     }
 }

@@ -38,7 +38,6 @@ import kotlin.collections.HashMap
 
 class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, OnVideoUriSaved, OnDeleteFile, OnUpdatedJSONFile {
 
-
     // UI
     private lateinit var nextButton: ImageButton
     private lateinit var previousButton: ImageButton

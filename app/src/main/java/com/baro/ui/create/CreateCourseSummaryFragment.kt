@@ -19,8 +19,8 @@ import com.baro.constants.*
 import com.baro.ui.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
+import com.baro.helpers.interfaces.OnCourseCreate
 import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
-import com.baro.helpers.interfaces.OnCourseDeleted
 import com.baro.models.Category
 import com.baro.models.Country
 import com.baro.models.Course
@@ -57,7 +57,7 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
@@ -140,6 +140,7 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
         countryText.text = country.getCountryName(weakContext)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun configureCreateButton(view: View) {
         createButton = view.findViewById(R.id.btn_create)
         createButton.setOnClickListener {
@@ -150,6 +151,17 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
                 val courseCredentialsSave = AsyncHelpers.CourseCredentialsSave(this, weakContext)
                 val taskParams = AsyncHelpers.CourseCredentialsSave.TaskParams(course, thumbnailUri)
                 courseCredentialsSave.execute(taskParams)
+
+                val courseThumbnailPath = Paths.get(activity?.getExternalFilesDir(null).toString(),
+                    FileEnum.USER_DIRECTORY.key,
+                    FileEnum.COURSE_DIRECTORY.key,
+                    course.getCourseUUID().toString(),
+                    FileEnum.PHOTO_THUMBNAIL_FILE.key)
+
+                val imageUri = Uri.fromFile(courseThumbnailPath.toFile())
+                val coursePair = Pair(course, imageUri)
+                val callback = (activity as OnCourseCreate)
+                callback.onCourseCreate(coursePair)
 
             } else {
                 Toast.makeText(context, getString(R.string.lenght_course_name_warning_toast), Toast.LENGTH_LONG).show()
@@ -204,7 +216,7 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
                 }
     }
 
-    override fun onDataReturned(result: Boolean?) {
+    override fun onCourseDataReturned(result: Boolean?) {
         if (result == true) {
             val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
 

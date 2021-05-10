@@ -149,7 +149,7 @@ class AsyncHelpers {
 
         @RequiresApi(Build.VERSION_CODES.P)
         override fun onPostExecute(result: LoadUserDataResponse?) {
-            callback.onDataReturned(result)
+            callback.onUserDataReturned(result)
         }
 
         class TaskParams(var user: User?, var contentResolver: ContentResolver)
@@ -230,7 +230,7 @@ class AsyncHelpers {
 
         @RequiresApi(Build.VERSION_CODES.P)
         override fun onPostExecute(result: Boolean?) {
-            callback.onDataReturned(result)
+            callback.onCourseDataReturned(result)
         }
 
         class TaskParams(var course: Course?, var imageUri: Uri?)
@@ -238,10 +238,10 @@ class AsyncHelpers {
     }
 
 
-    class CreatorCourseCredentialsLoad(private var callback: OnCreatorCourseCredentialsLoad) : AsyncTask<CreatorCourseCredentialsLoad.TaskParams, Void?, ArrayList<Pair<Course, Uri>>>() {
+    class CreatorCourseCredentialsLoad(private var callback: OnCreatorCourseCredentialsLoad) : AsyncTask<CreatorCourseCredentialsLoad.TaskParams, Void?, ArrayList<Pair<Course, Uri?>>>() {
         @RequiresApi(Build.VERSION_CODES.P)
-        override fun doInBackground(vararg params: TaskParams?): ArrayList<Pair<Course, Uri>>? {
-            var courses = ArrayList<Pair<Course, Uri>>()
+        override fun doInBackground(vararg params: TaskParams?): ArrayList<Pair<Course, Uri?>>? {
+            var courses = ArrayList<Pair<Course, Uri?>>()
 
             val path = params[0]?.path
             val coursesFile = FileHelper.createDirAtPath(path)
@@ -305,7 +305,7 @@ class AsyncHelpers {
                 }
             }
 
-            var arrayListResults = ArrayList<Pair<Course, Uri>>()
+            var arrayListResults = ArrayList<Pair<Course, Uri?>>()
 
             if (courses.size > 1) {
                 courses.sortedBy { it.first }
@@ -318,7 +318,7 @@ class AsyncHelpers {
         }
 
         @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(result: ArrayList<Pair<Course, Uri>>) {
+        override fun onPostExecute(result: ArrayList<Pair<Course, Uri?>>) {
             callback.onCreatorCourseCredentialsLoad(result)
         }
 
@@ -394,12 +394,12 @@ class AsyncHelpers {
 
     }
 
-    class DeleteCourse(private var context: WeakReference<Context>) : AsyncTask<DeleteCourse.TaskParams, Boolean?, Boolean?>() {
+    class DeleteCourse(private var callback: OnCourseDeleted, private var context: WeakReference<Context>) : AsyncTask<DeleteCourse.TaskParams, Course?, Course?>() {
 
         class TaskParams(var course: Course)
 
         @RequiresApi(Build.VERSION_CODES.O)
-        override fun doInBackground(vararg params: TaskParams?): Boolean? {
+        override fun doInBackground(vararg params: TaskParams?): Course? {
             val course = params[0]?.course
             val coursePath = Paths.get(context.get()?.getExternalFilesDir(null).toString(),
                     FileEnum.USER_DIRECTORY.key,
@@ -407,13 +407,13 @@ class AsyncHelpers {
                     course?.getCourseUUID().toString())
             val courseFile = coursePath.toFile()
             FileHelper.deleteFile(courseFile)
-            return true
+            return course
         }
 
-//        @RequiresApi(Build.VERSION_CODES.P)
-//        override fun onPostExecute(result: Boolean?) {
-//            callback.onCourseDeleted(result)
-//        }
+        @RequiresApi(Build.VERSION_CODES.P)
+        override fun onPostExecute(course: Course?) {
+            callback.onCourseDeleted(course)
+        }
 
     }
 

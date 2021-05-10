@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity(), OnUserDataFound {
 
 
 
-    override fun onDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
+    override fun onUserDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
         val username = userData?.username
         val imageBmp = userData?.imageBmp
         if (user != null) {
