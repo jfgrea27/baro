@@ -43,11 +43,8 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
 
     private lateinit var photoThumbnailButton: ImageButton
     private lateinit var usernameEditText: EditText
-    private lateinit var passwordEditText: EditText
     private lateinit var nextButton: ImageButton
-    private var cameraPermission = false
-    private var readPermission = false
-    private var writePermission = false
+
     private var photoUri: Uri? = null
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -57,7 +54,6 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
         // Configure UI
         configurePhotoThumbnailButton(view)
         configureUsernameEditText(view)
-        configurePasswordEditText(view)
         configureNextButton(view)
         return view
     }
@@ -79,7 +75,6 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
         photoThumbnailButton.setImageURI(uri)
     }
 
-    //TODO - Implement as Helper - Add Permission Check
     @RequiresApi(Build.VERSION_CODES.O)
     private var getCameraContent: ActivityResultLauncher<Uri?>? = registerForActivityResult(
             TakePicture()
@@ -128,11 +123,6 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
         usernameEditText = view?.findViewById(R.id.edit_text_username)!!
     }
 
-    private fun configurePasswordEditText(view: View?) {
-        passwordEditText = view?.findViewById(R.id.edit_text_password)!!
-    }
-
-
 
     override fun onUserCredentialsSaveDone(result: Boolean?) {
         if (result == true) {
@@ -148,7 +138,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
     }
 
     override fun getUsername(): String {
-        return usernameEditText.getText().toString()
+        return usernameEditText.text.toString()
     }
 
     override fun getPath(): String {

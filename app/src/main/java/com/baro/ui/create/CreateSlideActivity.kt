@@ -19,6 +19,7 @@ import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
 import com.baro.constants.IntentEnum
+import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnDeleteFile
@@ -26,7 +27,6 @@ import com.baro.helpers.interfaces.OnUpdatedJSONFile
 import com.baro.helpers.interfaces.OnVideoUriSaved
 import com.baro.models.Course
 import com.baro.models.Slide
-import com.baro.ui.dialogs.ImageDialog
 import kotlinx.android.synthetic.main.dialog_image_chooser.*
 import java.io.File
 import java.lang.ref.WeakReference

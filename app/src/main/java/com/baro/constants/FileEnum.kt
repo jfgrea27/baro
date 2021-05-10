@@ -1,7 +1,7 @@
 package com.baro.constants
 
 
-enum class FileEnum(// TODO Add more Enums as required.
+enum class FileEnum(
         val key: String?) {
     // Directories
     OFFLINE_DIRECTORY("offline"),

@@ -16,6 +16,7 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.baro.R
 import com.baro.constants.*
+import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
@@ -25,7 +26,6 @@ import com.baro.models.Country
 import com.baro.models.Course
 import com.baro.ui.dialogs.CategoryDialog
 import com.baro.ui.dialogs.CountryDialog
-import com.baro.ui.dialogs.ImageDialog
 import com.baro.ui.interfaces.OnBackPressed
 import kotlinx.android.synthetic.main.dialog_image_chooser.view.*
 import java.lang.ref.WeakReference

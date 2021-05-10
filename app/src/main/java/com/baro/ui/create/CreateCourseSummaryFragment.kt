@@ -16,7 +16,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import com.baro.R
 import com.baro.constants.*
-import com.baro.ui.dialogs.ImageDialog
+import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnCourseCreate

@@ -1,7 +1,7 @@
 package com.baro.constants
 
 
-enum class JSONEnum(// TODO add more as needed
+enum class JSONEnum(
         val key: String?) {
     COURSE_NAME_KEY("course-name"),
     COURSE_UUID_KEY("course-uuid"),
