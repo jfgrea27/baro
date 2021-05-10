@@ -256,48 +256,51 @@ class AsyncHelpers {
 
                         // Retrieve content file
                         val contents = FileHelper.readFile(jsonFile)
-                        val jsonContents = JSONHelper.createJSONFromString(contents!!)
 
-                        // Course UUID
-                        val courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
-                        // Course Name
-                        val courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
-                        // Category
-                        val categoryJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString())
-                        // Language
-                        val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
-                        // Timestamp
-                        val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString().toLong()
-                        // Slides
-                        val slidesJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())
+                        if (contents != null) {
+                            val jsonContents = JSONHelper.createJSONFromString(contents!!)
 
-                        // Creation course
-                        val course = Course(UUID.fromString(courseUUID as String?), user)
+                            // Course UUID
+                            val courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
+                            // Course Name
+                            val courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
+                            // Category
+                            val categoryJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString())
+                            // Language
+                            val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
+                            // Timestamp
+                            val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString().toLong()
+                            // Slides
+                            val slidesJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())
 
-                        //  Adding course name
-                        course.setCourseName(courseName as String)
-                        // Adding Course Category
-                        course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(categoryJSON as JSONArray))
-                        // Adding Course language
-                        if (language.toString() == "null") {
-                            course.setCourseCountry(Country(null))
-                        } else {
-                            course.setCourseCountry(Country(language.toString()))
+                            // Creation course
+                            val course = Course(UUID.fromString(courseUUID as String?), user)
 
+                            //  Adding course name
+                            course.setCourseName(courseName as String)
+                            // Adding Course Category
+                            course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(categoryJSON as JSONArray))
+                            // Adding Course language
+                            if (language.toString() == "null") {
+                                course.setCourseCountry(Country(null))
+                            } else {
+                                course.setCourseCountry(Country(language.toString()))
+
+                            }
+                            // Adding timestamp
+                            course.setCreationDate(courseCreationTimestamp)
+
+                            // Adding Slides
+                            course.setSlidesFromJSONArray(slidesJSON)
+
+                            // Thumbnail
+                            val imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                            val imageFile = imagePath.toFile()
+                            val imageUri = Uri.fromFile(imageFile)
+
+                            val pair = Pair<Course, Uri>(course, imageUri)
+                            courses.add(pair)
                         }
-                        // Adding timestamp
-                        course.setCreationDate(courseCreationTimestamp)
-
-                        // Adding Slides
-                        course.setSlidesFromJSONArray(slidesJSON)
-
-                        // Thumbnail
-                        val imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
-                        val imageFile = imagePath.toFile()
-                        val imageUri = Uri.fromFile(imageFile)
-
-                        val pair = Pair<Course, Uri>(course, imageUri)
-                        courses.add(pair)
                     }
                 }
             }

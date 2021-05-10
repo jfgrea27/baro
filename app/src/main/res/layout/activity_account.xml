@@ -6,73 +6,85 @@
     android:layout_height="match_parent"
     tools:context=".ui.account.AccountActivity">
 
-    <ImageView
-        android:id="@+id/im_account"
-        android:layout_width="@dimen/medium_icon_width"
-        android:layout_height="@dimen/medium_icon_height"
-        android:background="?android:selectableItemBackground"
-        android:scaleType="fitCenter"
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/top_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/medium_medium_large_icon_width"
+        android:background="@color/light_green"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
 
-    <ImageButton
-        android:id="@+id/btn_followers"
-        android:layout_width="@dimen/smaller_icon_width"
-        android:layout_height="@dimen/smaller_icon_height"
-        app:layout_constraintBottom_toTopOf="@+id/text_account"
-        app:layout_constraintEnd_toStartOf="@+id/btn_settings"
-        app:layout_constraintStart_toEndOf="@+id/im_account"
-        app:srcCompat="@drawable/ic_people"
-        android:scaleType="fitCenter"
-        android:backgroundTint="@color/white"
-        app:layout_constraintTop_toTopOf="@+id/im_account" />
+        <ImageView
+            android:id="@+id/im_account"
+            android:layout_width="@dimen/medium_icon_width"
+            android:layout_height="@dimen/medium_icon_height"
+            android:background="?android:selectableItemBackground"
+            android:scaleType="fitCenter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageButton
-        android:id="@+id/btn_settings"
-        android:layout_width="@dimen/smaller_icon_width"
-        android:layout_height="@dimen/smaller_icon_height"
-        android:background="?android:selectableItemBackground"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/text_account"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btn_followers"
-        app:layout_constraintTop_toTopOf="@+id/im_account"
-        app:srcCompat="@drawable/ic_settings" />
+        <ImageButton
+            android:id="@+id/btn_followers"
+            android:layout_width="@dimen/smaller_icon_width"
+            android:layout_height="@dimen/smaller_icon_height"
+            android:backgroundTint="@color/white"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@+id/text_account"
+            app:layout_constraintEnd_toStartOf="@+id/btn_settings"
+            app:layout_constraintStart_toEndOf="@+id/im_account"
+            app:layout_constraintTop_toTopOf="@+id/im_account"
+            app:srcCompat="@drawable/ic_people" />
 
-    <TextView
-        android:id="@+id/text_account"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/account"
-        app:layout_constraintEnd_toEndOf="@+id/im_account"
-        app:layout_constraintStart_toStartOf="@+id/im_account"
-        app:layout_constraintTop_toBottomOf="@+id/im_account" />
+        <ImageButton
+            android:id="@+id/btn_settings"
+            android:layout_width="@dimen/smaller_icon_width"
+            android:layout_height="@dimen/smaller_icon_height"
+            android:background="?android:selectableItemBackground"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@+id/text_account"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btn_followers"
+            app:layout_constraintTop_toTopOf="@+id/im_account"
+            app:srcCompat="@drawable/ic_settings" />
+
+        <TextView
+            android:id="@+id/text_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/account"
+            app:layout_constraintEnd_toEndOf="@+id/im_account"
+            app:layout_constraintStart_toStartOf="@+id/im_account"
+            app:layout_constraintTop_toBottomOf="@+id/im_account" />
 
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/followers"
+            app:layout_constraintEnd_toEndOf="@+id/btn_followers"
+            app:layout_constraintStart_toStartOf="@+id/btn_followers"
+            app:layout_constraintTop_toBottomOf="@+id/btn_followers" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/followers"
-        app:layout_constraintEnd_toEndOf="@+id/btn_followers"
-        app:layout_constraintStart_toStartOf="@+id/btn_followers"
-        app:layout_constraintTop_toBottomOf="@+id/btn_followers" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/settings"
+            app:layout_constraintEnd_toEndOf="@+id/btn_settings"
+            app:layout_constraintStart_toStartOf="@+id/btn_settings"
+            app:layout_constraintTop_toBottomOf="@+id/btn_settings" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/settings"
-        app:layout_constraintEnd_toEndOf="@+id/btn_settings"
-        app:layout_constraintStart_toStartOf="@+id/btn_settings"
-        app:layout_constraintTop_toBottomOf="@+id/btn_settings" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/grid_courses"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/grid_height"
+        android:layout_height="450dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_account">
+        app:layout_constraintTop_toBottomOf="@+id/top_view">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -103,7 +115,9 @@
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_view"
         app:layout_constraintVertical_bias="0.0" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
 import com.baro.R
 import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
@@ -71,7 +72,9 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         } else {
             populateSlideVideoUri()
         }
+
         videoUri = course.getSlides()[slideCounter].getVideoUri()
+
 
         // Configure UI
         configureNextButton()
@@ -480,17 +483,31 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
                     course.getSlides().add(slide)
                 }
 
-                videoUri = course.getSlides().get(slideCounter).getVideoUri()
+                var file = course.getSlides()[slideCounter].getVideoUri()?.toFile()
+
+                if (file?.exists() == true) {
+                    videoUri = course.getSlides()[slideCounter].getVideoUri()
+                } else {
+                    videoUri = null
+                }
             } else if (direction == AppCodes.BACKWARDS_SLIDE) {
                 if (videoUri == null && slideCounter == course.getSlides().size.minus(1) && slideCounter > 0) {
                     course.getSlides().removeAt(course.getSlides().size.minus(1))
                 }
-
                 slideCounter -= 1
-                videoUri = course.getSlides()[slideCounter].getVideoUri()
+
+                var file = course.getSlides()[slideCounter].getVideoUri()?.toFile()
+
+                if (file?.exists() == true) {
+                    videoUri = course.getSlides()[slideCounter].getVideoUri()
+                 } else {
+                    videoUri = null
+                }
             }
             updateUI()
         }
+
+
 
     }
 

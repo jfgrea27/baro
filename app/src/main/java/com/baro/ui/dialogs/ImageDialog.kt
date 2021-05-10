@@ -22,16 +22,16 @@ class ImageDialog(var onInputListener: OnInputListener?) : AppCompatDialogFragme
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.dialog_image_chooser, container, false)
-        gallery = view.findViewById<ImageButton?>(R.id.btn_folder)
-        gallery.setOnClickListener(View.OnClickListener {
+        gallery = view.findViewById(R.id.btn_folder)
+        gallery.setOnClickListener {
             onInputListener?.sendInput(AppCodes.GALLERY_SELECTION.code)
             dialog?.dismiss()
-        })
-        roll = view.findViewById<ImageButton?>(R.id.btn_camera)
-        roll.setOnClickListener(View.OnClickListener {
+        }
+        roll = view.findViewById(R.id.btn_camera)
+        roll.setOnClickListener {
             onInputListener?.sendInput(AppCodes.CAMERA_ROLL_SELECTION.code)
             dialog?.dismiss()
-        })
+        }
         return view
     }
 
