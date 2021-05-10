@@ -4,12 +4,12 @@ import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import android.provider.MediaStore
 import androidx.annotation.RequiresApi
-
 import java.io.*
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.*
+
 
 object FileHelper {
     /**
@@ -41,6 +41,15 @@ object FileHelper {
         } else {
             createFile(file)
         }
+    }
+
+    fun createDirAtPath(path: Path?): File {
+        val file = File(path.toString())
+        if (!file.exists()) {
+            file.mkdirs()
+        }
+
+        return file
     }
 
     private fun createFile(file: File?): File? {
@@ -146,8 +155,34 @@ object FileHelper {
 
     fun deleteFile(file: File?) {
         if (file?.isDirectory == true) {
-            for (child in file.listFiles()) deleteFile(child)
+            file.deleteRecursively()
         }
         file?.delete()
     }
+
+
+    fun copyVideoToFile(outputAddress: File, originalUri: Uri, content: ContentResolver?): File? {
+        var `in`: InputStream? = null
+        `in` = try {
+            content?.openInputStream(originalUri)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            return null
+        }
+        return try {
+            copyFile(`in`, outputAddress)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    @Throws(IOException::class)
+    fun copyFile(`in`: InputStream?, outputFile: File?): File? {
+        val fos = FileOutputStream(outputFile)
+        copyStream(`in`, fos)
+        return outputFile
+    }
+
+
 }

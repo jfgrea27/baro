@@ -8,6 +8,8 @@ enum class JSONEnum(// TODO add more as needed
     USER_UUID_KEY("user-uuid"),
     USER_NAME_KEY("user-name"),
     COURSE_LANGUAGE("course-language"),
-    COURSE_CATEGORY("course-category");
+    COURSE_CREATION_DATETIME("course-creation-datetime"),
+    COURSE_CATEGORY("course-category"),
+    COURSE_SLIDES("slide");
 
 }

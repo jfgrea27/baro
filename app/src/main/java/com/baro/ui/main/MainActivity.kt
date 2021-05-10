@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), OnUserDataFound {
         configureAccountButton()
         configureShareButton()
         configureLearnButton()
-        configurWelcomeTextView()
+        configureWelcomeTextView()
 
         // Update UI with User Credentials
         val loadUserDataParams = AsyncHelpers.LoadUserData.TaskParams(user, this.contentResolver)
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity(), OnUserDataFound {
         userRetrieveThumbnail.execute(loadUserDataParams)
     }
 
-    private fun configurWelcomeTextView() {
+    private fun configureWelcomeTextView() {
         welcomeTextView = findViewById(R.id.text_account)
     }
 
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), OnUserDataFound {
     }
 
     private fun configureAccountButton() {
-        accountButton = findViewById(R.id.im_account)
+        accountButton = findViewById(R.id.btn_account)
         accountButton.setOnClickListener {
             if (user != null) {
                 val intentAccountActivity = Intent(
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity(), OnUserDataFound {
 
 
 
-    override fun onDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
+    override fun onUserDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
         val username = userData?.username
         val imageBmp = userData?.imageBmp
         if (user != null) {

@@ -44,7 +44,6 @@
         app:layout_constraintEnd_toEndOf="@id/btn_internet"/>
 
     <TextView
-        android:id="@+id/text_local"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/share_locally"

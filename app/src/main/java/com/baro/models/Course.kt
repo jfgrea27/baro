@@ -1,21 +1,28 @@
 package com.baro.models
 
 
-import com.baro.constants.CategoryEnum
-import com.baro.constants.LanguageEnum
-import java.net.URI
-import java.time.LocalDate
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+import org.json.JSONArray
 import java.util.*
+import kotlin.collections.ArrayList
 
-class Course // TODO discuss properties
-(private val courseName: String?, private val courseUUID: UUID?, private val creator: User?, private val languageEnum: LanguageEnum?, private val categoryEnum: CategoryEnum?) {
-    private val updateDate: LocalDate? = null
-    private val photoThumbnail: URI? = null
-    private val soundThumbnail: URI? = null
-    private val slides: ArrayList<Slide?>? = null
+@Parcelize
+data class Course
+(private val courseUUID: UUID?, private val creator: User?, private val slides: ArrayList<Slide> = ArrayList()) : Parcelable, Comparable<Course>{
+    private var courseName: String? = null
+    private var country: Country? = null
+    private var categories = ArrayList<Category>()
+    private var creationDate: Long? = null
 
     fun getCourseUUID(): UUID? {
         return courseUUID
+    }
+    fun getCreationDate(): Long? {
+        return creationDate
+    }
+    fun setCreationDate(timestamp: Long) {
+        creationDate = timestamp
     }
 
     fun getCreator(): User? {
@@ -26,12 +33,40 @@ class Course // TODO discuss properties
         return courseName
     }
 
-    fun getCourseLanguage(): LanguageEnum? {
-        return languageEnum
+    fun setCourseName(name: String) {
+        courseName = name
     }
 
-    fun getCourseCategory(): CategoryEnum? {
-        return categoryEnum
+    fun getCourseCountry(): Country? {
+        return country
+    }
+
+    fun setCourseCountry(country :Country?) {
+        this.country = country
+    }
+
+    fun getCourseCategory(): ArrayList<Category> {
+        return categories
+    }
+
+    fun setCourseCategory(category :ArrayList<Category> ) {
+        categories = category
+    }
+
+    fun getSlides(): ArrayList<Slide> {
+        return slides
+    }
+    fun setSlidesFromJSONArray(jsonArray: JSONArray) {
+
+        for (i in 0 until jsonArray.length()) {
+            val slideUUID = UUID.fromString(jsonArray.getString(i))
+            val slide = Slide(slideUUID)
+            slide.setCourse(this)
+            slides.add(slide)
+        }
+    }
+    override fun compareTo(other: Course): Int {
+        return getCreationDate()!!.compareTo(other.getCreationDate()!!)
     }
 
 }

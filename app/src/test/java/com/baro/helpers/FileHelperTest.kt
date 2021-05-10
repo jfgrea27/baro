@@ -54,6 +54,7 @@ class FileHelperTest {
                 file!!.exists()
                 result = true
                 file.absolutePath
+
                 result = "path/to/parent/filename"
             }
         }

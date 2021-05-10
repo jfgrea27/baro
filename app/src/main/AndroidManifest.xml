@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Baro">
-        <activity android:name=".ui.learn.LearnActivity"></activity>
+        <activity android:name=".ui.create.CreateSlideActivity"></activity>
+        <activity android:name=".ui.learn.LearnActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -30,7 +31,6 @@
         <activity android:name=".ui.share.BluetoothSendActivity" />
         <activity android:name=".ui.share.SendReceiveActivity" />
         <activity android:name=".ui.share.ShareActivity" />
-        <activity android:name=".ui.create.CreateActivity" />
         <activity android:name=".ui.account.AccountActivity" />
         <activity android:name=".ui.splash.SplashActivity">
             <intent-filter>
