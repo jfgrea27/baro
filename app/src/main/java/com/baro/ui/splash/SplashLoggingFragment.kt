@@ -1,6 +1,7 @@
 package com.baro.ui.splash
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -24,12 +25,15 @@ import com.baro.R
 import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
+import com.baro.constants.PermissionsEnum
 import com.baro.dialogs.ImageDialog
 import com.baro.dialogs.ImageDialog.OnInputListener
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
+import com.baro.helpers.PermissionsHelper
 import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
 import com.baro.ui.main.MainActivity
+import java.lang.ref.WeakReference
 
 import java.nio.file.Paths
 import java.util.*
@@ -60,14 +64,12 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun configurePhotoThumbnailButton(view: View?) {
-        photoThumbnailButton = view?.findViewById(R.id.im_account )!!
+        photoThumbnailButton = view?.findViewById(R.id.im_account)!!
 
         photoThumbnailButton.setOnClickListener { v: View? ->
-            checkCameraPermissions()
-            if (cameraPermission and readPermission and writePermission) {
-                val imageDialog = ImageDialog(this)
-                imageDialog.show(parentFragmentManager, AppTags.THUMBNAIL_SELECTION.toString())
-            }
+            val imageDialog = ImageDialog(this)
+            imageDialog.show(parentFragmentManager, AppTags.THUMBNAIL_SELECTION.toString())
+
         }
     }
 
@@ -91,14 +93,16 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
     override fun sendInput(choice: Int) {
         if (choice == AppCodes.CAMERA_ROLL_SELECTION.code) {
             val userMetaDataPath = Paths.get(activity?.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                        FileEnum.USER_DIRECTORY.key,
+                        FileEnum.PHOTO_THUMBNAIL_FILE.key)
             val userThumbnailFile = FileHelper.createFileAtPath(userMetaDataPath)
             photoUri = FileProvider.getUriForFile(activity?.applicationContext!!, activity?.applicationContext!!.packageName + ".fileprovider", userThumbnailFile!!)
+            getCameraContent?.launch(photoUri)
 
-        getCameraContent?.launch(photoUri)
         } else if (choice == AppCodes.GALLERY_SELECTION.code) {
-            getGalleryContent?.launch("image/*")
+
+                getGalleryContent?.launch("image/*")
+
         }
     }
 
@@ -128,65 +132,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
         passwordEditText = view?.findViewById(R.id.edit_text_password)!!
     }
 
-    // Permissions
-    private fun checkCameraPermissions() {
-        val permissionsToBeGranted = ArrayList<String?>()
-        if (ContextCompat.checkSelfPermission(
-                        requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) !=
-                PackageManager.PERMISSION_GRANTED) {
-            permissionsToBeGranted.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
-            readPermission = true
-        }
-        if (ContextCompat.checkSelfPermission(
-                        requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-                PackageManager.PERMISSION_GRANTED) {
-            permissionsToBeGranted.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        } else {
-            writePermission = true
-        }
-        if (ContextCompat.checkSelfPermission(
-                        requireContext(), Manifest.permission.CAMERA) !=
-                PackageManager.PERMISSION_GRANTED) {
-            permissionsToBeGranted.add(Manifest.permission.CAMERA)
-        } else {
-            cameraPermission = true
-        }
-        if (permissionsToBeGranted.size > 0) {
-            val permissions = permissionsToBeGranted.toTypedArray()
-            requestPermissionLauncher!!.launch(permissions)
-        }
-    }
 
-    //TODO - Refactor
-    @VisibleForTesting
-    private val requestPermissionLauncher: ActivityResultLauncher<Array<String?>?>? = registerForActivityResult(RequestMultiplePermissions()) { permissions: MutableMap<String?, Boolean?>? ->
-        if (permissions != null) {
-            for ((key, value) in permissions) {
-                value?.let { handlePermission(key, it) }
-            }
-        }
-    }
-
-    private fun handlePermission(permission: String?, isGranted: Boolean) {
-        when (permission) {
-            Manifest.permission.READ_EXTERNAL_STORAGE -> if (!isGranted) {
-                Toast.makeText(context, R.string.read_storage_permission, Toast.LENGTH_LONG).show()
-            } else {
-                readPermission = true
-            }
-            Manifest.permission.WRITE_EXTERNAL_STORAGE -> if (!isGranted) {
-                Toast.makeText(context, R.string.write_storage_permission, Toast.LENGTH_LONG).show()
-            } else {
-                writePermission = true
-            }
-            Manifest.permission.CAMERA -> if (!isGranted) {
-                Toast.makeText(context, R.string.need_camera_access_toast, Toast.LENGTH_LONG).show()
-            } else {
-                cameraPermission = true
-            }
-        }
-    }
 
     override fun onUserCredentialsSaveDone(result: Boolean?) {
         if (result == true) {

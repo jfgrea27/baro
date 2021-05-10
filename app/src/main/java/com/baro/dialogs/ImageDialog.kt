@@ -1,5 +1,6 @@
 package com.baro.dialogs
 
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,9 @@ import androidx.appcompat.app.AppCompatDialogFragment
 
 import com.baro.R
 import com.baro.constants.AppCodes
+import com.baro.constants.PermissionsEnum
+import com.baro.helpers.PermissionsHelper
+import java.lang.ref.WeakReference
 
 
 class ImageDialog(var onInputListener: OnInputListener?) : AppCompatDialogFragment() {
@@ -24,13 +28,21 @@ class ImageDialog(var onInputListener: OnInputListener?) : AppCompatDialogFragme
         val view = inflater.inflate(R.layout.dialog_image_chooser, container, false)
         gallery = view.findViewById<ImageButton?>(R.id.btn_folder)
         gallery.setOnClickListener(View.OnClickListener {
-            onInputListener?.sendInput(AppCodes.GALLERY_SELECTION.code)
-            dialog?.dismiss()
+            val weakReference = WeakReference<Activity>(this.activity)
+            if (PermissionsHelper.checkAndRequestPermissions(weakReference, PermissionsEnum.GALLERY_SELECTION)) {
+                onInputListener?.sendInput(AppCodes.GALLERY_SELECTION.code)
+                dialog?.dismiss()
+            }
+
         })
         roll = view.findViewById<ImageButton?>(R.id.btn_camera)
         roll.setOnClickListener(View.OnClickListener {
-            onInputListener?.sendInput(AppCodes.CAMERA_ROLL_SELECTION.code)
-            dialog?.dismiss()
+            val weakReference = WeakReference<Activity>(this.activity)
+            if (PermissionsHelper.checkAndRequestPermissions(weakReference, PermissionsEnum.CAMERA_ROLL_SELECTION)) {
+                onInputListener?.sendInput(AppCodes.CAMERA_ROLL_SELECTION.code)
+                dialog?.dismiss()
+            }
+
         })
         return view
     }
