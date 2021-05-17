@@ -78,7 +78,7 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
     private fun tellFragments() {
         val fragments: List<Fragment> = supportFragmentManager.fragments
         for (f in fragments) {
-            if (f != null && f is EditCourseSummaryFragment) {
+            if (f is EditCourseSummaryFragment) {
                 f.onBackPressed()
             }
         }
@@ -137,12 +137,12 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getCoursesFromFiles() {
-        var coursePath = Paths.get(
+        val coursePath = Paths.get(
             getExternalFilesDir(null).toString(),
             FileEnum.USER_DIRECTORY.key,
             FileEnum.COURSE_DIRECTORY.key
         )
-        var params = AsyncHelpers.CreatorCourseCredentialsLoad.TaskParams(coursePath, user)
+        val params = AsyncHelpers.CreatorCourseCredentialsLoad.TaskParams(coursePath, user)
         AsyncHelpers.CreatorCourseCredentialsLoad(this).execute(params)
     }
 
@@ -164,7 +164,7 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
     private fun updateRecycleView() {
         courseAdapter?.notifyDataSetChanged()
 
-        var weakReference = WeakReference<Context>(this)
+        val weakReference = WeakReference<Context>(this)
         courseAdapter = CourseAdapter(weakReference, this.courses, this)
         courseRecycleView.adapter = courseAdapter
     }
@@ -190,11 +190,11 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
         courseAdapter?.notifyDataSetChanged()
     }
 
-    override fun onCourseDeleted(courseDeleted: Course?) {
+    override fun onCourseDeleted(result: Course?) {
         var position = -1
 
         for (course in courses) {
-            if (courseDeleted?.getCourseUUID() == course.first.getCourseUUID()) {
+            if (result?.getCourseUUID() == course.first.getCourseUUID()) {
                 position = courses.indexOf(course)
             }
         }
