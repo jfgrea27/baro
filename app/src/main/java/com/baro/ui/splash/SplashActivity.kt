@@ -3,6 +3,7 @@ package com.baro.ui.splash
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -24,7 +25,7 @@ class SplashActivity : AppCompatActivity(), OnUserLoginCheckComplete {
         setContentView(R.layout.activity_splash)
         configureProgressBar()
         if (savedInstanceState == null) {
-            Handler().postDelayed(Runnable { getCurrentlyLoggingInUser() }, SPLASH_TIME_OUT.toLong())
+            Handler(Looper.getMainLooper()).postDelayed({ getCurrentlyLoggingInUser() }, SPLASH_TIME_OUT.toLong())
         }
     }
 
