@@ -195,7 +195,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         addDeleteVideoButton.setOnClickListener {
 
             if (videoUri == null) {
-                // TODO PERMISSION_REFACTOR
                 val imageDialog = ImageDialog(this)
                 imageDialog.show(supportFragmentManager, AppTags.THUMBNAIL_SELECTION.toString())
                 updateUI()
