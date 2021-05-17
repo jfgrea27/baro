@@ -61,7 +61,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         setContentView(R.layout.activity_create_slide)
 
         // Get Course
-        course = intent.getParcelableExtra(IntentEnum.COURSE.key)
+        course = intent.getParcelableExtra(IntentEnum.COURSE.key)!!
 
         // Create First Slide
         if (course.getSlides().size == 0) {
