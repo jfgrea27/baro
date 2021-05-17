@@ -1,9 +1,6 @@
 package com.baro.ui.splash
 
-import android.Manifest
-import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -14,29 +11,22 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.*
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.annotation.RequiresApi
-import androidx.annotation.VisibleForTesting
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-
 import com.baro.R
 import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
-import com.baro.constants.PermissionsEnum
 import com.baro.dialogs.ImageDialog
 import com.baro.dialogs.ImageDialog.OnInputListener
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
-import com.baro.helpers.PermissionsHelper
 import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
 import com.baro.ui.main.MainActivity
-import java.lang.ref.WeakReference
-
 import java.nio.file.Paths
-import java.util.*
 
 @RequiresApi(api = Build.VERSION_CODES.N)
 class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSaveComplete {
@@ -62,7 +52,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
     private fun configurePhotoThumbnailButton(view: View?) {
         photoThumbnailButton = view?.findViewById(R.id.im_account)!!
 
-        photoThumbnailButton.setOnClickListener { v: View? ->
+        photoThumbnailButton.setOnClickListener {
             val imageDialog = ImageDialog(this)
             imageDialog.show(parentFragmentManager, AppTags.THUMBNAIL_SELECTION.toString())
 
@@ -103,9 +93,9 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun configureNextButton(view: View?) {
-        nextButton = view?.findViewById<ImageButton?>(R.id.btn_next)!!
+        nextButton = view?.findViewById(R.id.btn_next)!!
 
-        nextButton.setOnClickListener { v: View? ->
+        nextButton.setOnClickListener {
             if (usernameEditText.text.length > 5) {
                 val userCredentialsSave = AsyncHelpers.UserCredentialsSave(this)
                 userCredentialsSave.execute(context)
