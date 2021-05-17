@@ -1,5 +1,6 @@
 package com.baro.ui.account
 
+import android.app.Activity
 import android.content.Context
 import android.net.Uri
 import android.os.Build
@@ -15,7 +16,9 @@ import com.baro.R
 import com.baro.adapters.CourseAdapter
 import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
+import com.baro.constants.PermissionsEnum
 import com.baro.helpers.AsyncHelpers
+import com.baro.helpers.PermissionsHelper
 import com.baro.helpers.interfaces.OnCourseCreate
 import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.helpers.interfaces.OnCourseDeleted
@@ -86,18 +89,22 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
         createButton = findViewById(R.id.btn_create)
 
         createButton.setOnClickListener {
-            // TODO __PERMISSION_REFACTOR__
+            val weakReference = WeakReference<Activity>(this)
+            if (PermissionsHelper.checkAndRequestPermissions(weakReference, PermissionsEnum.CREATE_COURSE_SELECTION)) {
+                val course = Course(UUID.randomUUID(), user)
+                course.setCreationDate(System.currentTimeMillis())
+                val createCourseSummaryFragment: CreateCourseSummaryFragment =
+                    CreateCourseSummaryFragment.newInstance(course)
 
-            val course = Course(UUID.randomUUID(), user)
-            course.setCreationDate(System.currentTimeMillis())
-            val createCourseSummaryFragment: CreateCourseSummaryFragment =
-                CreateCourseSummaryFragment.newInstance(course)
+                supportFragmentManager.beginTransaction()
+                    .add(R.id.fragment_container_view, createCourseSummaryFragment, null)
+                    .addToBackStack(AppTags.CREATE_COURSE_SUMMARY_FRAGMENT.name)
+                    .setReorderingAllowed(true)
+                    .commit()
+            }
 
-            supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container_view, createCourseSummaryFragment, null)
-                .addToBackStack(AppTags.CREATE_COURSE_SUMMARY_FRAGMENT.name)
-                .setReorderingAllowed(true)
-                .commit()
+
+
         }
     }
 
@@ -163,16 +170,18 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
     }
 
     override fun notifyCourseSelected(course: Course) {
-        // TODO __PERMISSION_REFACTOR_holder_
 
-        val editCourseSummaryFragment: EditCourseSummaryFragment =
-            EditCourseSummaryFragment.newInstance(course)
+        val weakReference = WeakReference<Activity>(this)
+        if (PermissionsHelper.checkAndRequestPermissions(weakReference, PermissionsEnum.READ_COURSE)) {
+            val editCourseSummaryFragment: EditCourseSummaryFragment =
+                EditCourseSummaryFragment.newInstance(course)
 
-        supportFragmentManager.beginTransaction()
-            .add(R.id.fragment_container_view, editCourseSummaryFragment, null)
-            .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)
-            .setReorderingAllowed(true)
-            .commit()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container_view, editCourseSummaryFragment, null)
+                .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)
+                .setReorderingAllowed(true)
+                .commit()
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
