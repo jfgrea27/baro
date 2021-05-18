@@ -2,7 +2,7 @@ package com.baro.constants
 
 
 enum class JSONEnum(
-        val key: String?) {
+        val key: String) {
     COURSE_NAME_KEY("course-name"),
     COURSE_UUID_KEY("course-uuid"),
     USER_UUID_KEY("user-uuid"),

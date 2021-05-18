@@ -20,7 +20,7 @@ import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
-import com.baro.helpers.interfaces.OnCourseDeleted
+import com.baro.helpers.AsyncHelpers.OnCourseDeleted
 import com.baro.models.Category
 import com.baro.models.Country
 import com.baro.models.Course
@@ -28,6 +28,8 @@ import com.baro.ui.dialogs.CategoryDialog
 import com.baro.ui.dialogs.CountryDialog
 import com.baro.ui.interfaces.OnBackPressed
 import kotlinx.android.synthetic.main.dialog_image_chooser.view.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
@@ -80,16 +82,21 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
         return view
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun configureDeleteButton(view: View) {
         deleteButton = view.findViewById(R.id.btn_delete)
 
         deleteButton.setOnClickListener{
-            val weakContext = WeakReference<Context>(context)
-            val onCourseDeleted = (activity as OnCourseDeleted)
-
-            val asyncHelpers = AsyncHelpers.DeleteCourse(onCourseDeleted, weakContext)
-            val params = AsyncHelpers.DeleteCourse.TaskParams(course)
-            asyncHelpers.execute(params)
+            runBlocking {
+                launch {
+                    val done = AsyncHelpers().deleteCourse(context?.getExternalFilesDir(null), course)
+                    if (!done) {
+                        Toast.makeText(context, "Course Failed to Delete", Toast.LENGTH_SHORT).show()
+                    }
+                    val onCourseDeleted = (activity as OnCourseDeleted)
+                    onCourseDeleted.onCourseDeleted(course)
+                }
+            }
         }
     }
 

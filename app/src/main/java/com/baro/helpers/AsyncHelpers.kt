@@ -34,51 +34,46 @@ class AsyncHelpers {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    class VerifyUserCredentials(private var callback: OnUserLoginCheckComplete) : AsyncTask<File?, Void?, User?>() {
-        @RequiresApi(api = Build.VERSION_CODES.O)
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    fun coroutineVerifyUserCredentials(file: File?): User? {
 
 
-        override fun doInBackground(vararg externalFilesDir: File?): User? {
-
-            val userMetaDataPath = Paths.get(externalFilesDir[0].toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.META_DATA_FILE.key)
+        val userMetaDataPath = Paths.get(file.toString(),
+            FileEnum.USER_DIRECTORY.key,
+            FileEnum.META_DATA_FILE.key)
 
 
-            val userThumbnailPath = Paths.get(externalFilesDir[0].toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.PHOTO_THUMBNAIL_FILE.key)
+        val userThumbnailPath = Paths.get(file.toString(),
+            FileEnum.USER_DIRECTORY.key,
+            FileEnum.PHOTO_THUMBNAIL_FILE.key)
 
-            val userMetaDataFile = FileHelper.getFileAtPath(userMetaDataPath)
-            val userThumbnailFile = FileHelper.getFileAtPath(userThumbnailPath)
+        val userMetaDataFile = FileHelper.getFileAtPath(userMetaDataPath)
+        val userThumbnailFile = FileHelper.getFileAtPath(userThumbnailPath)
 
-            var user: User? = null
+        var user: User? = null
 
-            if (userMetaDataFile != null) {
-                val contentMetaData = FileHelper.readFile(userMetaDataFile)
-                val jsonMetaData = contentMetaData?.let { JSONHelper.createJSONFromString(it) }
+        if (userMetaDataFile != null) {
+            val contentMetaData = FileHelper.readFile(userMetaDataFile)
+            val jsonMetaData = contentMetaData?.let { JSONHelper.createJSONFromString(it) }
 
-                user = if (userThumbnailFile != null && userThumbnailFile.length() > 0) {
-                    User(
-                            UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
-                            jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String,
-                            userThumbnailFile
-                    )
-                } else {
-                    User(
-                            UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
-                            jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String)
-                }
+            user = if (userThumbnailFile != null && userThumbnailFile.length() > 0) {
+                User(
+                    UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
+                    jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String,
+                    userThumbnailFile
+                )
+            } else {
+                User(
+                    UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
+                    jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String)
             }
-            return user
         }
-
-        @RequiresApi(Build.VERSION_CODES.O)
-        override fun onPostExecute(result: User?) {
-            callback.onUserLoginCheckDone(result)
-        }
+        return user
 
     }
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -130,31 +125,19 @@ class AsyncHelpers {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class LoadUserData(private var callback: OnUserDataFound) : AsyncTask<LoadUserData.TaskParams, Void?, LoadUserData.LoadUserDataResponse?>() {
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun doInBackground(vararg params: TaskParams?): LoadUserDataResponse? {
-            val user = params[0]?.user
-            val contentResolver = params[0]?.contentResolver
-            if (user?.getThumbnailFile() != null) {
-                val source = ImageDecoder.createSource(contentResolver!!, Uri.fromFile(user.getThumbnailFile()))
-                val username = user.getUsername()
-                val imageBmp = ImageDecoder.decodeBitmap(source)
-                return LoadUserDataResponse(username, imageBmp)
-            } else if (user?.getUsername() != null) {
-                return LoadUserDataResponse(user.getUsername(), null)
-            } else {
-                return null
-            }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun loadUserThumbnail(thumbnailFile: File?, weakReferenceContentResolver: WeakReference<ContentResolver>): Bitmap? {
+        val content = weakReferenceContentResolver.get()
+        return if (thumbnailFile != null && thumbnailFile.exists()) {
+            val source = ImageDecoder.createSource(content!!, Uri.fromFile(thumbnailFile))
+            ImageDecoder.decodeBitmap(source)
+        } else {
+            null
+        }
         }
 
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(result: LoadUserDataResponse?) {
-            callback.onUserDataReturned(result)
-        }
 
-        class TaskParams(var user: User?, var contentResolver: ContentResolver)
-        class LoadUserDataResponse(var username: String?, var imageBmp: Bitmap?)
-    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -394,27 +377,20 @@ class AsyncHelpers {
 
     }
 
-    class DeleteCourse(private var callback: OnCourseDeleted, private var context: WeakReference<Context>) : AsyncTask<DeleteCourse.TaskParams, Course?, Course?>() {
-
-        class TaskParams(var course: Course)
-
-        @RequiresApi(Build.VERSION_CODES.O)
-        override fun doInBackground(vararg params: TaskParams?): Course? {
-            val course = params[0]?.course
-            val coursePath = Paths.get(context.get()?.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.COURSE_DIRECTORY.key,
-                    course?.getCourseUUID().toString())
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun deleteCourse(rootDir: File?, course: Course): Boolean {
+        if (rootDir?.exists() == true) {
+            val coursePath = Paths.get(rootDir.toString(),
+            FileEnum.USER_DIRECTORY.key,
+            FileEnum.COURSE_DIRECTORY.key,
+            course.getCourseUUID().toString())
             val courseFile = coursePath.toFile()
             FileHelper.deleteFile(courseFile)
-            return course
-        }
+            return true} else {return false}
+    }
 
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(course: Course?) {
-            callback.onCourseDeleted(course)
-        }
-
+    public interface OnCourseDeleted {
+        fun onCourseDeleted(result: Course?)
     }
 
 

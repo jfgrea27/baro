@@ -1,7 +1,8 @@
 package com.baro.ui.main
 
+import android.content.ContentResolver
 import android.content.Intent
-import android.net.Uri
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.widget.ImageButton
@@ -13,23 +14,24 @@ import com.baro.ui.account.AccountActivity
 import com.baro.R
 import com.baro.constants.AppTags
 import com.baro.helpers.AsyncHelpers
-import com.baro.helpers.interfaces.OnUserDataFound
 import com.baro.models.User
 import com.baro.ui.learn.LearnActivity
 import com.baro.ui.share.ShareActivity
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.lang.ref.WeakReference
 import java.util.*
 
 
-class MainActivity : AppCompatActivity(), OnUserDataFound {
+class MainActivity : AppCompatActivity() {
     private lateinit var welcomeTextView: TextView
     private lateinit var accountButton: ImageButton
     private lateinit var shareButton: ImageButton
     private lateinit var learnButton: ImageButton
 
     private var user: User? = null
-    private var thumbnailUri: Uri? = null
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -44,9 +46,17 @@ class MainActivity : AppCompatActivity(), OnUserDataFound {
         configureWelcomeTextView()
 
         // Update UI with User Credentials
-        val loadUserDataParams = AsyncHelpers.LoadUserData.TaskParams(user, this.contentResolver)
-        val userRetrieveThumbnail = AsyncHelpers.LoadUserData(this)
-        userRetrieveThumbnail.execute(loadUserDataParams)
+        updateUserCredentials()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    private fun updateUserCredentials() {
+        runBlocking {
+            launch {
+                val weakReference = WeakReference<ContentResolver>(contentResolver)
+                val bitmap = AsyncHelpers().loadUserThumbnail(user?.getThumbnailFile(), weakReference)
+                onUserDataReturned(bitmap) }
+        }
     }
 
     private fun configureWelcomeTextView() {
@@ -93,19 +103,14 @@ class MainActivity : AppCompatActivity(), OnUserDataFound {
         }
     }
 
-
-
-
-    override fun onUserDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
-        val username = userData?.username
-        val imageBmp = userData?.imageBmp
+    private fun onUserDataReturned(imageBitmap: Bitmap?) {
         if (user != null) {
-            welcomeTextView.text = "Welcome "+ username
-            if (imageBmp != null) {
-                accountButton.setImageBitmap(imageBmp)
-            }
+            welcomeTextView.text = "Welcome "+ user?.getUsername()
         } else {
             Toast.makeText(this@MainActivity, R.string.error_retrieving_credentials, Toast.LENGTH_LONG).show()
+        }
+        if (imageBitmap != null) {
+            accountButton.setImageBitmap(imageBitmap)
         }
     }
 
