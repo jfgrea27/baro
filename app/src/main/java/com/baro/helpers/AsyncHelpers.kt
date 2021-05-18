@@ -77,51 +77,45 @@ class AsyncHelpers {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class UserCredentialsSave(private var callback: OnUserCredentialsSaveComplete) : AsyncTask<Context, Void?, Boolean?>() {
-        @RequiresApi(api = Build.VERSION_CODES.P)
-        override fun doInBackground(vararg context: Context): Boolean {
-            // Save the Meta information
-            saveCredentials(callback.getUsername(), callback.getPath())
-            // Save Photo URI
-            savePhotoUri(callback.getPhotoUri(), context[0])
-            return true
-        }
-
-
-        override fun onPostExecute(result: Boolean?) {
-            callback.onUserCredentialsSaveDone(result)
-        }
-
-        @RequiresApi(api = Build.VERSION_CODES.O)
-        private fun saveCredentials(username: String, path: String) {
-            val credentialDetails = HashMap<String?, String?>()
-            val userUUID = UUID.randomUUID()
-            credentialDetails[JSONEnum.USER_NAME_KEY.key] = username
-            credentialDetails[JSONEnum.USER_UUID_KEY.key] = userUUID.toString()
-            val jsonCredentials = JSONHelper.createJSONFromHashMap(credentialDetails)
-            val userMetaDataPath = Paths.get(path,
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.META_DATA_FILE.key)
-            val userMetaDataFile = FileHelper.createFileAtPath(userMetaDataPath)
-            FileHelper.writeToFile(userMetaDataFile, jsonCredentials.toString())
-        }
-
-        @RequiresApi(api = Build.VERSION_CODES.P)
-        private fun savePhotoUri(photoUri: Uri?, context: Context) {
-            if (photoUri != null) {
-
-                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, photoUri))
-                val userThumbnailPicturePath = Paths.get(context.getExternalFilesDir(null).toString(),
-                        FileEnum.USER_DIRECTORY.key,
-                        FileEnum.PHOTO_THUMBNAIL_FILE.key)
-                val file = File(userThumbnailPicturePath.toString())
-
-                FileHelper.writeBitmapToFile(file, bitmap)
-            }
-        }
-
-
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun userCredentialsSave(username: String, path: String, photoUri: Uri?, weakReference: WeakReference<Context>): Boolean {
+        savePhotoUri(photoUri, weakReference.get())
+        return saveCredentials(username, path)
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private fun saveCredentials(username: String, path: String): Boolean {
+
+        val credentialDetails = HashMap<String?, String?>()
+        val userUUID = UUID.randomUUID()
+        credentialDetails[JSONEnum.USER_NAME_KEY.key] = username
+        credentialDetails[JSONEnum.USER_UUID_KEY.key] = userUUID.toString()
+        val jsonCredentials = JSONHelper.createJSONFromHashMap(credentialDetails)
+        val userMetaDataPath = Paths.get(
+            path,
+            FileEnum.USER_DIRECTORY.key,
+            FileEnum.META_DATA_FILE.key
+        )
+        val userMetaDataFile = FileHelper.createFileAtPath(userMetaDataPath)
+        return FileHelper.writeToFile(userMetaDataFile, jsonCredentials.toString())
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.P)
+    private fun savePhotoUri(photoUri: Uri?, context: Context?) {
+        if (photoUri != null) {
+            if (context != null) {
+                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, photoUri))
+                val userThumbnailPicturePath = Paths.get(
+                    context.getExternalFilesDir(null).toString(),
+                    FileEnum.USER_DIRECTORY.key,
+                    FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                val file = File(userThumbnailPicturePath.toString())
+                FileHelper.writeBitmapToFile(file, bitmap)}
+
+
+        }
+    }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -389,7 +383,7 @@ class AsyncHelpers {
             return true} else {return false}
     }
 
-    public interface OnCourseDeleted {
+    interface OnCourseDeleted {
         fun onCourseDeleted(result: Course?)
     }
 

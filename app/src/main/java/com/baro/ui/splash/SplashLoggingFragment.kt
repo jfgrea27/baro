@@ -1,5 +1,6 @@
 package com.baro.ui.splash
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -24,12 +25,14 @@ import com.baro.dialogs.ImageDialog
 import com.baro.dialogs.ImageDialog.OnInputListener
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
-import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
 import com.baro.ui.main.MainActivity
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.lang.ref.WeakReference
 import java.nio.file.Paths
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSaveComplete {
+class SplashLoggingFragment : Fragment(), OnInputListener  {
 
     private lateinit var photoThumbnailButton: ImageButton
     private lateinit var usernameEditText: EditText
@@ -37,7 +40,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
 
     private var photoUri: Uri? = null
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.P)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_logging, container, false)
 
@@ -91,14 +94,23 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.P)
     private fun configureNextButton(view: View?) {
         nextButton = view?.findViewById(R.id.btn_next)!!
 
         nextButton.setOnClickListener {
             if (usernameEditText.text.length > 5) {
-                val userCredentialsSave = AsyncHelpers.UserCredentialsSave(this)
-                userCredentialsSave.execute(context)
+                runBlocking {
+                    launch {
+                        val weakReference  = WeakReference<Context>(context)
+                        val result = AsyncHelpers().userCredentialsSave(usernameEditText.text.toString(),
+                            requireContext().getExternalFilesDir(null).toString(),
+                            photoUri,
+                            weakReference)
+                        onUserCredentialsSaveDone(result)
+
+                    }
+                }
             } else {
                 // TODO discuss if we need a username..
                 Toast.makeText(
@@ -114,7 +126,7 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
     }
 
 
-    override fun onUserCredentialsSaveDone(result: Boolean?) {
+    private fun onUserCredentialsSaveDone(result: Boolean?) {
         if (result == true) {
             val startMainActivity = Intent(
                     activity,
@@ -125,18 +137,6 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
         } else {
             Toast.makeText(context, R.string.error_saving_credentials, Toast.LENGTH_LONG).show()
         }
-    }
-
-    override fun getUsername(): String {
-        return usernameEditText.text.toString()
-    }
-
-    override fun getPath(): String {
-        return requireContext().getExternalFilesDir(null).toString()
-    }
-
-    override fun getPhotoUri(): Uri? {
-        return photoUri
     }
 
 }
