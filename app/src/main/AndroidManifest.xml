@@ -5,6 +5,13 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
 
     <application
         android:allowBackup="true"
@@ -13,7 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Baro">
-        <activity android:name=".ui.create.CreateSlideActivity"></activity>
+        <activity android:name=".ui.create.CreateSlideActivity" />
         <activity android:name=".ui.learn.LearnActivity" />
 
         <provider
@@ -29,7 +36,7 @@
         <activity android:name=".ui.share.UploadActivity" />
         <activity android:name=".ui.share.BluetoothReceiveActivity" />
         <activity android:name=".ui.share.BluetoothSendActivity" />
-        <activity android:name=".ui.share.SendReceiveActivity" />
+        <activity android:name=".ui.share.WifiDirectActivity" />
         <activity android:name=".ui.share.ShareActivity" />
         <activity android:name=".ui.account.AccountActivity" />
         <activity android:name=".ui.splash.SplashActivity">

@@ -82,5 +82,5 @@ class CourseAdapter internal constructor(var context: WeakReference<Context>, va
         var courseCategory: TextView = itemView.findViewById(R.id.txt_category)
     }
 
-    public interface OnCourseSelected { fun notifyCourseSelected(course: Course)}
+    interface OnCourseSelected { fun notifyCourseSelected(course: Course)}
 }

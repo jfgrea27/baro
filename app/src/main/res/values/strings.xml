@@ -30,4 +30,7 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="no_category">No Category</string>
+    <string name="wifi_direct_peer_connection">WifiDirect Peer Connection</string>
+    <string name="wifidirect_connection">WifiDirect Connection</string>
+    <string name="list_of_devices">List of Devices</string>
 </resources>
