@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.wifi.p2p.WifiP2pConfig
 import android.net.wifi.p2p.WifiP2pDevice
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
@@ -132,7 +133,35 @@ class WifiDirectActivity : AppCompatActivity() {
 
 
     fun connectDevice(device: WifiP2pDevice) {
-        Toast.makeText(applicationContext, "Connecting to " + device.deviceName, Toast.LENGTH_LONG).show()
+        val config = WifiP2pConfig()
+        config.deviceAddress = device.deviceAddress
+        channel?.also { channel ->
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return
+            }
+            manager?.connect(channel, config, object : WifiP2pManager.ActionListener {
+
+                override fun onSuccess() {
+                    Toast.makeText(applicationContext, "DEBUG: Connected to " + device.deviceName, Toast.LENGTH_LONG).show()
+                }
+
+                override fun onFailure(reason: Int) {
+                    Toast.makeText(applicationContext, "DEBUG: No connection established", Toast.LENGTH_LONG).show()
+                }
+            }
+            )
+        }
     }
 
 }
