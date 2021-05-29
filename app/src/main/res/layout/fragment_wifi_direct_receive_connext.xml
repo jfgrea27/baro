@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.create.CreateCourseSummaryFragment"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+
+        <TextView
+            android:id="@+id/txt_peer_connection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:text="@string/wifi_direct_peer_connection"
+            android:textSize="@dimen/medium_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.509"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txt_wifi_p2p_connection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/wifidirect_connection"
+            app:layout_constraintBottom_toTopOf="@+id/txt_receive"
+            app:layout_constraintStart_toStartOf="@+id/txt_peer_connection"
+            app:layout_constraintTop_toBottomOf="@+id/txt_peer_connection" />
+
+        <ImageView
+            android:id="@+id/img_wifidirect_connection_status"
+            android:layout_width="@dimen/smaller_icon_height"
+            android:layout_height="@dimen/smaller_icon_height"
+            app:layout_constraintBottom_toBottomOf="@+id/txt_wifi_p2p_connection"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/txt_wifi_p2p_connection"
+            app:layout_constraintTop_toTopOf="@+id/txt_wifi_p2p_connection"
+            app:srcCompat="@drawable/ic_wifi_off" />
+
+
+        <TextView
+            android:id="@+id/txt_receive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Waiting for Sender..."
+            android:textSize="@dimen/medium_text"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_peer_connection" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

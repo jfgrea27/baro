@@ -7,6 +7,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.wifi.p2p.WifiP2pConfig
 import android.net.wifi.p2p.WifiP2pDevice
+import android.net.wifi.p2p.WifiP2pInfo
 import android.net.wifi.p2p.WifiP2pManager
 import android.os.Bundle
 import android.widget.ImageButton
@@ -14,34 +15,57 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.baro.R
+import com.baro.constants.AppCodes
+import com.baro.constants.AppTags
 
 
-class WifiDirectActivity : AppCompatActivity() {
+class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoListener {
 
+    // WifiDirect
+    private val manager: WifiP2pManager? by lazy(LazyThreadSafetyMode.NONE) {
+        getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager?
+    }
+    private var channel: WifiP2pManager.Channel? = null
+    private var receiver: BroadcastReceiver? = null
 
-    private lateinit var sendButton: ImageButton
-    private lateinit var receiveButton: ImageButton
+    private var isReceiving: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         setContentView(R.layout.activity_wifi_direct)
 
-        configureBaseFragment()
-        activateWifi()
+        getUserIntent()
+        configureView()
+
+        initWifiP2P()
         discoverPeers()
     }
 
-    private fun configureBaseFragment() {
-        val peerConnectFragment: WifiDirectPeerConnectFragment =
-            WifiDirectPeerConnectFragment.newInstance()
-
-        supportFragmentManager.beginTransaction()
-            .add(R.id.fragment_container_view, peerConnectFragment, null)
-            .setReorderingAllowed(true)
-            .commit()
+    private fun getUserIntent() {
+        val userIntent = intent.extras?.get(AppTags.WIFIP2P_INTENT.name)
+        isReceiving = userIntent != AppCodes.WIFIP2P_PEER_SEND.code
     }
+
+
+    private fun configureView() {
+        if (isReceiving) {
+            val peerReceiveFragment: WifiDirectPeerReceiveFragment =
+                WifiDirectPeerReceiveFragment.newInstance()
+
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container_view, peerReceiveFragment, null)
+                .setReorderingAllowed(true)
+                .commit()
+        } else {
+            val peerSendFragment: WifiDirectPeerSendFragment =
+                WifiDirectPeerSendFragment.newInstance()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container_view, peerSendFragment, null)
+                .setReorderingAllowed(true)
+                .commit()
+        }
+    }
+
 
     private fun discoverPeers() {
         if (ActivityCompat.checkSelfPermission(
@@ -65,21 +89,13 @@ class WifiDirectActivity : AppCompatActivity() {
             }
 
             override fun onFailure(reasonCode: Int) {
-                Toast.makeText(applicationContext, "DEBUG: annot discover peers", Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, "DEBUG: Cannot discover peers", Toast.LENGTH_LONG).show()
             }
         })
 
     }
 
-    // WifiDirect
-    private val manager: WifiP2pManager? by lazy(LazyThreadSafetyMode.NONE) {
-        getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager?
-    }
-
-    var channel: WifiP2pManager.Channel? = null
-    var receiver: BroadcastReceiver? = null
-
-    private fun activateWifi() {
+    private fun initWifiP2P() {
         channel = manager?.initialize(this, mainLooper, null)
         channel?.also { channel ->
             receiver = manager?.let { WiFiDirectBroadcastReceiver(it, channel, this) }
@@ -108,32 +124,55 @@ class WifiDirectActivity : AppCompatActivity() {
         receiver?.also { receiver ->
             unregisterReceiver(receiver)
         }
+
+        if (!isReceiving) {
+            // Stops connection between devices
+            manager?.removeGroup(channel, object : WifiP2pManager.ActionListener {
+                override fun onFailure(reasonCode: Int) {
+                    Toast.makeText(
+                        applicationContext,
+                        "DEBUG: Could not disconnect devices Reason :$reasonCode", Toast.LENGTH_LONG
+                    ).show()
+
+                }
+
+                override fun onSuccess() {
+                    Toast.makeText(
+                        applicationContext,
+                        "DEBUG: Device disconnected", Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            })
+        }
     }
 
 
     // Notify WifiDirectPeerConnectFragment
     fun wifiDirectStatusUpdate(wifiDirectConnected: Boolean) {
-        val wifiDirectPeerConnectFragment = supportFragmentManager
-            .findFragmentById(R.id.fragment_container_view) as WifiDirectPeerConnectFragment
-
-        wifiDirectPeerConnectFragment.changeWifiDirectStatus(wifiDirectConnected)
+        if (isReceiving) {
+            val wifiDirectPeerReceiveFragment = supportFragmentManager
+                .findFragmentById(R.id.fragment_container_view) as WifiDirectPeerReceiveFragment?
+            wifiDirectPeerReceiveFragment?.changeWifiDirectStatus(wifiDirectConnected)
+        } else {
+            val wifiDirectPeerSendFragment = supportFragmentManager
+                .findFragmentById(R.id.fragment_container_view) as WifiDirectPeerSendFragment?
+            wifiDirectPeerSendFragment?.changeWifiDirectStatus(wifiDirectConnected)
+        }
     }
 
     fun updateWifiP2PDeviceList(wifiP2pDeviceList: MutableCollection<WifiP2pDevice>) {
-        val wifiDirectPeerConnectFragment = supportFragmentManager
-            .findFragmentById(R.id.fragment_container_view) as WifiDirectPeerConnectFragment
-
-        val devices = ArrayList<WifiP2pDevice>()
-
-        for (device in wifiP2pDeviceList) {
-            devices.add(device)
+        if (!isReceiving) {
+            val wifiDirectPeerSendFragment = supportFragmentManager
+                .findFragmentById(R.id.fragment_container_view) as WifiDirectPeerSendFragment
+            wifiDirectPeerSendFragment.updateWifiP2PDeviceList(wifiP2pDeviceList)
         }
-        wifiDirectPeerConnectFragment.updateWifiP2PDeviceList(devices)
     }
 
 
     fun connectDevice(device: WifiP2pDevice) {
         val config = WifiP2pConfig()
+
         config.deviceAddress = device.deviceAddress
         channel?.also { channel ->
             if (ActivityCompat.checkSelfPermission(
@@ -150,18 +189,35 @@ class WifiDirectActivity : AppCompatActivity() {
                 // for ActivityCompat#requestPermissions for more details.
                 return
             }
-            manager?.connect(channel, config, object : WifiP2pManager.ActionListener {
+            if (!isReceiving) {
+                manager?.createGroup(channel, object : WifiP2pManager.ActionListener {
+                    override fun onSuccess() {
+                        Toast.makeText(applicationContext, "DEBUG: Connected to " + device.deviceName, Toast.LENGTH_LONG).show()
+                    }
 
-                override fun onSuccess() {
-                    Toast.makeText(applicationContext, "DEBUG: Connected to " + device.deviceName, Toast.LENGTH_LONG).show()
-                }
+                    override fun onFailure(reason: Int) {
+                        Toast.makeText(applicationContext, "DEBUG: No connection established", Toast.LENGTH_LONG).show()
 
-                override fun onFailure(reason: Int) {
-                    Toast.makeText(applicationContext, "DEBUG: No connection established", Toast.LENGTH_LONG).show()
-                }
+                    }
+                })
             }
-            )
+
+
+//            manager?.connect(channel, config, object : WifiP2pManager.ActionListener {
+//
+//                override fun onSuccess() {
+//                    Toast.makeText(applicationContext, "DEBUG: Connected to " + device.deviceName, Toast.LENGTH_LONG).show()
+//                }
+//
+//                override fun onFailure(reason: Int) {
+//                    Toast.makeText(applicationContext, "DEBUG: No connection established", Toast.LENGTH_LONG).show()
+//                }
+//            })
         }
+    }
+
+    override fun onConnectionInfoAvailable(p0: WifiP2pInfo?) {
+        Toast.makeText(applicationContext, "DEBUG: No connection established", Toast.LENGTH_LONG).show()
     }
 
 }

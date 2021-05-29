@@ -1,6 +1,7 @@
 package com.baro.ui.share
 
 import android.app.Activity
+import androidx.fragment.app.Fragment
 import android.net.wifi.p2p.WifiP2pDevice
 import android.os.Build
 import android.os.Bundle
@@ -10,25 +11,21 @@ import android.view.ViewGroup
 import android.widget.*
 import android.widget.AdapterView.OnItemClickListener
 import androidx.annotation.RequiresApi
-import androidx.fragment.app.Fragment
 import com.baro.R
 import com.baro.adapters.DeviceAdapter
 import java.lang.ref.WeakReference
 
 
-class WifiDirectPeerConnectFragment : Fragment() {
+class WifiDirectPeerSendFragment : Fragment() {
 
     private lateinit var peerListView: ListView
     private lateinit var wifiDirectStatus: ImageView
+
 
     // Adapter
     private lateinit var adapter: DeviceAdapter
     private var devices = ArrayList<WifiP2pDevice>()
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -36,7 +33,7 @@ class WifiDirectPeerConnectFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        var view =  inflater.inflate(R.layout.fragment_wifi_direct_peer_connect, container, false)
+        var view =  inflater.inflate(R.layout.fragment_wifi_direct_send_connect, container, false)
 
         configurePeerListView(view)
         configureWifiDirectStatusImage(view)
@@ -63,7 +60,7 @@ class WifiDirectPeerConnectFragment : Fragment() {
 
         @JvmStatic
         fun newInstance() =
-            WifiDirectPeerConnectFragment().apply {
+            WifiDirectPeerSendFragment().apply {
             }
     }
 
@@ -75,7 +72,7 @@ class WifiDirectPeerConnectFragment : Fragment() {
         }
     }
 
-    fun updateWifiP2PDeviceList(wifiP2pDeviceList: ArrayList<WifiP2pDevice>) {
+    fun updateWifiP2PDeviceList(wifiP2pDeviceList: MutableCollection<WifiP2pDevice>) {
         for (device in wifiP2pDeviceList) {
             if (device !in devices) {
                 devices.add(device)

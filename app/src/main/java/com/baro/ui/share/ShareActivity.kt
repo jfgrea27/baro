@@ -28,7 +28,7 @@ class ShareActivity : AppCompatActivity() {
     private fun configureLocalButton() {
         localButton = findViewById(R.id.btn_local)
         localButton.setOnClickListener{
-            val intent = Intent(this, WifiDirectActivity::class.java)
+            val intent = Intent(this, SendReceiveActivity::class.java)
             startActivity(intent)
         }
 
