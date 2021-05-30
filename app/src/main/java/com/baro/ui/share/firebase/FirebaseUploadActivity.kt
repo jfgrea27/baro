@@ -1,13 +1,14 @@
-package com.baro.ui.share
+package com.baro.ui.share.firebase
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
 import com.baro.R
 
-class BluetoothSendActivity : AppCompatActivity() {
+
+class FirebaseUploadActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_bluetooth_send)
+        setContentView(R.layout.activity_upload)
     }
 }

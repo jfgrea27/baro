@@ -1,4 +1,4 @@
-package com.baro.ui.share
+package com.baro.ui.share.p2p
 
 import androidx.fragment.app.Fragment
 import android.os.Build

@@ -1,4 +1,4 @@
-package com.baro.ui.share
+package com.baro.ui.share.p2p
 
 import android.app.Activity
 import androidx.fragment.app.Fragment
@@ -51,7 +51,7 @@ class WifiDirectPeerSendFragment : Fragment() {
         peerListView.adapter = adapter
 
         peerListView.onItemClickListener = OnItemClickListener { _, _, position, _ ->
-            (activity as WifiDirectActivity).connectDevice(devices[position])
+            (activity as WifiDirectActivity).connectClientDevice(devices[position])
             }
      }
 

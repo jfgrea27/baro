@@ -1,4 +1,4 @@
-package com.baro.ui.share
+package com.baro.ui.share.p2p
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +9,7 @@ import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
 
 
-class SendReceiveActivity : AppCompatActivity(){
+class WifiDirectSendReceiveActivity : AppCompatActivity(){
 
 
     private lateinit var sendButton: ImageButton

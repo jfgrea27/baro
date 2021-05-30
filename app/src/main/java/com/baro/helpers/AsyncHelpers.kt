@@ -16,9 +16,13 @@ import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
 import com.baro.models.Country
 import com.baro.models.Course
 import com.baro.models.User
+import com.baro.ui.share.p2p.WifiDirectReceiver
 import org.json.JSONArray
-import java.io.File
+import java.io.*
 import java.lang.ref.WeakReference
+import java.net.InetSocketAddress
+import java.net.ServerSocket
+import java.net.Socket
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
@@ -34,20 +38,25 @@ class AsyncHelpers {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    class VerifyUserCredentials(private var callback: OnUserLoginCheckComplete) : AsyncTask<File?, Void?, User?>() {
+    class VerifyUserCredentials(private var callback: OnUserLoginCheckComplete) :
+        AsyncTask<File?, Void?, User?>() {
         @RequiresApi(api = Build.VERSION_CODES.O)
 
 
         override fun doInBackground(vararg externalFilesDir: File?): User? {
 
-            val userMetaDataPath = Paths.get(externalFilesDir[0].toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.META_DATA_FILE.key)
+            val userMetaDataPath = Paths.get(
+                externalFilesDir[0].toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.META_DATA_FILE.key
+            )
 
 
-            val userThumbnailPath = Paths.get(externalFilesDir[0].toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.PHOTO_THUMBNAIL_FILE.key)
+            val userThumbnailPath = Paths.get(
+                externalFilesDir[0].toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.PHOTO_THUMBNAIL_FILE.key
+            )
 
             val userMetaDataFile = FileHelper.getFileAtPath(userMetaDataPath)
             val userThumbnailFile = FileHelper.getFileAtPath(userThumbnailPath)
@@ -60,14 +69,15 @@ class AsyncHelpers {
 
                 user = if (userThumbnailFile != null && userThumbnailFile.length() > 0) {
                     User(
-                            UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
-                            jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String,
-                            userThumbnailFile
+                        UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
+                        jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String,
+                        userThumbnailFile
                     )
                 } else {
                     User(
-                            UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
-                            jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String)
+                        UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
+                        jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String
+                    )
                 }
             }
             return user
@@ -82,7 +92,8 @@ class AsyncHelpers {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class UserCredentialsSave(private var callback: OnUserCredentialsSaveComplete) : AsyncTask<Context, Void?, Boolean?>() {
+    class UserCredentialsSave(private var callback: OnUserCredentialsSaveComplete) :
+        AsyncTask<Context, Void?, Boolean?>() {
         @RequiresApi(api = Build.VERSION_CODES.P)
         override fun doInBackground(vararg context: Context): Boolean {
             // Save the Meta information
@@ -104,9 +115,11 @@ class AsyncHelpers {
             credentialDetails[JSONEnum.USER_NAME_KEY.key] = username
             credentialDetails[JSONEnum.USER_UUID_KEY.key] = userUUID.toString()
             val jsonCredentials = JSONHelper.createJSONFromHashMap(credentialDetails)
-            val userMetaDataPath = Paths.get(path,
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.META_DATA_FILE.key)
+            val userMetaDataPath = Paths.get(
+                path,
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.META_DATA_FILE.key
+            )
             val userMetaDataFile = FileHelper.createFileAtPath(userMetaDataPath)
             FileHelper.writeToFile(userMetaDataFile, jsonCredentials.toString())
         }
@@ -115,10 +128,17 @@ class AsyncHelpers {
         private fun savePhotoUri(photoUri: Uri?, context: Context) {
             if (photoUri != null) {
 
-                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, photoUri))
-                val userThumbnailPicturePath = Paths.get(context.getExternalFilesDir(null).toString(),
-                        FileEnum.USER_DIRECTORY.key,
-                        FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                val bitmap = ImageDecoder.decodeBitmap(
+                    ImageDecoder.createSource(
+                        context.contentResolver,
+                        photoUri
+                    )
+                )
+                val userThumbnailPicturePath = Paths.get(
+                    context.getExternalFilesDir(null).toString(),
+                    FileEnum.USER_DIRECTORY.key,
+                    FileEnum.PHOTO_THUMBNAIL_FILE.key
+                )
                 val file = File(userThumbnailPicturePath.toString())
 
                 FileHelper.writeBitmapToFile(file, bitmap)
@@ -130,13 +150,17 @@ class AsyncHelpers {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class LoadUserData(private var callback: OnUserDataFound) : AsyncTask<LoadUserData.TaskParams, Void?, LoadUserData.LoadUserDataResponse?>() {
+    class LoadUserData(private var callback: OnUserDataFound) :
+        AsyncTask<LoadUserData.TaskParams, Void?, LoadUserData.LoadUserDataResponse?>() {
         @RequiresApi(Build.VERSION_CODES.P)
         override fun doInBackground(vararg params: TaskParams?): LoadUserDataResponse? {
             val user = params[0]?.user
             val contentResolver = params[0]?.contentResolver
             if (user?.getThumbnailFile() != null) {
-                val source = ImageDecoder.createSource(contentResolver!!, Uri.fromFile(user.getThumbnailFile()))
+                val source = ImageDecoder.createSource(
+                    contentResolver!!,
+                    Uri.fromFile(user.getThumbnailFile())
+                )
                 val username = user.getUsername()
                 val imageBmp = ImageDecoder.decodeBitmap(source)
                 return LoadUserDataResponse(username, imageBmp)
@@ -159,7 +183,10 @@ class AsyncHelpers {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class CourseCredentialsSave(private var callback: OnCourseCredentialsSaveComplete, private var context: WeakReference<Context>) : AsyncTask<CourseCredentialsSave.TaskParams, Void?, Boolean?>() {
+    class CourseCredentialsSave(
+        private var callback: OnCourseCredentialsSaveComplete,
+        private var context: WeakReference<Context>
+    ) : AsyncTask<CourseCredentialsSave.TaskParams, Void?, Boolean?>() {
         @RequiresApi(Build.VERSION_CODES.P)
         override fun doInBackground(vararg params: TaskParams?): Boolean? {
             // Save the Meta information
@@ -183,25 +210,30 @@ class AsyncHelpers {
 
             val courseMetadata = HashMap<String?, String?>()
 
-            courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUserUUID().toString()
+            courseMetadata[JSONEnum.USER_NAME_KEY.key] =
+                course?.getCreator()?.getUserUUID().toString()
             courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
             courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
-            courseMetadata[JSONEnum.COURSE_CREATION_DATETIME.key] = course.getCreationDate()?.toString()
+            courseMetadata[JSONEnum.COURSE_CREATION_DATETIME.key] =
+                course.getCreationDate()?.toString()
             val isoCode = course.getCourseCountry()?.getIsoCode()
             if (isoCode == null) {
                 courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = "null"
             } else {
-                courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course.getCourseCountry()?.getIsoCode()
+                courseMetadata[JSONEnum.COURSE_LANGUAGE.key] =
+                    course.getCourseCountry()?.getIsoCode()
             }
-            courseMetadata[JSONEnum.COURSE_CATEGORY.key] = JSONArray(course.getCourseCategory().toString()).toString()
-            courseMetadata[JSONEnum.COURSE_SLIDES.key] = JSONArray(course.getSlides().toString()).toString()
+            courseMetadata[JSONEnum.COURSE_CATEGORY.key] =
+                JSONArray(course.getCourseCategory().toString()).toString()
+            courseMetadata[JSONEnum.COURSE_SLIDES.key] =
+                JSONArray(course.getSlides().toString()).toString()
 
             val courseMetaDataPath = Paths.get(
-                    context.get()?.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.COURSE_DIRECTORY.key,
-                    course?.getCourseUUID().toString(),
-                    FileEnum.META_DATA_FILE.key
+                context.get()?.getExternalFilesDir(null).toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.COURSE_DIRECTORY.key,
+                course?.getCourseUUID().toString(),
+                FileEnum.META_DATA_FILE.key
             )
 
             val courseMetaDataFile = FileHelper.createFileAtPath(courseMetaDataPath)
@@ -215,12 +247,19 @@ class AsyncHelpers {
         private fun savePhotoUri(photoUri: Uri?, course: Course?) {
             if (photoUri != null) {
 
-                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.get()?.contentResolver!!, photoUri))
-                val userThumbnailPicturePath = Paths.get(context.get()?.getExternalFilesDir(null).toString(),
-                        FileEnum.USER_DIRECTORY.key,
-                        FileEnum.COURSE_DIRECTORY.key,
-                        course?.getCourseUUID().toString(),
-                        FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                val bitmap = ImageDecoder.decodeBitmap(
+                    ImageDecoder.createSource(
+                        context.get()?.contentResolver!!,
+                        photoUri
+                    )
+                )
+                val userThumbnailPicturePath = Paths.get(
+                    context.get()?.getExternalFilesDir(null).toString(),
+                    FileEnum.USER_DIRECTORY.key,
+                    FileEnum.COURSE_DIRECTORY.key,
+                    course?.getCourseUUID().toString(),
+                    FileEnum.PHOTO_THUMBNAIL_FILE.key
+                )
                 val file = File(userThumbnailPicturePath.toString())
 
                 FileHelper.writeBitmapToFile(file, bitmap)
@@ -238,7 +277,8 @@ class AsyncHelpers {
     }
 
 
-    class CreatorCourseCredentialsLoad(private var callback: OnCreatorCourseCredentialsLoad) : AsyncTask<CreatorCourseCredentialsLoad.TaskParams, Void?, ArrayList<Pair<Course, Uri?>>>() {
+    class CreatorCourseCredentialsLoad(private var callback: OnCreatorCourseCredentialsLoad) :
+        AsyncTask<CreatorCourseCredentialsLoad.TaskParams, Void?, ArrayList<Pair<Course, Uri?>>>() {
         @RequiresApi(Build.VERSION_CODES.P)
         override fun doInBackground(vararg params: TaskParams?): ArrayList<Pair<Course, Uri?>>? {
             var courses = ArrayList<Pair<Course, Uri?>>()
@@ -250,7 +290,8 @@ class AsyncHelpers {
                 for (courseFolder in coursesFile.listFiles()) {
 
                     if (courseFolder.isDirectory) {
-                        val jsonFilePath = Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
+                        val jsonFilePath =
+                            Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
 
                         val jsonFile = jsonFilePath.toFile()
 
@@ -265,13 +306,18 @@ class AsyncHelpers {
                             // Course Name
                             val courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
                             // Category
-                            val categoryJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString())
+                            val categoryJSON = JSONArray(
+                                jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString()
+                            )
                             // Language
                             val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
                             // Timestamp
-                            val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString().toLong()
+                            val courseCreationTimestamp =
+                                jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString()
+                                    .toLong()
                             // Slides
-                            val slidesJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())
+                            val slidesJSON =
+                                JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())
 
                             // Creation course
                             val course = Course(UUID.fromString(courseUUID as String?), user)
@@ -279,7 +325,11 @@ class AsyncHelpers {
                             //  Adding course name
                             course.setCourseName(courseName as String)
                             // Adding Course Category
-                            course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(categoryJSON as JSONArray))
+                            course.setCourseCategory(
+                                CategoryEnum.getCategoriesFromJSONArray(
+                                    categoryJSON as JSONArray
+                                )
+                            )
                             // Adding Course language
                             if (language.toString() == "null") {
                                 course.setCourseCountry(Country(null))
@@ -294,7 +344,10 @@ class AsyncHelpers {
                             course.setSlidesFromJSONArray(slidesJSON)
 
                             // Thumbnail
-                            val imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                            val imagePath = Paths.get(
+                                courseFolder.toString(),
+                                FileEnum.PHOTO_THUMBNAIL_FILE.key
+                            )
                             val imageFile = imagePath.toFile()
                             val imageUri = Uri.fromFile(imageFile)
 
@@ -327,14 +380,21 @@ class AsyncHelpers {
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    class VideoUriSave(private var callback: OnVideoUriSaved, private var weakReferenceContentResolver: WeakReference<ContentResolver>) : AsyncTask<VideoUriSave.TaskParams, Void?, File?>() {
+    class VideoUriSave(
+        private var callback: OnVideoUriSaved,
+        private var weakReferenceContentResolver: WeakReference<ContentResolver>
+    ) : AsyncTask<VideoUriSave.TaskParams, Void?, File?>() {
         override fun doInBackground(vararg params: TaskParams?): File? {
             val outputFile = params[0]?.outputFile
             val videoUri = params[0]?.videoUri
 
             if (outputFile != null && outputFile.exists()) {
                 if (videoUri != null) {
-                    return FileHelper.copyVideoToFile(outputFile, videoUri, weakReferenceContentResolver.get())
+                    return FileHelper.copyVideoToFile(
+                        outputFile,
+                        videoUri,
+                        weakReferenceContentResolver.get()
+                    )
                 }
             }
             return null
@@ -351,7 +411,8 @@ class AsyncHelpers {
     }
 
 
-    class DeleteFile(private var callback: OnDeleteFile) : AsyncTask<DeleteFile.TaskParams, Boolean?, Boolean?>() {
+    class DeleteFile(private var callback: OnDeleteFile) :
+        AsyncTask<DeleteFile.TaskParams, Boolean?, Boolean?>() {
         override fun doInBackground(vararg params: TaskParams?): Boolean? {
             val deleteFile = params[0]?.deleteFile
             val deleteSlide = params[0]?.deleteSlide
@@ -369,7 +430,8 @@ class AsyncHelpers {
     }
 
 
-    class UpdateJSONFile(private var callback: OnUpdatedJSONFile) : AsyncTask<UpdateJSONFile.TaskParams, Boolean?, Boolean?>() {
+    class UpdateJSONFile(private var callback: OnUpdatedJSONFile) :
+        AsyncTask<UpdateJSONFile.TaskParams, Boolean?, Boolean?>() {
         override fun doInBackground(vararg params: UpdateJSONFile.TaskParams?): Boolean? {
             val fileToUpdate = params[0]?.fileToUpdate
             val hashMapData = params[0]?.hashMapData
@@ -390,21 +452,29 @@ class AsyncHelpers {
             callback.onUpdatedJSONFile(result)
         }
 
-        class TaskParams(var fileToUpdate: File?, var hashMapData: HashMap<String, ArrayList<String>>?)
+        class TaskParams(
+            var fileToUpdate: File?,
+            var hashMapData: HashMap<String, ArrayList<String>>?
+        )
 
     }
 
-    class DeleteCourse(private var callback: OnCourseDeleted, private var context: WeakReference<Context>) : AsyncTask<DeleteCourse.TaskParams, Course?, Course?>() {
+    class DeleteCourse(
+        private var callback: OnCourseDeleted,
+        private var context: WeakReference<Context>
+    ) : AsyncTask<DeleteCourse.TaskParams, Course?, Course?>() {
 
         class TaskParams(var course: Course)
 
         @RequiresApi(Build.VERSION_CODES.O)
         override fun doInBackground(vararg params: TaskParams?): Course? {
             val course = params[0]?.course
-            val coursePath = Paths.get(context.get()?.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.COURSE_DIRECTORY.key,
-                    course?.getCourseUUID().toString())
+            val coursePath = Paths.get(
+                context.get()?.getExternalFilesDir(null).toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.COURSE_DIRECTORY.key,
+                course?.getCourseUUID().toString()
+            )
             val courseFile = coursePath.toFile()
             FileHelper.deleteFile(courseFile)
             return course
@@ -417,5 +487,100 @@ class AsyncHelpers {
 
     }
 
+    class DataReceiverAsyncTask(private var callback: OnDataReceived) :
+        AsyncTask<String?, Void, String?>() {
+
+        @Override
+        override fun onPostExecute(result: String?) {
+            callback.onDataReceived(result)
+        }
+
+        override fun doInBackground(vararg p0: String?): String? {
+            return try {
+                val serverSocket = ServerSocket(8988)
+                val client = serverSocket.accept();
+
+
+                val inputStream = client.getInputStream();
+                val string = getStringValue(inputStream);
+                serverSocket.close();
+                string
+            } catch (e: IOException) {
+                null;
+            }
+        }
+
+        private fun getStringValue(inputStream: InputStream?): String? {
+            var result = String()
+            val buf = ByteArray(1024)
+            var len: Int
+            try {
+                while (inputStream!!.read(buf).also { len = it } != -1) {
+                    result += String(buf)
+                }
+                inputStream.close()
+            } catch (e: IOException) {
+                return result
+            }
+            return result
+        }
+
+    }
+
+    class DataSenderAsyncTask(private var weakContentResolver: WeakReference<ContentResolver>, private var receiver: WifiDirectReceiver, private var callback: OnDataSent) :
+        AsyncTask<String?, Void, Void>() {
+        private val SOCKET_TIMEOUT = 5000
+        @Override
+        override fun onPostExecute(result: Void?) {
+            callback.onDataSent()
+        }
+
+        override fun doInBackground(vararg p0: String?): Void? {
+            val string = p0[0]
+
+            val socket = Socket()
+            try {
+
+                socket.bind(null)
+                socket.connect(InetSocketAddress(receiver.ip, receiver.port), SOCKET_TIMEOUT)
+                val stream: OutputStream = socket.getOutputStream()
+                var `is`: InputStream? = null
+                try {
+                    `is` = ByteArrayInputStream(string?.toByteArray())
+                } catch (e: FileNotFoundException) {
+                }
+                copyFile(`is`, stream)
+            } catch (e: IOException) {
+
+            } finally {
+                if (socket != null) {
+                    if (socket.isConnected) {
+                        try {
+                            socket.close()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+            return null
+        }
+
+        private fun copyFile(inputStream: InputStream?, out: OutputStream): Boolean {
+            val buf = ByteArray(1024)
+            var len: Int
+            try {
+                while (inputStream?.read(buf).also { len = it!! } != -1) {
+                    out.write(buf, 0, len)
+                }
+                out.close()
+                inputStream?.close()
+            } catch (e: IOException) {
+                return false
+            }
+            return true
+        }
+
+    }
 
 }
