@@ -65,7 +65,7 @@ class SplashActivity : AppCompatActivity(), OnUserLoginCheckComplete {
 
             supportFragmentManager.beginTransaction()
                     .setReorderingAllowed(true)
-                    .add(R.id.fragment_container_view, SplashLoggingFragment::class.java, null)
+                    .add(R.id.fragment_container_peer_connection, SplashLoggingFragment::class.java, null)
                     .commit()
         }
     }

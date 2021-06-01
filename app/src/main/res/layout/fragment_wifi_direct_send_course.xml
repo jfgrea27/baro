@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.create.CreateCourseSummaryFragment"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+
+        <TextView
+            android:id="@+id/txt_peer_connection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:text="@string/send_course"
+            android:textSize="@dimen/medium_text"
+            app:layout_constraintBottom_toTopOf="@+id/img_course_thumbnail"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/img_course_thumbnail"
+            android:layout_width="@dimen/largest_logo_width"
+            android:layout_height="@dimen/largest_logo_width"
+            app:layout_constraintBottom_toTopOf="@+id/progressbar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_peer_connection"
+            app:srcCompat="@drawable/ic_book" />
+
+
+        <ImageButton
+            android:id="@+id/btn_send"
+            android:layout_width="@dimen/medium_large_icon_width"
+            android:layout_height="@dimen/medium_large_icon_width"
+            android:backgroundTint="@color/white"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/progressbar"
+            app:srcCompat="@drawable/ic_upload_file_black_48dp" />
+
+        <ProgressBar
+            android:id="@+id/progressbar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="@dimen/medium_large_icon_width"
+            android:layout_height="@dimen/medium_text"
+            app:layout_constraintBottom_toTopOf="@+id/btn_send"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/img_course_thumbnail" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

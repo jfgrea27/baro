@@ -7,6 +7,7 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.baro.constants.CategoryEnum
 import com.baro.constants.FileEnum
@@ -16,10 +17,11 @@ import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
 import com.baro.models.Country
 import com.baro.models.Course
 import com.baro.models.User
-import com.baro.ui.share.p2p.WifiDirectReceiver
+import com.baro.ui.share.p2p.WifiDirectEndpoint
 import org.json.JSONArray
 import java.io.*
 import java.lang.ref.WeakReference
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.net.Socket
@@ -487,17 +489,85 @@ class AsyncHelpers {
 
     }
 
-    class DataReceiverAsyncTask(private var callback: OnDataReceived) :
-        AsyncTask<String?, Void, String?>() {
+    class GroupOwnerReceiveClientInetAddressAsyncTask(
+        private var callback: OnClientInetAddressReceived
+
+    ) :
+        AsyncTask<String?, Void, InetAddress?>() {
+
+        companion object {
+            val PORT_GET_CLIENT_INET = 8988
+        }
+
+        @Override
+        override fun onPostExecute(result: InetAddress?) {
+            callback.onClientInetAddressReceived(result)
+        }
+
+        override fun doInBackground(vararg p0: String?): InetAddress? {
+            return try {
+                val serverSocket = ServerSocket(PORT_GET_CLIENT_INET)
+                val client = serverSocket.accept();
+                val clientInetAddress = client.inetAddress
+                serverSocket.close();
+                return clientInetAddress
+            } catch (e: IOException) {
+                null;
+            }
+        }
+    }
+
+    class ClientSendInetAddressAsyncTask(
+        private var serverEndPoint: WifiDirectEndpoint,
+        private var callback: OnClientInetAddressSent
+    ) :
+        AsyncTask<Void?, InetAddress?, InetAddress?>() {
+        private val SOCKET_TIMEOUT = 5000
+        override fun doInBackground(vararg p0: Void?): InetAddress? {
+            val socket = Socket()
+            try {
+                socket.bind(null)
+                socket.connect(
+                    InetSocketAddress(serverEndPoint.ip, serverEndPoint.port),
+                    SOCKET_TIMEOUT
+                )
+            } catch (e: IOException) {
+
+            } finally {
+                if (socket != null) {
+                    if (socket.isConnected) {
+                        try {
+                            socket.close()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+            return socket.inetAddress
+        }
+    }
+
+
+    class ReceiveCourseAsyncTask(
+        private var callback: OnCourseReceived
+    ) :
+        AsyncTask<Void?, String?, String?>() {
+        private val SOCKET_TIMEOUT = 5000
+
+
+        companion object {
+            val PORT_GET_COURSE = 9989
+        }
 
         @Override
         override fun onPostExecute(result: String?) {
-            callback.onDataReceived(result)
+            callback.onCourseReceived(result)
         }
 
-        override fun doInBackground(vararg p0: String?): String? {
+        override fun doInBackground(vararg p0: Void?): String? {
             return try {
-                val serverSocket = ServerSocket(8988)
+                val serverSocket = ServerSocket(PORT_GET_COURSE)
                 val client = serverSocket.accept();
 
 
@@ -510,6 +580,7 @@ class AsyncHelpers {
             }
         }
 
+        // TODO remove this
         private fun getStringValue(inputStream: InputStream?): String? {
             var result = String()
             val buf = ByteArray(1024)
@@ -527,22 +598,22 @@ class AsyncHelpers {
 
     }
 
-    class DataSenderAsyncTask(private var weakContentResolver: WeakReference<ContentResolver>, private var receiver: WifiDirectReceiver, private var callback: OnDataSent) :
-        AsyncTask<String?, Void, Void>() {
+
+    class SendCourseAsyncTask(
+        private var receiverEndPoint: WifiDirectEndpoint,
+        private var callback: OnCourseSent
+    ) :
+        AsyncTask<Void?, Boolean?, Boolean?>() {
         private val SOCKET_TIMEOUT = 5000
-        @Override
-        override fun onPostExecute(result: Void?) {
-            callback.onDataSent()
-        }
-
-        override fun doInBackground(vararg p0: String?): Void? {
-            val string = p0[0]
-
+        override fun doInBackground(vararg p0: Void?): Boolean? {
             val socket = Socket()
+            val string = "Test 123"  // TODO change this to the course that we pass as a File.. will need to compess into bytes - send first the number of bytes for progressbar...
             try {
-
                 socket.bind(null)
-                socket.connect(InetSocketAddress(receiver.ip, receiver.port), SOCKET_TIMEOUT)
+                socket.connect(
+                    InetSocketAddress(receiverEndPoint.ip, receiverEndPoint.port),
+                    SOCKET_TIMEOUT
+                )
                 val stream: OutputStream = socket.getOutputStream()
                 var `is`: InputStream? = null
                 try {
@@ -551,7 +622,8 @@ class AsyncHelpers {
                 }
                 copyFile(`is`, stream)
             } catch (e: IOException) {
-
+                Log.i("FAILED SEND COURSE", e.toString())
+                return false
             } finally {
                 if (socket != null) {
                     if (socket.isConnected) {
@@ -563,8 +635,14 @@ class AsyncHelpers {
                     }
                 }
             }
-            return null
+            return true
         }
+
+        @Override
+        override fun onPostExecute(result: Boolean?) {
+            callback.onCourseSent(result)
+        }
+
 
         private fun copyFile(inputStream: InputStream?, out: OutputStream): Boolean {
             val buf = ByteArray(1024)
@@ -580,6 +658,7 @@ class AsyncHelpers {
             }
             return true
         }
+
 
     }
 

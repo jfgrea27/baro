@@ -55,7 +55,7 @@ class ShareActivityNewLoggingTest {
                 Matchers.allOf(ViewMatchers.withId(R.id.edit_text_username),
                         childAtPosition(
                                 childAtPosition(
-                                        ViewMatchers.withId(R.id.fragment_container_view),
+                                        ViewMatchers.withId(R.id.fragment_container_peer_connection),
                                         0),
                                 2),
                         ViewMatchers.isDisplayed()))
@@ -65,7 +65,7 @@ class ShareActivityNewLoggingTest {
                 Matchers.allOf(ViewMatchers.withId(R.id.btn_next),
                         childAtPosition(
                                 childAtPosition(
-                                        ViewMatchers.withId(R.id.fragment_container_view),
+                                        ViewMatchers.withId(R.id.fragment_container_peer_connection),
                                         0),
                                 1),
                         ViewMatchers.isDisplayed()))
@@ -101,7 +101,7 @@ class ShareActivityNewLoggingTest {
                 Matchers.allOf(ViewMatchers.withId(R.id.edit_text_username),
                         childAtPosition(
                                 childAtPosition(
-                                        ViewMatchers.withId(R.id.fragment_container_view),
+                                        ViewMatchers.withId(R.id.fragment_container_peer_connection),
                                         0),
                                 2),
                         ViewMatchers.isDisplayed()))
@@ -111,7 +111,7 @@ class ShareActivityNewLoggingTest {
                 Matchers.allOf(ViewMatchers.withId(R.id.btn_next),
                         childAtPosition(
                                 childAtPosition(
-                                        ViewMatchers.withId(R.id.fragment_container_view),
+                                        ViewMatchers.withId(R.id.fragment_container_peer_connection),
                                         0),
                                 1),
                         ViewMatchers.isDisplayed()))

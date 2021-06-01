@@ -33,4 +33,6 @@
     <string name="wifi_direct_peer_connection">WifiDirect Peer Connection</string>
     <string name="wifidirect_connection">WifiDirect Connection</string>
     <string name="list_of_devices">List of Devices</string>
+    <string name="send_course">Send Course</string>
+    <string name="receive_course">Receive Course</string>
 </resources>

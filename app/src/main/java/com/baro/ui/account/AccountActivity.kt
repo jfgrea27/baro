@@ -94,7 +94,7 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
                 CreateCourseSummaryFragment.newInstance(course)
 
             supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container_view, createCourseSummaryFragment, null)
+                .add(R.id.fragment_container_peer_connection, createCourseSummaryFragment, null)
                 .addToBackStack(AppTags.CREATE_COURSE_SUMMARY_FRAGMENT.name)
                 .setReorderingAllowed(true)
                 .commit()
@@ -169,7 +169,7 @@ class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCre
             EditCourseSummaryFragment.newInstance(course)
 
         supportFragmentManager.beginTransaction()
-            .add(R.id.fragment_container_view, editCourseSummaryFragment, null)
+            .add(R.id.fragment_container_peer_connection, editCourseSummaryFragment, null)
             .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)
             .setReorderingAllowed(true)
             .commit()

@@ -35,7 +35,7 @@
             app:layout_constraintTop_toBottomOf="@+id/txt_peer_connection" />
 
         <ImageView
-            android:id="@+id/img_wifidirect_connection_status"
+            android:id="@+id/img_course_thumbnail"
             android:layout_width="@dimen/smaller_icon_height"
             android:layout_height="@dimen/smaller_icon_height"
             app:layout_constraintBottom_toBottomOf="@+id/txt_wifi_p2p_connection"
