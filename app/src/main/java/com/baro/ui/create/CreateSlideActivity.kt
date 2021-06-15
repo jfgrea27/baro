@@ -131,7 +131,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
 
         finishSlide.setOnClickListener {
             updateJsonCourse()
-
+            //TODO add notifyDataSetChanged
             finish()
         }
     }

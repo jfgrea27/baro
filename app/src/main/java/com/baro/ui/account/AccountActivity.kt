@@ -222,4 +222,11 @@ class AccountActivity : AppCompatActivity(), OnCreatorCourseCredentialsLoad,
         courses.add(course)
         courseAdapter?.notifyItemInserted(courses.size - 1)
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onResume() {
+        super.onResume()
+        getCoursesFromFiles()
+        courseAdapter?.notifyDataSetChanged()
+    }
 }

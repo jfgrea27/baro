@@ -36,7 +36,7 @@ class AsyncHelpers {
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    fun coroutineVerifyUserCredentials(file: File?): User? {
+    fun verifyUserCredentials(file: File?): User? {
 
 
         val userMetaDataPath = Paths.get(file.toString(),
