@@ -30,4 +30,6 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="no_category">No Category</string>
+    <string name="course_saved_successfully">Course Saved Successfully!!</string>
+    <string name="course_saved_unsuccessfully">Course not saved :(</string>
 </resources>

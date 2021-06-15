@@ -182,6 +182,7 @@ class AccountActivity : AppCompatActivity(), OnCreatorCourseCredentialsLoad,
 
         val weakReference = WeakReference<Activity>(this)
         if (PermissionsHelper.checkAndRequestPermissions(weakReference, PermissionsEnum.READ_COURSE)) {
+
             val editCourseSummaryFragment: EditCourseSummaryFragment =
                 EditCourseSummaryFragment.newInstance(course)
 

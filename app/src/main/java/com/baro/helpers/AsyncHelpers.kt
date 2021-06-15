@@ -17,6 +17,7 @@ import com.baro.models.Country
 import com.baro.models.Course
 import com.baro.models.User
 import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
 import java.lang.ref.WeakReference
 import java.nio.file.Path
@@ -157,7 +158,6 @@ class AsyncHelpers {
         private fun saveCredentials(course: Course) {
 
             val course = course
-
             val courseMetadata = HashMap<String?, String?>()
 
             courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUserUUID().toString()
@@ -345,31 +345,18 @@ class AsyncHelpers {
 
     }
 
+    fun updateJSONFile(courseMetaFile: File, slideHashMap: java.util.HashMap<String, java.util.ArrayList<String>>): Boolean {
+        //TODO - Account for null jsonContents
+        val contents = FileHelper.readFile(courseMetaFile)
 
-    class UpdateJSONFile(private var callback: OnUpdatedJSONFile) : AsyncTask<UpdateJSONFile.TaskParams, Boolean?, Boolean?>() {
-        override fun doInBackground(vararg params: UpdateJSONFile.TaskParams?): Boolean? {
-            val fileToUpdate = params[0]?.fileToUpdate
-            val hashMapData = params[0]?.hashMapData
+        val jsonContents = JSONHelper.createJSONFromString(contents!!)
 
-            var contents = FileHelper.readFile(fileToUpdate)
-
-            var jsonContents = JSONHelper.createJSONFromString(contents!!)
-
-            for ((key, value) in hashMapData!!) {
-                jsonContents!!.put(key, value)
-            }
-
-            return FileHelper.writeToFile(fileToUpdate, jsonContents.toString())
+        for ((key, value) in slideHashMap) {
+            jsonContents!!.put(key, value)
         }
-
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(result: Boolean?) {
-            callback.onUpdatedJSONFile(result)
-        }
-
-        class TaskParams(var fileToUpdate: File?, var hashMapData: HashMap<String, ArrayList<String>>?)
-
+        return FileHelper.writeToFile(courseMetaFile, jsonContents.toString())
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun deleteCourse(rootDir: File?, course: Course): Boolean {
@@ -382,6 +369,8 @@ class AsyncHelpers {
             FileHelper.deleteFile(courseFile)
             return true} else {return false}
     }
+
+
 
     interface OnCourseDeleted {
         fun onCourseDeleted(result: Course?)

@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
+import android.widget.Toast
 import android.widget.VideoView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,11 +24,12 @@ import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnDeleteFile
-import com.baro.helpers.interfaces.OnUpdatedJSONFile
 import com.baro.helpers.interfaces.OnVideoUriSaved
 import com.baro.models.Course
 import com.baro.models.Slide
 import kotlinx.android.synthetic.main.dialog_image_chooser.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
@@ -36,7 +38,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
-class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, OnVideoUriSaved, OnDeleteFile, OnUpdatedJSONFile {
+class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, OnVideoUriSaved, OnDeleteFile {
 
     // UI
     private lateinit var nextButton: ImageButton
@@ -121,9 +123,14 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         }
         slideHashMap[FileEnum.SLIDE_DIRECTORY.key.toString()] = slideUUIDArrayList
 
-        val updateJSONFile = AsyncHelpers.UpdateJSONFile(this)
-        var params = AsyncHelpers.UpdateJSONFile.TaskParams(courseMetaFile, slideHashMap)
-        updateJSONFile.execute(params)
+        runBlocking {
+            launch {
+                val result = AsyncHelpers().updateJSONFile(courseMetaFile, slideHashMap)
+                if (result) {
+                    Toast.makeText(this@CreateSlideActivity, getString(R.string.course_saved_successfully), Toast.LENGTH_SHORT).show()
+                } else {Toast.makeText(this@CreateSlideActivity, getString(R.string.course_saved_unsuccessfully), Toast.LENGTH_SHORT).show()}
+            }
+        }
     }
     @RequiresApi(Build.VERSION_CODES.O)
     private fun configureFinishButton() {
@@ -136,8 +143,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         }
     }
 
-    override fun onUpdatedJSONFile(result: Boolean?) {
-    }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
