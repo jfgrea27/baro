@@ -6,8 +6,10 @@ import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 
 import com.baro.R
+import com.baro.constants.AppCodes
+import com.baro.constants.AppTags
 import com.baro.ui.share.firebase.FirebaseUploadActivity
-import com.baro.ui.share.p2p.WifiDirectSendReceiveActivity
+import com.baro.ui.share.p2p.WifiDirectActivity
 
 class ShareActivity : AppCompatActivity() {
     private lateinit var internetButton: ImageButton
@@ -30,8 +32,13 @@ class ShareActivity : AppCompatActivity() {
     private fun configureLocalButton() {
         localButton = findViewById(R.id.btn_local)
         localButton.setOnClickListener{
-            val intent = Intent(this, WifiDirectSendReceiveActivity::class.java)
-            startActivity(intent)
+
+            val startWifiActivity = Intent(
+                this,
+                WifiDirectActivity::class.java)
+
+            startWifiActivity.putExtra(AppTags.WIFIP2P_INTENT.name, AppCodes.WIFIP2P_PEER_RECEIVE.code)
+            startActivity(startWifiActivity)
         }
 
 

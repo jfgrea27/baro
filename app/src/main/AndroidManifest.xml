@@ -34,10 +34,7 @@
         </provider>
 
         <activity android:name=".ui.share.firebase.FirebaseUploadActivity" />
-        <activity android:name=".ui.share.BluetoothReceiveActivity" />
-        <activity android:name=".ui.share.BluetoothSendActivity" />
         <activity android:name=".ui.share.p2p.WifiDirectActivity" />
-        <activity android:name=".ui.share.p2p.WifiDirectSendReceiveActivity" />
         <activity android:name=".ui.share.ShareActivity" />
         <activity android:name=".ui.account.AccountActivity" />
         <activity android:name=".ui.splash.SplashActivity">

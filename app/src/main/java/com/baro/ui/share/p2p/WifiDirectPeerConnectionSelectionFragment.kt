@@ -16,7 +16,7 @@ import com.baro.adapters.DeviceAdapter
 import java.lang.ref.WeakReference
 
 
-class WifiDirectPeerConnectionFragment : Fragment() {
+class WifiDirectPeerConnectionSelectionFragment : Fragment() {
 
     private lateinit var peerListView: ListView
     private lateinit var wifiDirectStatus: ImageView
@@ -41,7 +41,7 @@ class WifiDirectPeerConnectionFragment : Fragment() {
     }
 
     private fun configureWifiDirectStatusImage(view: View) {
-        wifiDirectStatus = view.findViewById(R.id.img_course_thumbnail)
+        wifiDirectStatus = view.findViewById(R.id.img_wifi_status)
     }
 
     private fun configurePeerListView(view: View){
@@ -60,7 +60,7 @@ class WifiDirectPeerConnectionFragment : Fragment() {
 
         @JvmStatic
         fun newInstance() =
-            WifiDirectPeerConnectionFragment().apply {
+            WifiDirectPeerConnectionSelectionFragment().apply {
             }
     }
 

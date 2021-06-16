@@ -35,4 +35,6 @@
     <string name="list_of_devices">List of Devices</string>
     <string name="send_course">Send Course</string>
     <string name="receive_course">Receive Course</string>
+    <string name="send_txt">Send</string>
+    <string name="waiting_room">Waiting Room</string>
 </resources>

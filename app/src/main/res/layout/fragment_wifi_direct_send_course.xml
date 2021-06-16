@@ -20,14 +20,14 @@
             android:layout_marginTop="36dp"
             android:text="@string/send_course"
             android:textSize="@dimen/medium_text"
-            app:layout_constraintBottom_toTopOf="@+id/img_course_thumbnail"
+            app:layout_constraintBottom_toTopOf="@+id/img_wifi_status"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/img_course_thumbnail"
+            android:id="@+id/img_wifi_status"
             android:layout_width="@dimen/largest_logo_width"
             android:layout_height="@dimen/largest_logo_width"
             app:layout_constraintBottom_toTopOf="@+id/progressbar"
@@ -59,7 +59,7 @@
             app:layout_constraintBottom_toTopOf="@+id/btn_send"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/img_course_thumbnail" />
+            app:layout_constraintTop_toBottomOf="@+id/img_wifi_status" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

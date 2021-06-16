@@ -546,54 +546,81 @@ class AsyncHelpers {
             }
             return socket.inetAddress
         }
+
+
+        @Override
+        override fun onPostExecute(result: InetAddress?) {
+            callback.onClientInetAddressRSent()
+        }
     }
 
 
     class ReceiveCourseAsyncTask(
+        private var weakContext: WeakReference<Context>,
         private var callback: OnCourseReceived
     ) :
-        AsyncTask<Void?, String?, String?>() {
-        private val SOCKET_TIMEOUT = 5000
-
-
+        AsyncTask<Void?, Boolean?, Boolean?>() {
         companion object {
             val PORT_GET_COURSE = 9989
         }
 
         @Override
-        override fun onPostExecute(result: String?) {
+        override fun onPostExecute(result: Boolean?) {
             callback.onCourseReceived(result)
         }
 
-        override fun doInBackground(vararg p0: Void?): String? {
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun doInBackground(vararg p0: Void?): Boolean? {
             return try {
                 val serverSocket = ServerSocket(PORT_GET_COURSE)
                 val client = serverSocket.accept();
 
 
                 val inputStream = client.getInputStream();
-                val string = getStringValue(inputStream);
+
+                val dis = DataInputStream(inputStream)
+                val courseSize = dis.readLong()
+                val courseUUID = dis.readUTF()
+                callback.retrieveSize(courseSize)
+                val courseZipPath = Paths.get(
+                    weakContext.get()?.getExternalFilesDir(null).toString(),
+                    FileEnum.LEARN_DIRECTORY.key,
+                    "$courseUUID.zip"
+                )
+                val courseFileDestination = Paths.get(
+                    weakContext.get()?.filesDir.toString(),
+                    FileEnum.LEARN_DIRECTORY.key,
+                    courseUUID
+                )
+                val courseTempZipFile = FileHelper.createFileAtPath(courseZipPath)
+
+                writeToFile(inputStream, courseTempZipFile!!);
                 serverSocket.close();
-                string
+
+                FileHelper.unzip(courseTempZipFile, courseFileDestination.toString())
             } catch (e: IOException) {
-                null;
+                false
             }
         }
 
         // TODO remove this
-        private fun getStringValue(inputStream: InputStream?): String? {
-            var result = String()
+        private fun writeToFile(inputStream: InputStream?, courseZipFile: File): Boolean {
             val buf = ByteArray(1024)
             var len: Int
+            var currentSize = 0
             try {
+                val outStream: OutputStream = FileOutputStream(courseZipFile)
                 while (inputStream!!.read(buf).also { len = it } != -1) {
-                    result += String(buf)
+                    currentSize += 1024
+                    outStream.write(buf, 0, len)
+                    callback.sendProgress(currentSize)
                 }
                 inputStream.close()
             } catch (e: IOException) {
-                return result
+                Log.d("Not saved file", e.toString())
+                return false
             }
-            return result
+            return true
         }
 
     }
@@ -603,11 +630,13 @@ class AsyncHelpers {
         private var receiverEndPoint: WifiDirectEndpoint,
         private var callback: OnCourseSent
     ) :
-        AsyncTask<Void?, Boolean?, Boolean?>() {
+        AsyncTask<SendCourseAsyncTask.TaskParams?, Boolean?, Boolean?>() {
         private val SOCKET_TIMEOUT = 5000
-        override fun doInBackground(vararg p0: Void?): Boolean? {
+        override fun doInBackground(vararg p0: SendCourseAsyncTask.TaskParams?): Boolean? {
+            val courseZipFile = p0[0]?.courseZipFile
+            val courseUUID = p0[0]?.courseUUID
             val socket = Socket()
-            val string = "Test 123"  // TODO change this to the course that we pass as a File.. will need to compess into bytes - send first the number of bytes for progressbar...
+
             try {
                 socket.bind(null)
                 socket.connect(
@@ -615,9 +644,18 @@ class AsyncHelpers {
                     SOCKET_TIMEOUT
                 )
                 val stream: OutputStream = socket.getOutputStream()
+
+
+                // Send course UUID
+                val dos = DataOutputStream(stream)
+                courseZipFile?.length()?.let { dos.writeLong(it) }
+                dos.flush()
+                dos.writeUTF(courseUUID.toString())
+                dos.flush()
+
                 var `is`: InputStream? = null
                 try {
-                    `is` = ByteArrayInputStream(string?.toByteArray())
+                    `is` = FileInputStream(courseZipFile)
                 } catch (e: FileNotFoundException) {
                 }
                 copyFile(`is`, stream)
@@ -659,7 +697,10 @@ class AsyncHelpers {
             return true
         }
 
+        class TaskParams(
+            var courseZipFile: File?,
+            var courseUUID: UUID?
+        )
 
     }
-
 }

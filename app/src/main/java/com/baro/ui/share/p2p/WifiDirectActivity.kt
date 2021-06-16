@@ -16,11 +16,16 @@ import com.baro.constants.AppTags
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.interfaces.OnClientInetAddressReceived
 import com.baro.helpers.interfaces.OnClientInetAddressSent
+import com.baro.models.Course
 import java.net.InetAddress
+import java.util.*
+
 
 
 class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoListener,
     OnClientInetAddressReceived, OnClientInetAddressSent {
+
+    private var course: Course? = null
 
     // WifiDirect
     private val manager: WifiP2pManager? by lazy(LazyThreadSafetyMode.NONE) {
@@ -47,18 +52,30 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
     }
 
     private fun getUserIntent() {
-        val userIntent = intent.extras?.get(AppTags.WIFIP2P_INTENT.name)
-        isReceiving = userIntent != AppCodes.WIFIP2P_PEER_SEND.code
+        isReceiving = intent.extras?.get(AppTags.WIFIP2P_INTENT.name) != AppCodes.WIFIP2P_PEER_SEND.code
+
+        if (!isReceiving){
+            course = intent.getParcelableExtra(AppTags.COURSE_OBJECT.name) as Course
+        }
+
     }
 
 
     private fun configureView() {
-        val peerConnectionFragment: WifiDirectPeerConnectionFragment =
-            WifiDirectPeerConnectionFragment.newInstance()
-        supportFragmentManager.beginTransaction()
-            .add(R.id.fragment_container_peer_connection, peerConnectionFragment, null)
-            .setReorderingAllowed(true)
-            .commit()
+
+        if (!isReceiving){
+            val peerConnectionSelectionFragment: WifiDirectPeerConnectionSelectionFragment =
+                WifiDirectPeerConnectionSelectionFragment.newInstance()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container_peer_connection, peerConnectionSelectionFragment, null)
+                .commit()
+        } else{
+            val peerConnectionWaitingRoomFragment: WifiDirectPeerConnectionWaitingRoomFragment =
+                WifiDirectPeerConnectionWaitingRoomFragment.newInstance()
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragment_container_peer_connection, peerConnectionWaitingRoomFragment, null)
+                .commit()
+        }
     }
 
 
@@ -144,15 +161,24 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
 
     // Notify WifiDirectPeerConnectFragment
     fun wifiDirectStatusUpdate(wifiDirectConnected: Boolean) {
-        val wifiDirectPeerConnectionFragment = supportFragmentManager
-            .findFragmentById(R.id.fragment_container_peer_connection) as WifiDirectPeerConnectionFragment?
-        wifiDirectPeerConnectionFragment?.changeWifiDirectStatus(wifiDirectConnected)
+        if (!isReceiving) {
+            val wifiDirectPeerConnectionFragment = supportFragmentManager
+                .findFragmentById(R.id.fragment_container_peer_connection) as WifiDirectPeerConnectionSelectionFragment?
+            wifiDirectPeerConnectionFragment?.changeWifiDirectStatus(wifiDirectConnected)
+        } else {
+            val wifiDirectPeerWaitingRoomFragment = supportFragmentManager
+                .findFragmentById(R.id.fragment_container_peer_connection) as WifiDirectPeerConnectionWaitingRoomFragment?
+            wifiDirectPeerWaitingRoomFragment?.changeWifiDirectStatus(wifiDirectConnected)
+        }
+
     }
 
     fun updateWifiP2PDeviceList(wifiP2pDeviceList: MutableCollection<WifiP2pDevice>) {
-        val wifiDirectPeerConnectionFragment = supportFragmentManager
-            .findFragmentById(R.id.fragment_container_peer_connection) as WifiDirectPeerConnectionFragment
-        wifiDirectPeerConnectionFragment.updateWifiP2PDeviceList(wifiP2pDeviceList)
+        if(!isReceiving) {
+            val wifiDirectPeerConnectionFragment = supportFragmentManager
+                .findFragmentById(R.id.fragment_container_peer_connection) as WifiDirectPeerConnectionSelectionFragment
+            wifiDirectPeerConnectionFragment.updateWifiP2PDeviceList(wifiP2pDeviceList)
+        }
     }
 
 
@@ -235,6 +261,7 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
             applicationContext,
             "DEBUG: Received Client's IP: " + clientInetAddress?.hostAddress,
             Toast.LENGTH_LONG
+
         ).show()
         otherDeviceInetAddress = clientInetAddress
         shareCourse()
@@ -259,9 +286,8 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
 
         } else {
 
-            val file = null  // TODO change this to the zip file of the course
             val sendFragment: WifiDirectCourseSendFragment =
-                WifiDirectCourseSendFragment.newInstance(file, otherDeviceInetAddress)
+                WifiDirectCourseSendFragment.newInstance(course, otherDeviceInetAddress)
 
             supportFragmentManager.beginTransaction()
                 .add(R.id.fragment_container_send_receive, sendFragment, null)

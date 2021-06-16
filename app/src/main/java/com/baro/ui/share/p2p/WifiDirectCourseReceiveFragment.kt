@@ -1,30 +1,26 @@
 package com.baro.ui.share.p2p
 
-import android.app.Activity
 import androidx.fragment.app.Fragment
-import android.net.wifi.p2p.WifiP2pDevice
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import android.widget.AdapterView.OnItemClickListener
 import androidx.annotation.RequiresApi
 import com.baro.R
-import com.baro.adapters.DeviceAdapter
-import com.baro.constants.AppTags
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.interfaces.OnCourseReceived
-import java.io.File
 import java.lang.ref.WeakReference
-import java.net.InetAddress
 
 
 class WifiDirectCourseReceiveFragment : Fragment(), OnCourseReceived{
 
     // UI
     private lateinit var progressBar: ProgressBar
+
+    private var courseSize: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +29,8 @@ class WifiDirectCourseReceiveFragment : Fragment(), OnCourseReceived{
     }
 
     private fun receiveCourse() {
-        val receiveCourse = AsyncHelpers.ReceiveCourseAsyncTask(this)
+        val weakContext = WeakReference<Context>(activity)
+        val receiveCourse = AsyncHelpers.ReceiveCourseAsyncTask(weakContext,this)
         receiveCourse.execute()
     }
 
@@ -52,7 +49,6 @@ class WifiDirectCourseReceiveFragment : Fragment(), OnCourseReceived{
 
     private fun configureProgressBar(view: View) {
         progressBar = view.findViewById(R.id.progressbar)
-
     }
 
 
@@ -61,13 +57,22 @@ class WifiDirectCourseReceiveFragment : Fragment(), OnCourseReceived{
         fun newInstance() = WifiDirectCourseReceiveFragment()
     }
 
-    override fun onCourseReceived(result: String?) {
+    override fun onCourseReceived(result: Boolean?) {
 
         Toast.makeText(
             activity?.applicationContext,
-            "DEBUG: Received: $result",
+            "DEBUG: Received FIle",
             Toast.LENGTH_LONG
         ).show()
+
+    }
+
+    override fun retrieveSize(courseSize: Long) {
+        this.courseSize = courseSize
+    }
+
+    override fun sendProgress(currentSize: Int) {
+        progressBar.progress = (currentSize/ courseSize!!).toInt()
     }
 
 }

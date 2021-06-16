@@ -88,12 +88,12 @@
             android:id="@+id/text_create"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:text="@string/edit"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="@+id/btn_create"
             app:layout_constraintStart_toStartOf="@+id/btn_create"
-            app:layout_constraintTop_toBottomOf="@+id/btn_create"
-            android:gravity="center_horizontal" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_create" />
 
         <TextView
             android:id="@+id/text_country"
@@ -118,11 +118,11 @@
             android:layout_height="@dimen/smaller_icon_width"
             android:background="@color/white"
             android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="@+id/btn_delete"
-            app:layout_constraintEnd_toStartOf="@+id/btn_delete"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_send"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/btn_delete"
+            app:layout_constraintStart_toEndOf="@+id/btn_delete"
+            app:layout_constraintTop_toBottomOf="@+id/text_country"
             app:srcCompat="@drawable/ic_create" />
 
         <ImageButton
@@ -131,23 +131,46 @@
             android:layout_height="@dimen/smaller_icon_width"
             android:background="@color/white"
             android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/text_create"
+            app:layout_constraintEnd_toStartOf="@+id/btn_create"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/btn_create"
-            app:layout_constraintTop_toBottomOf="@+id/txt_category"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/btn_create"
             app:srcCompat="@drawable/ic_delete" />
 
         <TextView
             android:id="@+id/text_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:text="@string/delete"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="@+id/btn_delete"
             app:layout_constraintStart_toStartOf="@+id/btn_delete"
-            app:layout_constraintTop_toBottomOf="@+id/btn_delete"
-            android:gravity="center_horizontal" />
+            app:layout_constraintTop_toBottomOf="@+id/btn_delete" />
+
+        <ImageButton
+            android:id="@+id/btn_send"
+            android:layout_width="@dimen/smaller_icon_width"
+            android:layout_height="@dimen/smaller_icon_width"
+            android:background="@color/white"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@+id/text_create"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_create"
+            app:srcCompat="@drawable/ic_upload_file_black_48dp" />
+
+        <TextView
+            android:id="@+id/text_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/send_txt"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="@+id/btn_send"
+            app:layout_constraintStart_toStartOf="@+id/btn_send"
+            app:layout_constraintTop_toBottomOf="@+id/btn_send" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
