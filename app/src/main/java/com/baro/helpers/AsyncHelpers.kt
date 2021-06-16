@@ -132,9 +132,6 @@ class AsyncHelpers {
         }
         }
 
-
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     class CourseCredentialsSave(private var callback: OnCourseCredentialsSaveComplete, private var context: WeakReference<Context>) : AsyncTask<CourseCredentialsSave.TaskParams, Void?, Boolean?>() {
@@ -325,6 +322,15 @@ class AsyncHelpers {
 
         class TaskParams(var outputFile: File?, var videoUri: Uri?)
 
+    }
+
+    fun videoUriSave(outputFile: File?, videoUri: Uri?, weakReferenceContentResolver: WeakReference<ContentResolver>): File? {
+        if (outputFile != null && outputFile.exists()) {
+            if (videoUri != null) {
+                return FileHelper.copyVideoToFile(outputFile, videoUri, weakReferenceContentResolver.get())
+            }
+        }
+        return null
     }
 
 

@@ -1,12 +1,11 @@
 package com.baro.ui.create
 
-import android.content.ContentResolver
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
-import android.widget.Toast
 import android.widget.VideoView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -125,8 +124,8 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
             launch {
                 val result = AsyncHelpers().updateJSONFile(courseMetaFile, slideHashMap)
                 if (result) {
-                    Toast.makeText(this@CreateSlideActivity, getString(R.string.course_saved_successfully), Toast.LENGTH_SHORT).show()
-                } else {Toast.makeText(this@CreateSlideActivity, getString(R.string.course_saved_unsuccessfully), Toast.LENGTH_SHORT).show()}
+                    Log.d("CreateSlide", getString(R.string.course_saved_successfully))
+                } else {Log.d("CreateSlide", getString(R.string.course_saved_unsuccessfully))}
             }
         }
     }
@@ -157,7 +156,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
             }
             videoUri = course.getSlides()[slideCounter].getVideoUri()
             setVideoURI(AppCodes.NO_CHANGE_SLIDE)
-            //SetVideoURI().execute(AppCodes.NO_CHANGE_SLIDE)
             updateJsonCourse()
         }
 
@@ -217,7 +215,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         previousButton.setOnClickListener {
             updateClickable(allUnclickable = true)
             setVideoURI(AppCodes.BACKWARDS_SLIDE)
-            //SetVideoURI().execute(AppCodes.BACKWARDS_SLIDE)
+            updateJsonCourse()
         }
     }
 
@@ -230,7 +228,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         nextButton.setOnClickListener {
             updateClickable(allUnclickable = true)
             setVideoURI(AppCodes.FORWARD_SLIDE)
-            //SetVideoURI().execute(AppCodes.FORWARD_SLIDE)
+            updateJsonCourse()
 
         }
     }
@@ -433,13 +431,32 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     private var getCameraContent: ActivityResultLauncher<Uri?>? = registerForActivityResult(
-            ActivityResultContracts.TakeVideo()
+            ActivityResultContracts.CaptureVideo()
     ) {
         if (!removeEmptyFileAndReturnIsEmpty()) {
-            videoView.setVideoURI(videoUri)
-            videoView.seekTo(100)
+            val slideVideoPath = Paths.get(
+                this@CreateSlideActivity.getExternalFilesDir(null).toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.COURSE_DIRECTORY.key,
+                course.getCourseUUID().toString(),
+                FileEnum.SLIDE_DIRECTORY.key,
+                course.getSlides()[slideCounter].slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
+            )
+            val slideVideoFile = slideVideoPath.toFile()
+
+            runBlocking{
+                launch{
+                    videoUri = Uri.fromFile(slideVideoFile)
+                    videoView.setVideoURI(videoUri)
+                    videoView.seekTo(100)
+
+                }
+            }
+
+
         } else {
             videoUri = null
         }
