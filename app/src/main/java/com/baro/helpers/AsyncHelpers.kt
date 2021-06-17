@@ -301,28 +301,6 @@ class AsyncHelpers {
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    class VideoUriSave(private var callback: OnVideoUriSaved, private var weakReferenceContentResolver: WeakReference<ContentResolver>) : AsyncTask<VideoUriSave.TaskParams, Void?, File?>() {
-        override fun doInBackground(vararg params: TaskParams?): File? {
-            val outputFile = params[0]?.outputFile
-            val videoUri = params[0]?.videoUri
-
-            if (outputFile != null && outputFile.exists()) {
-                if (videoUri != null) {
-                    return FileHelper.copyVideoToFile(outputFile, videoUri, weakReferenceContentResolver.get())
-                }
-            }
-            return null
-
-        }
-
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(result: File?) {
-            callback.onVideoUriSaved(result)
-        }
-
-        class TaskParams(var outputFile: File?, var videoUri: Uri?)
-
-    }
 
     fun videoUriSave(outputFile: File?, videoUri: Uri?, weakReferenceContentResolver: WeakReference<ContentResolver>): File? {
         if (outputFile != null && outputFile.exists()) {
@@ -335,7 +313,7 @@ class AsyncHelpers {
 
 
     fun updateJSONFile(courseMetaFile: File, slideHashMap: java.util.HashMap<String, java.util.ArrayList<String>>): Boolean {
-        //TODO - Account for null jsonContents
+
         val contents = FileHelper.readFile(courseMetaFile)
 
         val jsonContents = JSONHelper.createJSONFromString(contents!!)

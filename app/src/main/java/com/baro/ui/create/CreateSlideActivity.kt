@@ -21,7 +21,6 @@ import com.baro.constants.IntentEnum
 import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
-import com.baro.helpers.interfaces.OnVideoUriSaved
 import com.baro.models.Course
 import com.baro.models.Slide
 import kotlinx.android.synthetic.main.dialog_image_chooser.*
@@ -35,7 +34,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
-class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, OnVideoUriSaved {
+class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
 
     // UI
     private lateinit var nextButton: ImageButton
@@ -398,19 +397,19 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
 
         val slideVideoFile = FileHelper.createFileAtPath(slideVideoPath)
         val contentResolverReference = WeakReference(contentResolver)
-        val videoUriSave = AsyncHelpers.VideoUriSave(this, contentResolverReference)
-        val taskParams = AsyncHelpers.VideoUriSave.TaskParams(slideVideoFile, uri)
-        videoUriSave.execute(taskParams)
-
-
-    }
-
-    override fun onVideoUriSaved(outputFile: File?) {
-        if (outputFile != null) {
-            videoUri = Uri.fromFile(outputFile)
+        runBlocking{
+            launch {
+                val videoUriSave = AsyncHelpers().videoUriSave(slideVideoFile, uri, contentResolverReference)
+                if (videoUriSave != null) {
+                    videoUri = Uri.fromFile(videoUriSave)
+                }
+                updateUI()
+            }
         }
-        updateUI()
+
+
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun removeEmptyFileAndReturnIsEmpty(): Boolean {
@@ -452,7 +451,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
                     videoUri = Uri.fromFile(slideVideoFile)
                     videoView.setVideoURI(videoUri)
                     videoView.seekTo(100)
-
                 }
             }
 
