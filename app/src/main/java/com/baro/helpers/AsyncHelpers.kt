@@ -134,81 +134,69 @@ class AsyncHelpers {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class CourseCredentialsSave(private var callback: OnCourseCredentialsSaveComplete, private var context: WeakReference<Context>) : AsyncTask<CourseCredentialsSave.TaskParams, Void?, Boolean?>() {
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun doInBackground(vararg params: TaskParams?): Boolean? {
-            // Save the Meta information
-            val course = params[0]?.course
-            val imageUri = params[0]?.imageUri
-
-            if (course != null) {
-                saveCredentials(course)
-            }
-
-            // Save Photo URI
-            savePhotoUri(imageUri, course)
-
-            return true
+    @RequiresApi(Build.VERSION_CODES.P)
+    fun courseCredentialsSave(course: Course?, imageUri: Uri?, context: WeakReference<Context>): Boolean {
+        if (course != null) {
+            saveCredentials(course, context)
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.O)
-        private fun saveCredentials(course: Course) {
+        // Save Photo URI
+        savePhotoUri(imageUri, course, context)
 
-            val course = course
-            val courseMetadata = HashMap<String?, String?>()
-
-            courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUserUUID().toString()
-            courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
-            courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
-            courseMetadata[JSONEnum.COURSE_CREATION_DATETIME.key] = course.getCreationDate()?.toString()
-            val isoCode = course.getCourseCountry()?.getIsoCode()
-            if (isoCode == null) {
-                courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = "null"
-            } else {
-                courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course.getCourseCountry()?.getIsoCode()
-            }
-            courseMetadata[JSONEnum.COURSE_CATEGORY.key] = JSONArray(course.getCourseCategory().toString()).toString()
-            courseMetadata[JSONEnum.COURSE_SLIDES.key] = JSONArray(course.getSlides().toString()).toString()
-
-            val courseMetaDataPath = Paths.get(
-                    context.get()?.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.COURSE_DIRECTORY.key,
-                    course?.getCourseUUID().toString(),
-                    FileEnum.META_DATA_FILE.key
-            )
-
-            val courseMetaDataFile = FileHelper.createFileAtPath(courseMetaDataPath)
-            val courseJSONMeta = JSONHelper.createJSONFromHashMap(courseMetadata)
+        return true
 
 
-            FileHelper.writeToFile(courseMetaDataFile, courseJSONMeta.toString())
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveCredentials(course: Course, context: WeakReference<Context>) {
+
+        val course = course
+        val courseMetadata = HashMap<String?, String?>()
+
+        courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUserUUID().toString()
+        courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
+        courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
+        courseMetadata[JSONEnum.COURSE_CREATION_DATETIME.key] = course.getCreationDate()?.toString()
+        val isoCode = course.getCourseCountry()?.getIsoCode()
+        if (isoCode == null) {
+            courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = "null"
+        } else {
+            courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course.getCourseCountry()?.getIsoCode()
         }
+        courseMetadata[JSONEnum.COURSE_CATEGORY.key] = JSONArray(course.getCourseCategory().toString()).toString()
+        courseMetadata[JSONEnum.COURSE_SLIDES.key] = JSONArray(course.getSlides().toString()).toString()
 
-        @RequiresApi(api = Build.VERSION_CODES.P)
-        private fun savePhotoUri(photoUri: Uri?, course: Course?) {
-            if (photoUri != null) {
+        val courseMetaDataPath = Paths.get(
+            context.get()?.getExternalFilesDir(null).toString(),
+            FileEnum.USER_DIRECTORY.key,
+            FileEnum.COURSE_DIRECTORY.key,
+            course?.getCourseUUID().toString(),
+            FileEnum.META_DATA_FILE.key
+        )
 
-                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.get()?.contentResolver!!, photoUri))
-                val userThumbnailPicturePath = Paths.get(context.get()?.getExternalFilesDir(null).toString(),
-                        FileEnum.USER_DIRECTORY.key,
-                        FileEnum.COURSE_DIRECTORY.key,
-                        course?.getCourseUUID().toString(),
-                        FileEnum.PHOTO_THUMBNAIL_FILE.key)
-                val file = File(userThumbnailPicturePath.toString())
+        val courseMetaDataFile = FileHelper.createFileAtPath(courseMetaDataPath)
+        val courseJSONMeta = JSONHelper.createJSONFromHashMap(courseMetadata)
 
-                FileHelper.writeBitmapToFile(file, bitmap)
-            }
+
+        FileHelper.writeToFile(courseMetaDataFile, courseJSONMeta.toString())
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    private fun savePhotoUri(photoUri: Uri?, course: Course?, context: WeakReference<Context>) {
+        if (photoUri != null) {
+
+            val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.get()?.contentResolver!!, photoUri))
+            val userThumbnailPicturePath = Paths.get(context.get()?.getExternalFilesDir(null).toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.COURSE_DIRECTORY.key,
+                course?.getCourseUUID().toString(),
+                FileEnum.PHOTO_THUMBNAIL_FILE.key)
+            val file = File(userThumbnailPicturePath.toString())
+
+            FileHelper.writeBitmapToFile(file, bitmap)
         }
-
-
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(result: Boolean?) {
-            callback.onCourseDataReturned(result)
-        }
-
-        class TaskParams(var course: Course?, var imageUri: Uri?)
-
     }
 
 

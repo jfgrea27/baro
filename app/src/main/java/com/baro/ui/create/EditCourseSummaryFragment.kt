@@ -19,11 +19,11 @@ import com.baro.constants.*
 import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
-import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.helpers.AsyncHelpers.OnCourseDeleted
 import com.baro.models.Category
 import com.baro.models.Country
 import com.baro.models.Course
+import com.baro.ui.account.AccountActivity
 import com.baro.ui.dialogs.CategoryDialog
 import com.baro.ui.dialogs.CountryDialog
 import com.baro.ui.interfaces.OnBackPressed
@@ -36,7 +36,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected, OnBackPressed{
+class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected, OnBackPressed{
 
     // UI
     private lateinit var courseTitleEditText: EditText
@@ -62,7 +62,7 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
@@ -217,6 +217,7 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
         countryText.text = country.getCountryName(weakContext)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun configureEditButton(view: View) {
         editButton = view.findViewById(R.id.btn_create)
         editButton.setOnClickListener {
@@ -224,9 +225,12 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
             if (courseName.length > 3) {
                 course.setCourseName(courseName)
                 val weakContext = WeakReference<Context>(context)
-                val courseCredentialsSave = AsyncHelpers.CourseCredentialsSave(this, weakContext)
-                val taskParams = AsyncHelpers.CourseCredentialsSave.TaskParams(course, thumbnailUri)
-                courseCredentialsSave.execute(taskParams)
+                runBlocking {
+                    launch{
+                        val result = AsyncHelpers().courseCredentialsSave(course, thumbnailUri, weakContext)
+                        onCourseDataReturned(result)
+                    }
+                }
 
             } else {
                 Toast.makeText(context, getString(R.string.lenght_course_name_warning_toast), Toast.LENGTH_LONG).show()
@@ -281,7 +285,7 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
                 }
     }
 
-    override fun onCourseDataReturned(result: Boolean?) {
+    fun onCourseDataReturned(result: Boolean?) {
         if (result == true) {
             val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
 
@@ -295,14 +299,19 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCo
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onBackPressed() {
         val courseName = courseTitleEditText.text.toString()
         course.setCourseName(courseName)
         val weakContext = WeakReference<Context>(context)
-        val  accountActivity = activity as OnCourseCredentialsSaveComplete
-        val courseCredentialsSave = AsyncHelpers.CourseCredentialsSave(accountActivity, weakContext)
-        val taskParams = AsyncHelpers.CourseCredentialsSave.TaskParams(course, thumbnailUri)
-        courseCredentialsSave.execute(taskParams)
+//        val accountActivity = activity as OnCourseCredentialsSaveComplete
+        runBlocking {
+            launch {
+                val result = AsyncHelpers().courseCredentialsSave(course, thumbnailUri, weakContext)
+            }
+        }
+        val intentToAccountActivity = Intent(activity, AccountActivity::class.java)
+        startActivity(intentToAccountActivity)
     }
 
 
