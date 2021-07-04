@@ -27,6 +27,7 @@ import com.baro.ui.account.AccountActivity
 import com.baro.ui.dialogs.CategoryDialog
 import com.baro.ui.dialogs.CountryDialog
 import com.baro.ui.interfaces.OnBackPressed
+import com.baro.ui.share.p2p.WifiDirectActivity
 import kotlinx.android.synthetic.main.dialog_image_chooser.view.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -47,6 +48,7 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, Coun
     private lateinit var editButton: ImageButton
     private lateinit var deleteButton: ImageButton
     private lateinit var countryText: TextView
+    private lateinit var sendButton: ImageButton
     // Model
     private lateinit var course: Course
 
@@ -77,9 +79,24 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, Coun
         configureEditButton(view)
         configureDeleteButton(view)
         configureEditTextCategories(view)
+        configureSendButton(view)
 
         updateUI()
         return view
+    }
+
+    private fun configureSendButton(view: View) {
+        sendButton = view.findViewById(R.id.btn_send)
+
+        sendButton.setOnClickListener{
+            val startWifiActivity = Intent(
+                activity,
+                WifiDirectActivity::class.java)
+
+            startWifiActivity.putExtra(AppTags.COURSE_OBJECT.name, course)
+            startWifiActivity.putExtra(AppTags.WIFIP2P_INTENT.name, AppCodes.WIFIP2P_PEER_SEND.code)
+            startActivity(startWifiActivity)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

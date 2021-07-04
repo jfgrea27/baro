@@ -1,0 +1,22 @@
+Index: app/src/main/res/values/strings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><resources>\n    <string name=\"app_name\">Baro</string>\n    <string name=\"account\">Account</string>\n    <string name=\"create\">Create</string>\n    <string name=\"share\">Share</string>\n    <string name=\"followers\">Followers</string>\n    <string name=\"settings\">Settings</string>\n    <string name=\"course_name\">Course Name</string>\n    <string name=\"username\">Username</string>\n    <string name=\"share_locally\">Share Locally</string>\n    <string name=\"share_online\">Share Online</string>\n    <string name=\"receive\">Receive</string>\n    <string name=\"send\">Send</string>\n    <string name=\"toast_no_username_found\">No username found.</string>\n    <string name=\"please_enter_valid_username_toast\">Please enter a valid username</string>\n    <string name=\"need_camera_access_toast\">Need camera access</string>\n    <string name=\"write_storage_permission\">Need write external storage access</string>\n    <string name=\"read_storage_permission\">Need read external storage access</string>\n    <string name=\"choose_image_input\">Image Input</string>\n    <string name=\"error_saving_credentials\">Error in saving credentials</string>\n    <string name=\"learn\">Learn</string>\n    <string name=\"error_retrieving_credentials\">Could not retrieve credentials</string>\n    <string name=\"text_choose_category\">Choose Category</string>\n    <string name=\"text_choose_thumbnail\">Choose Thumbnail</string>\n    <string name=\"lenght_course_name_warning_toast\">Course should have a longer name.</string>\n    <string name=\"video_not_saved\">Video was not saved correctly</string>\n    <string name=\"choose_language\">Choose Language</string>\n    <string name=\"flag_name\">Flag Name</string>\n    <string name=\"choose_Categories\">Choose Categories</string>\n    <string name=\"edit\">Edit</string>\n    <string name=\"delete\">Delete</string>\n    <string name=\"no_category\">No Category</string>\n    <string name=\"course_saved_successfully\">Course Saved Successfully!!</string>\n    <string name=\"course_saved_unsuccessfully\">Course not saved :(</string>\n</resources>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/values/strings.xml	(revision 70cac004d659d6dfd3c79a18b60624c0614f8f29)
++++ app/src/main/res/values/strings.xml	(date 1625413698498)
+@@ -32,4 +32,11 @@
+     <string name="no_category">No Category</string>
+     <string name="course_saved_successfully">Course Saved Successfully!!</string>
+     <string name="course_saved_unsuccessfully">Course not saved :(</string>
++    <string name="send_txt">Send</string>
++    <string name="wifi_direct_peer_connection">Wifi Direct</string>
++    <string name="wifidirect_connection">Wifi connection</string>
++    <string name="list_of_devices">List of Devices</string>
++    <string name="receive_course">Receive Course</string>
++    <string name="send_course">Send Course</string>
++    <string name="waiting_room">Waiting Room</string>
+ </resources>
+\ No newline at end of file

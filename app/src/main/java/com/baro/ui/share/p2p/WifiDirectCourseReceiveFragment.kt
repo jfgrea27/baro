@@ -4,6 +4,8 @@ import androidx.fragment.app.Fragment
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +14,8 @@ import androidx.annotation.RequiresApi
 import com.baro.R
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.interfaces.OnCourseReceived
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 
 
@@ -30,6 +34,7 @@ class WifiDirectCourseReceiveFragment : Fragment(), OnCourseReceived{
 
     private fun receiveCourse() {
         val weakContext = WeakReference<Context>(activity)
+
         val receiveCourse = AsyncHelpers.ReceiveCourseAsyncTask(weakContext,this)
         receiveCourse.execute()
     }
@@ -61,18 +66,18 @@ class WifiDirectCourseReceiveFragment : Fragment(), OnCourseReceived{
 
         Toast.makeText(
             activity?.applicationContext,
-            "DEBUG: Received FIle",
+            "DEBUG: Received FIle, Extracted = " + result,
             Toast.LENGTH_LONG
         ).show()
 
     }
 
-    override fun retrieveSize(courseSize: Long) {
-        this.courseSize = courseSize
+    override fun setProgressCourseSize(courseSize: Long) {
+        progressBar.max = courseSize.toInt()
     }
 
-    override fun sendProgress(currentSize: Int) {
-        progressBar.progress = (currentSize/ courseSize!!).toInt()
-    }
+    override fun setProgress (currentSize: Int) {
+        progressBar.progress = currentSize
 
+    }
 }

@@ -1,5 +1,6 @@
 package com.baro.helpers
 
+import android.R.attr.path
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.net.Uri
@@ -8,7 +9,6 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import java.io.*
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -119,21 +119,6 @@ object FileHelper {
             }
         }
         return false
-    }
-
-    fun writeUriToFile(destination: File?, uri: Uri?, content: ContentResolver?): Boolean? {
-        val file = createFile(destination)
-        var `in`: InputStream? = try {
-            uri?.let { content?.openInputStream(it) }
-        } catch (e: FileNotFoundException) {
-            return false
-        }
-        return try {
-            saveInputStream(`in`, file?.absolutePath)
-            true
-        } catch (e: IOException) {
-            false
-        }
     }
 
     private fun saveInputStream(`in`: InputStream?, desiredLocation: String?): Boolean {
@@ -260,7 +245,7 @@ object FileHelper {
     fun unzip(zipFilePath: File, destDirectory: String): Boolean {
         val destDir = File(destDirectory)
         if (!destDir.exists()) {
-            destDir.mkdir()
+            destDir.mkdirs()
         }
         ZipFile(zipFilePath).use { zip ->
 
@@ -272,18 +257,18 @@ object FileHelper {
                     val filePath = destDirectory + File.separator + entry.name
 
                     if (!entry.isDirectory) {
-
+                        createFile(File(filePath))
                         extractFile(input, filePath)
                     } else {
 
                         val dir = File(filePath)
-                        dir.mkdir()
+                        dir.mkdirs()
                     }
 
                 }
 
             }
-//            deleteFile(zipFilePath)
+            deleteFile(zipFilePath)
             return true
         }
 

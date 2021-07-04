@@ -7,19 +7,24 @@ import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.baro.constants.CategoryEnum
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
 import com.baro.helpers.interfaces.*
-import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
+import com.baro.helpers.interfaces.OnCreatorCourseCredentialsLoad
 import com.baro.models.Country
 import com.baro.models.Course
 import com.baro.models.User
+import com.baro.ui.share.p2p.WifiDirectEndpoint
 import org.json.JSONArray
-import org.json.JSONObject
-import java.io.File
+import java.io.*
 import java.lang.ref.WeakReference
+import java.net.InetAddress
+import java.net.InetSocketAddress
+import java.net.ServerSocket
+import java.net.Socket
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
@@ -331,5 +336,212 @@ class AsyncHelpers {
         fun onCourseDeleted(result: Course?)
     }
 
+    class GroupOwnerReceiveClientInetAddressAsyncTask(
+        private var callback: OnClientInetAddressReceived
+
+    ) :
+        AsyncTask<String?, Void, InetAddress?>() {
+
+        companion object {
+            val PORT_GET_CLIENT_INET = 8988
+        }
+
+        @Override
+        override fun onPostExecute(result: InetAddress?) {
+            callback.onClientInetAddressReceived(result)
+        }
+
+        override fun doInBackground(vararg p0: String?): InetAddress? {
+            return try {
+                val serverSocket = ServerSocket(PORT_GET_CLIENT_INET)
+                val client = serverSocket.accept();
+                val clientInetAddress = client.inetAddress
+                serverSocket.close();
+                return clientInetAddress
+            } catch (e: IOException) {
+                null;
+            }
+        }
+    }
+
+    class ClientSendInetAddressAsyncTask(
+        private var serverEndPoint: WifiDirectEndpoint,
+        private var callback: OnClientInetAddressSent
+    ) :
+        AsyncTask<Void?, InetAddress?, InetAddress?>() {
+        private val SOCKET_TIMEOUT = 5000
+        override fun doInBackground(vararg p0: Void?): InetAddress? {
+            val socket = Socket()
+            try {
+                socket.bind(null)
+                socket.connect(
+                    InetSocketAddress(serverEndPoint.ip, serverEndPoint.port),
+                    SOCKET_TIMEOUT
+                )
+            } catch (e: IOException) {
+
+            } finally {
+                if (socket != null) {
+                    if (socket.isConnected) {
+                        try {
+                            socket.close()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+            return socket.inetAddress
+        }
+
+
+        @Override
+        override fun onPostExecute(result: InetAddress?) {
+            callback.onClientInetAddressRSent()
+        }
+    }
+
+
+    class ReceiveCourseAsyncTask(
+        private var weakContext: WeakReference<Context>,
+        private var callback: OnCourseReceived
+    ) :
+        AsyncTask<Void?, Boolean?, Boolean?>() {
+        companion object {
+            val PORT_GET_COURSE = 9989
+        }
+
+        @Override
+        override fun onPostExecute(result: Boolean?) {
+            callback.onCourseReceived(result)
+        }
+
+        @RequiresApi(Build.VERSION_CODES.O)
+        override fun doInBackground(vararg p0: Void?): Boolean? {
+            return try {
+                val serverSocket = ServerSocket(PORT_GET_COURSE)
+                val client = serverSocket.accept();
+
+
+                val inputStream = client.getInputStream();
+
+                val dis = DataInputStream(inputStream)
+                val courseSize = dis.readLong()
+                val courseUUID = dis.readUTF()
+                callback.setProgressCourseSize(courseSize)
+                val courseZipPath = Paths.get(
+                    weakContext.get()?.getExternalFilesDir(null).toString(),
+                    FileEnum.LEARN_DIRECTORY.key,
+                    "$courseUUID.zip"
+                )
+                val coursePath = Paths.get(
+                    weakContext.get()?.getExternalFilesDir(null).toString(),
+                    FileEnum.LEARN_DIRECTORY.key,
+                    courseUUID
+                )
+                val courseTempZipFile = FileHelper.createFileAtPath(courseZipPath)
+
+                writeToFile(inputStream, courseTempZipFile!!);
+                serverSocket.close();
+                FileHelper.unzip(courseTempZipFile ,coursePath.toString())
+            } catch (e: IOException) {
+                false
+            }
+        }
+
+        // TODO remove this
+        private fun writeToFile(inputStream: InputStream?, courseZipFile: File): Boolean {
+            val buf = ByteArray(1024)
+            var len: Int
+            var currentSize = 0
+            try {
+                val outStream: OutputStream = FileOutputStream(courseZipFile)
+                while (inputStream!!.read(buf).also { len = it } != -1) {
+                    currentSize += 1024
+                    outStream.write(buf, 0, len)
+                    callback.setProgress(currentSize)
+                }
+                callback.setProgress(currentSize)
+                inputStream.close()
+            } catch (e: IOException) {
+                Log.d("Not saved file", e.toString())
+                return false
+            }
+            return true
+        }
+
+    }
+
+
+    class SendCourseAsyncTask(
+        private var receiverEndPoint: WifiDirectEndpoint,
+        private var callback: OnCourseSent
+    ) :
+        AsyncTask<SendCourseAsyncTask.TaskParams?, Boolean?, Boolean?>() {
+        private val SOCKET_TIMEOUT = 5000
+        override fun doInBackground(vararg p0: SendCourseAsyncTask.TaskParams?): Boolean? {
+            val courseZipFile = p0[0]?.courseZipFile
+            val courseUUID = p0[0]?.courseUUID
+            val socket = Socket()
+
+            try {
+                socket.bind(null)
+                socket.connect(
+                    InetSocketAddress(receiverEndPoint.ip, receiverEndPoint.port),
+                    SOCKET_TIMEOUT
+                )
+                val stream: OutputStream = socket.getOutputStream()
+
+
+                // Send course UUID
+                val dos = DataOutputStream(stream)
+                courseZipFile?.length()?.let { dos.writeLong(it) }
+                dos.flush()
+                dos.writeUTF(courseUUID.toString())
+                dos.flush()
+
+                var `is`: InputStream? = null
+                try {
+                    `is` = FileInputStream(courseZipFile)
+                } catch (e: FileNotFoundException) {
+                }
+                copyFile(`is`, stream)
+            } catch (e: IOException) {
+                Log.i("FAILED SEND COURSE", e.toString())
+                return false
+            } finally {
+                if (socket != null) {
+                    if (socket.isConnected) {
+                        try {
+                            socket.close()
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+            return true
+        }
+
+        private fun copyFile(inputStream: InputStream?, out: OutputStream): Boolean {
+            val buf = ByteArray(1024)
+            var len: Int
+            try {
+                while (inputStream?.read(buf).also { len = it!! } != -1) {
+                    out.write(buf, 0, len)
+                }
+                out.close()
+                inputStream?.close()
+            } catch (e: IOException) {
+                return false
+            }
+            return true
+        }
+        class TaskParams(
+            var courseZipFile: File?,
+            var courseUUID: UUID?
+        )
+
+    }
 
 }

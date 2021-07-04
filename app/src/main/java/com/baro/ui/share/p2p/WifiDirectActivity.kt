@@ -55,7 +55,7 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
         isReceiving = intent.extras?.get(AppTags.WIFIP2P_INTENT.name) != AppCodes.WIFIP2P_PEER_SEND.code
 
         if (!isReceiving){
-            course = intent.getParcelableExtra(AppTags.COURSE_OBJECT.name) as Course
+            course = intent.getParcelableExtra(AppTags.COURSE_OBJECT.name) as Course?
         }
 
     }

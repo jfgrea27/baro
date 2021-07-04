@@ -23,7 +23,7 @@ import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.PermissionsHelper
 import com.baro.helpers.interfaces.OnCourseCreate
 import com.baro.helpers.AsyncHelpers.OnCourseDeleted
-import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
+import com.baro.helpers.interfaces.OnCreatorCourseCredentialsLoad
 import com.baro.models.Course
 import com.baro.models.User
 import com.baro.ui.create.CreateCourseSummaryFragment
@@ -110,7 +110,7 @@ class AccountActivity : AppCompatActivity(), OnCreatorCourseCredentialsLoad,
                     CreateCourseSummaryFragment.newInstance(course)
 
                 supportFragmentManager.beginTransaction()
-                    .add(R.id.fragment_container_view, createCourseSummaryFragment, null)
+                    .add(R.id.fragment_container_peer_connection, createCourseSummaryFragment, null)
                     .addToBackStack(AppTags.CREATE_COURSE_SUMMARY_FRAGMENT.name)
                     .setReorderingAllowed(true)
                     .commit()
@@ -188,7 +188,7 @@ class AccountActivity : AppCompatActivity(), OnCreatorCourseCredentialsLoad,
                 EditCourseSummaryFragment.newInstance(course)
 
             supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container_view, editCourseSummaryFragment, null)
+                .add(R.id.fragment_container_peer_connection, editCourseSummaryFragment, null)
                 .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)
                 .setReorderingAllowed(true)
                 .commit()
