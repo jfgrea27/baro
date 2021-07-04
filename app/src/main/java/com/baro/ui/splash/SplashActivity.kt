@@ -1,30 +1,35 @@
 package com.baro.ui.splash
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 
 import com.baro.R
 import com.baro.constants.AppTags
 import com.baro.helpers.*
-import com.baro.helpers.interfaces.OnUserLoginCheckComplete
 import com.baro.models.User
 import com.baro.ui.main.MainActivity
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
-class SplashActivity : AppCompatActivity(), OnUserLoginCheckComplete {
+class SplashActivity : AppCompatActivity() {
 
     private var progressBar: ProgressBar? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
         configureProgressBar()
         if (savedInstanceState == null) {
-            Handler().postDelayed(Runnable { getCurrentlyLoggingInUser() }, SPLASH_TIME_OUT.toLong())
+            Handler(Looper.getMainLooper()).postDelayed({ getCurrentlyLoggingInUser() }, SPLASH_TIME_OUT.toLong())
         }
     }
 
@@ -33,9 +38,16 @@ class SplashActivity : AppCompatActivity(), OnUserLoginCheckComplete {
         progressBar = findViewById(R.id.progress_bar)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun getCurrentlyLoggingInUser() {
-        val userCredentialsTask = AsyncHelpers.VerifyUserCredentials(this)
-        userCredentialsTask.execute(getExternalFilesDir(null))
+
+        runBlocking {
+            launch {
+                var user = AsyncHelpers().coroutineVerifyUserCredentials(getExternalFilesDir(null))
+                onUserLoginCheckDone(user)
+            }
+        }
+
     }
 
     companion object {
@@ -43,7 +55,7 @@ class SplashActivity : AppCompatActivity(), OnUserLoginCheckComplete {
     }
 
 
-    override fun onUserLoginCheckDone(result: User?) {
+    private fun onUserLoginCheckDone(result: User?) {
         if (result != null) {
 
             val startMainActivity = Intent(
