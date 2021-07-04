@@ -22,7 +22,6 @@ import com.baro.constants.PermissionsEnum
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.PermissionsHelper
 import com.baro.helpers.interfaces.OnCourseCreate
-import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.helpers.AsyncHelpers.OnCourseDeleted
 import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
 import com.baro.models.Course
@@ -38,7 +37,7 @@ import kotlin.collections.ArrayList
 
 
 class AccountActivity : AppCompatActivity(), OnCreatorCourseCredentialsLoad,
-    CourseAdapter.OnCourseSelected, OnCourseCredentialsSaveComplete, OnCourseDeleted, OnCourseCreate{
+    CourseAdapter.OnCourseSelected, OnCourseDeleted, OnCourseCreate{
     // UI
     private lateinit var userThumbnailImageView: ImageView
     private lateinit var followersButton: ImageButton
@@ -82,11 +81,13 @@ class AccountActivity : AppCompatActivity(), OnCreatorCourseCredentialsLoad,
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onBackPressed() {
         tellFragments()
         super.onBackPressed()
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun tellFragments() {
         val fragments: List<Fragment> = supportFragmentManager.fragments
         for (f in fragments) {
@@ -194,12 +195,6 @@ class AccountActivity : AppCompatActivity(), OnCreatorCourseCredentialsLoad,
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun onCourseDataReturned(result: Boolean?) {
-        getCoursesFromFiles()
-        courseAdapter?.notifyDataSetChanged()
-    }
-
     override fun onCourseDeleted(result: Course?) {
         var position = -1
 
@@ -222,5 +217,12 @@ class AccountActivity : AppCompatActivity(), OnCreatorCourseCredentialsLoad,
     override fun onCourseCreate(course: Pair<Course, Uri?>) {
         courses.add(course)
         courseAdapter?.notifyItemInserted(courses.size - 1)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onResume() {
+        super.onResume()
+        getCoursesFromFiles()
+        courseAdapter?.notifyDataSetChanged()
     }
 }

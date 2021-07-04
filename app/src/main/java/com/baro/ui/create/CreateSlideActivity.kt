@@ -1,13 +1,11 @@
 package com.baro.ui.create
 
-import android.content.ContentResolver
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
-import android.widget.Toast
 import android.widget.VideoView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,8 +21,6 @@ import com.baro.constants.IntentEnum
 import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
-import com.baro.helpers.interfaces.OnDeleteFile
-import com.baro.helpers.interfaces.OnVideoUriSaved
 import com.baro.models.Course
 import com.baro.models.Slide
 import kotlinx.android.synthetic.main.dialog_image_chooser.*
@@ -38,7 +34,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 
-class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, OnVideoUriSaved, OnDeleteFile {
+class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener {
 
     // UI
     private lateinit var nextButton: ImageButton
@@ -91,7 +87,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
     @RequiresApi(Build.VERSION_CODES.O)
     private fun populateSlideVideoUri() {
         for (slide in course.getSlides()) {
-            var slidePath = Paths.get(
+            val slidePath = Paths.get(
                 this@CreateSlideActivity.getExternalFilesDir(null).toString(),
                 FileEnum.USER_DIRECTORY.key,
                 FileEnum.COURSE_DIRECTORY.key,
@@ -105,7 +101,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun updateJsonCourse() {
-        var courseMetaPath = Paths.get(
+        val courseMetaPath = Paths.get(
             this@CreateSlideActivity.getExternalFilesDir(null).toString(),
             FileEnum.USER_DIRECTORY.key,
             FileEnum.COURSE_DIRECTORY.key,
@@ -113,11 +109,11 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
             FileEnum.META_DATA_FILE.key
         )
 
-        var courseMetaFile = courseMetaPath.toFile()
+        val courseMetaFile = courseMetaPath.toFile()
 
-        var slideHashMap = HashMap<String, ArrayList<String>>()
+        val slideHashMap = HashMap<String, ArrayList<String>>()
 
-        var slideUUIDArrayList = ArrayList<String>()
+        val slideUUIDArrayList = ArrayList<String>()
         for (slide in course.getSlides()) {
             slideUUIDArrayList.add(slide.slideUUID.toString())
         }
@@ -127,8 +123,8 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
             launch {
                 val result = AsyncHelpers().updateJSONFile(courseMetaFile, slideHashMap)
                 if (result) {
-                    Toast.makeText(this@CreateSlideActivity, getString(R.string.course_saved_successfully), Toast.LENGTH_SHORT).show()
-                } else {Toast.makeText(this@CreateSlideActivity, getString(R.string.course_saved_unsuccessfully), Toast.LENGTH_SHORT).show()}
+                    Log.d("CreateSlide", getString(R.string.course_saved_successfully))
+                } else {Log.d("CreateSlide", getString(R.string.course_saved_unsuccessfully))}
             }
         }
     }
@@ -138,7 +134,6 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
 
         finishSlide.setOnClickListener {
             updateJsonCourse()
-
             finish()
         }
     }
@@ -159,7 +154,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
                 }
             }
             videoUri = course.getSlides()[slideCounter].getVideoUri()
-            SetVideoURI().execute(AppCodes.NO_CHANGE_SLIDE)
+            setVideoURI(AppCodes.NO_CHANGE_SLIDE)
             updateJsonCourse()
         }
 
@@ -177,20 +172,18 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
                 course.getSlides()[slideCounter].slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
         )
 
-        var videoFile = File(slideVideoPath.toString())
-        val deleteVideoFile = AsyncHelpers.DeleteFile(this)
-        val taskParams = AsyncHelpers.DeleteFile.TaskParams(videoFile, deleteSlide)
-        deleteVideoFile.execute(taskParams)
-
-    }
-
-    override fun onDeleteFile(deleteSlide: Boolean?) {
-        if (!deleteSlide!!) {
-            videoUri = null
+        val videoFile = File(slideVideoPath.toString())
+        runBlocking {
+            launch {
+                FileHelper.deleteFile(videoFile)
+                if (!deleteSlide) {
+                    videoUri = null
+                }
+                isPaused = true
+                updateUI()
+            }
         }
 
-        isPaused = true
-        updateUI()
     }
 
 
@@ -220,7 +213,8 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
 
         previousButton.setOnClickListener {
             updateClickable(allUnclickable = true)
-            SetVideoURI().execute(AppCodes.BACKWARDS_SLIDE)
+            setVideoURI(AppCodes.BACKWARDS_SLIDE)
+            updateJsonCourse()
         }
     }
 
@@ -232,7 +226,8 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
 
         nextButton.setOnClickListener {
             updateClickable(allUnclickable = true)
-            SetVideoURI().execute(AppCodes.FORWARD_SLIDE)
+            setVideoURI(AppCodes.FORWARD_SLIDE)
+            updateJsonCourse()
 
         }
     }
@@ -357,7 +352,7 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
             if (videoUri != null) {
                 if (isPaused) {
                     isPaused = false
-                    videoView.start();
+                    videoView.start()
                     updateUI()
                 }
             }
@@ -401,20 +396,20 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         )
 
         val slideVideoFile = FileHelper.createFileAtPath(slideVideoPath)
-        val contentResolverReference = WeakReference<ContentResolver>(contentResolver)
-        val videoUriSave = AsyncHelpers.VideoUriSave(this, contentResolverReference)
-        val taskParams = AsyncHelpers.VideoUriSave.TaskParams(slideVideoFile, uri)
-        videoUriSave.execute(taskParams)
-
-
-    }
-
-    override fun onVideoUriSaved(outputFile: File?) {
-        if (outputFile != null) {
-            videoUri = Uri.fromFile(outputFile)
+        val contentResolverReference = WeakReference(contentResolver)
+        runBlocking{
+            launch {
+                val videoUriSave = AsyncHelpers().videoUriSave(slideVideoFile, uri, contentResolverReference)
+                if (videoUriSave != null) {
+                    videoUri = Uri.fromFile(videoUriSave)
+                }
+                updateUI()
+            }
         }
-        updateUI()
+
+
     }
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun removeEmptyFileAndReturnIsEmpty(): Boolean {
@@ -435,13 +430,31 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         }
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     private var getCameraContent: ActivityResultLauncher<Uri?>? = registerForActivityResult(
-            ActivityResultContracts.TakeVideo()
+            ActivityResultContracts.CaptureVideo()
     ) {
         if (!removeEmptyFileAndReturnIsEmpty()) {
-            videoView.setVideoURI(videoUri)
-            videoView.seekTo(100)
+            val slideVideoPath = Paths.get(
+                this@CreateSlideActivity.getExternalFilesDir(null).toString(),
+                FileEnum.USER_DIRECTORY.key,
+                FileEnum.COURSE_DIRECTORY.key,
+                course.getCourseUUID().toString(),
+                FileEnum.SLIDE_DIRECTORY.key,
+                course.getSlides()[slideCounter].slideUUID.toString() + FileEnum.VIDEO_EXTENSION.key
+            )
+            val slideVideoFile = slideVideoPath.toFile()
+
+            runBlocking{
+                launch{
+                    videoUri = Uri.fromFile(slideVideoFile)
+                    videoView.setVideoURI(videoUri)
+                    videoView.seekTo(100)
+                }
+            }
+
+
         } else {
             videoUri = null
         }
@@ -471,47 +484,43 @@ class CreateSlideActivity : AppCompatActivity(), ImageDialog.OnInputListener, On
         }
     }
 
-    inner class SetVideoURI : AsyncTask<AppCodes, Void?, AppCodes>() {
-        override fun doInBackground(vararg directions: AppCodes): AppCodes {
-            course.getSlides()[slideCounter].setVideoUri(videoUri)
-            return directions[0]
-        }
 
-        override fun onPostExecute(direction: AppCodes?) {
-            if (direction == AppCodes.FORWARD_SLIDE) {
-                slideCounter += 1
-                if (course.getSlides().size == slideCounter) {
-                    val slide = Slide(UUID.randomUUID())
-                    slide.setCourse(course)
-                    course.getSlides().add(slide)
+    private fun setVideoURI(direction: AppCodes) {
+        runBlocking{
+            launch{
+                course.getSlides()[slideCounter].setVideoUri(videoUri)
+                if (direction == AppCodes.FORWARD_SLIDE) {
+                    slideCounter += 1
+                    if (course.getSlides().size == slideCounter) {
+                        val slide = Slide(UUID.randomUUID())
+                        slide.setCourse(course)
+                        course.getSlides().add(slide)
+                    }
+
+                    val file = course.getSlides()[slideCounter].getVideoUri()?.toFile()
+
+                    if (file?.exists() == true) {
+                        videoUri = course.getSlides()[slideCounter].getVideoUri()
+                    } else {
+                        videoUri = null
+                    }
+                } else if (direction == AppCodes.BACKWARDS_SLIDE) {
+                    if (videoUri == null && slideCounter == course.getSlides().size.minus(1) && slideCounter > 0) {
+                        course.getSlides().removeAt(course.getSlides().size.minus(1))
+                    }
+                    slideCounter -= 1
+
+                    val file = course.getSlides()[slideCounter].getVideoUri()?.toFile()
+
+                    if (file?.exists() == true) {
+                        videoUri = course.getSlides()[slideCounter].getVideoUri()
+                    } else {
+                        videoUri = null
+                    }
                 }
-
-                var file = course.getSlides()[slideCounter].getVideoUri()?.toFile()
-
-                if (file?.exists() == true) {
-                    videoUri = course.getSlides()[slideCounter].getVideoUri()
-                } else {
-                    videoUri = null
-                }
-            } else if (direction == AppCodes.BACKWARDS_SLIDE) {
-                if (videoUri == null && slideCounter == course.getSlides().size.minus(1) && slideCounter > 0) {
-                    course.getSlides().removeAt(course.getSlides().size.minus(1))
-                }
-                slideCounter -= 1
-
-                var file = course.getSlides()[slideCounter].getVideoUri()?.toFile()
-
-                if (file?.exists() == true) {
-                    videoUri = course.getSlides()[slideCounter].getVideoUri()
-                 } else {
-                    videoUri = null
-                }
+                updateUI()
             }
-            updateUI()
         }
-
-
-
     }
 
 

@@ -43,7 +43,7 @@ class SplashActivity : AppCompatActivity() {
 
         runBlocking {
             launch {
-                var user = AsyncHelpers().coroutineVerifyUserCredentials(getExternalFilesDir(null))
+                var user = AsyncHelpers().verifyUserCredentials(getExternalFilesDir(null))
                 onUserLoginCheckDone(user)
             }
         }

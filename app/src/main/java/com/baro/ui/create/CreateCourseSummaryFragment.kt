@@ -20,12 +20,13 @@ import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.interfaces.OnCourseCreate
-import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
 import com.baro.models.Category
 import com.baro.models.Country
 import com.baro.models.Course
 import com.baro.ui.dialogs.CategoryDialog
 import com.baro.ui.dialogs.CountryDialog
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
@@ -33,7 +34,7 @@ import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 
-class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, OnCourseCredentialsSaveComplete, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected{
+class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, CountryDialog.CountrySelector, CategoryDialog.OnCategorySelected{
 
     // UI
     private lateinit var courseTitleEditText: EditText
@@ -57,7 +58,7 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
@@ -140,7 +141,7 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
         countryText.text = country.getCountryName(weakContext)
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.P)
     private fun configureCreateButton(view: View) {
         createButton = view.findViewById(R.id.btn_create)
         createButton.setOnClickListener {
@@ -148,9 +149,24 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
             if (courseName.length > 3) {
                 course.setCourseName(courseName)
                 val weakContext = WeakReference<Context>(context)
-                val courseCredentialsSave = AsyncHelpers.CourseCredentialsSave(this, weakContext)
-                val taskParams = AsyncHelpers.CourseCredentialsSave.TaskParams(course, thumbnailUri)
-                courseCredentialsSave.execute(taskParams)
+                runBlocking{
+                    launch{
+                        val result = AsyncHelpers().courseCredentialsSave(course, thumbnailUri, weakContext)
+                        if (result) {
+                            val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
+
+                            intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
+
+                            activity?.supportFragmentManager?.popBackStack()
+
+                            activity?.supportFragmentManager?.beginTransaction()
+                                ?.remove(this@CreateCourseSummaryFragment)
+                                ?.commit()
+                            startActivity(intentToSlideActivity)
+                        }
+                    }
+
+                }
 
                 val courseThumbnailPath = Paths.get(activity?.getExternalFilesDir(null).toString(),
                     FileEnum.USER_DIRECTORY.key,
@@ -162,7 +178,6 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
                 val coursePair = Pair(course, imageUri)
                 val callback = (activity as OnCourseCreate)
                 callback.onCourseCreate(coursePair)
-
             } else {
                 Toast.makeText(context, getString(R.string.lenght_course_name_warning_toast), Toast.LENGTH_LONG).show()
             }
@@ -216,18 +231,4 @@ class CreateCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, On
                 }
     }
 
-    override fun onCourseDataReturned(result: Boolean?) {
-        if (result == true) {
-            val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
-
-            intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
-
-            activity?.supportFragmentManager?.popBackStack()
-
-            activity?.supportFragmentManager?.beginTransaction()
-                    ?.remove(this@CreateCourseSummaryFragment)
-                    ?.commit()
-            startActivity(intentToSlideActivity)
-        }
-    }
 }
