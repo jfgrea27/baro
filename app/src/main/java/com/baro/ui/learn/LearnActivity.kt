@@ -58,14 +58,9 @@ class LearnActivity : AppCompatActivity(), CourseAdapter.OnCourseSelected {
                 updateRecycleView()
             }
         }
-//        val params = AsyncHelpers.LearnerCourseLoad.TaskParams(coursePath)
-//        AsyncHelpers.CreatorCourseCredentialsLoad(this).execute(params)
+
     }
 
-//    override fun onCreatorCourseCredentialsLoad(courses: ArrayList<Pair<Course, Uri?>>) {
-//        this.courses = courses
-//        updateRecycleView()
-//    }
 
     private fun updateRecycleView() {
         courseAdapter?.notifyDataSetChanged()

@@ -1,6 +1,5 @@
 package com.baro.ui.learn
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -9,25 +8,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import com.baro.R
 import com.baro.constants.*
-import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.AsyncHelpers.OnCourseDeleted
-import com.baro.models.Country
 import com.baro.models.Course
-import com.baro.ui.dialogs.CategoryDialog
-import com.baro.ui.dialogs.CountryDialog
 import com.baro.ui.share.p2p.WifiDirectActivity
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.lang.ref.WeakReference
 import java.nio.file.Paths
 
 
@@ -36,7 +27,7 @@ class ReadCourseSummaryFragment : Fragment() {
     // UI
     private lateinit var courseTitleText: TextView
     private lateinit var categoryTextView: TextView
-    private lateinit var thumbnailButton: ImageView
+    private lateinit var thumbnailView: ImageView
     private lateinit var languageButton: ImageView
     private lateinit var categoryButton: ImageView
     private lateinit var learnButton: ImageView
@@ -45,8 +36,6 @@ class ReadCourseSummaryFragment : Fragment() {
     private lateinit var sendButton: ImageButton
     // Model
     private lateinit var course: Course
-
-    private var thumbnailUri: Uri? = null
 
 
 
@@ -62,7 +51,7 @@ class ReadCourseSummaryFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        val view = inflater.inflate(R.layout.fragment_edit_course_summary, container, false)
+        val view = inflater.inflate(R.layout.fragment_read_course_summary, container, false)
 
         // Configure UI
         configureCountryTextView(view)
@@ -71,11 +60,27 @@ class ReadCourseSummaryFragment : Fragment() {
         configureLanguageView(view)
         configureCategoryView(view)
         configureDeleteButton(view)
-        configureEditTextCategories(view)
+        configurTextCategories(view)
+        configureLearnButton(view)
         configureSendButton(view)
 
         updateUI()
         return view
+    }
+
+    private fun configureLearnButton(view: View) {
+        learnButton = view.findViewById(R.id.btn_create)
+
+        learnButton.setOnClickListener{
+            val intentToSlideActivity = Intent(activity, LearnSlideActivity::class.java)
+
+            intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
+
+            activity?.supportFragmentManager?.beginTransaction()
+                ?.remove(this@ReadCourseSummaryFragment)
+                ?.commit()
+            startActivity(intentToSlideActivity)
+        }
     }
 
     private fun configureSendButton(view: View) {
@@ -114,22 +119,8 @@ class ReadCourseSummaryFragment : Fragment() {
     private fun updateUI() {
         updateCourseTitle()
         updateLanguageIcon()
-        updatePhotoThumbnail()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun updatePhotoThumbnail() {
-        val courseThumbnailPath = Paths.get(activity?.getExternalFilesDir(null).toString(),
-                FileEnum.USER_DIRECTORY.key,
-                FileEnum.COURSE_DIRECTORY.key,
-                course.getCourseUUID().toString(),
-                FileEnum.PHOTO_THUMBNAIL_FILE.key)
-        val courseThumbnailFile = FileHelper.createFileAtPath(courseThumbnailPath)
-        if (courseThumbnailFile?.length()!! > 0) {
-            thumbnailButton.setImageURI(Uri.fromFile(courseThumbnailFile))
-        }
-
-    }
 
     private fun updateLanguageIcon() {
 
@@ -143,10 +134,10 @@ class ReadCourseSummaryFragment : Fragment() {
     }
 
     private fun updateCourseTitle() {
-        courseTitleText.setText(course.getCourseName())
+        courseTitleText.text = course.getCourseName()
     }
 
-    private fun configureEditTextCategories(view: View) {
+    private fun configurTextCategories(view: View) {
         categoryTextView = view.findViewById(R.id.txt_category)
         var categories = ""
 
@@ -170,10 +161,16 @@ class ReadCourseSummaryFragment : Fragment() {
         courseTitleText = view.findViewById(R.id.edit_course_name)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun configureThumbnailView(view: View) {
-        thumbnailButton = view.findViewById(R.id.btn_course_thumbnail)
+        thumbnailView = view.findViewById(R.id.btn_course_thumbnail)
+        val courseThumbnailPath = Paths.get(activity?.getExternalFilesDir(null).toString(),
+            FileEnum.LEARN_DIRECTORY.key,
+            course.getCourseUUID().toString(),
+            FileEnum.PHOTO_THUMBNAIL_FILE.key)
 
-//        thumbnailButton.setImageURI(Uri.fromFile(courseThumbnailFile))
+        val courseThumbnailFile = FileHelper.createFileAtPath(courseThumbnailPath)
+        thumbnailView.setImageURI(Uri.fromFile(courseThumbnailFile))
 
     }
 
@@ -211,20 +208,5 @@ class ReadCourseSummaryFragment : Fragment() {
                     }
                 }
     }
-
-    fun onCourseDataReturned(result: Boolean?) {
-//        if (result == true) {
-//            val intentToSlideActivity = Intent(activity, CreateSlideActivity::class.java)
-//
-//            intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
-//
-//            activity?.supportFragmentManager?.beginTransaction()
-//                ?.remove(this@ReadCourseSummaryFragment)
-//                ?.commit()
-//            startActivity(intentToSlideActivity)
-//        }
-    }
-
-
 
 }

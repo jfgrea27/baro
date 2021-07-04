@@ -321,10 +321,9 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, Coun
         val courseName = courseTitleEditText.text.toString()
         course.setCourseName(courseName)
         val weakContext = WeakReference<Context>(context)
-//        val accountActivity = activity as OnCourseCredentialsSaveComplete
         runBlocking {
             launch {
-                val result = AsyncHelpers().courseCredentialsSave(course, thumbnailUri, weakContext)
+                AsyncHelpers().courseCredentialsSave(course, thumbnailUri, weakContext)
             }
         }
         val intentToAccountActivity = Intent(activity, AccountActivity::class.java)

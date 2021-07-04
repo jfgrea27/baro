@@ -21,6 +21,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Baro">
         <activity android:name=".ui.create.CreateSlideActivity" />
+        <activity android:name=".ui.learn.LearnSlideActivity" />
+
         <activity android:name=".ui.learn.LearnActivity" />
 
         <provider
