@@ -3,35 +3,23 @@ package com.baro.ui.learn
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.VideoView
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.FileProvider
 import androidx.core.net.toFile
 import com.baro.R
 import com.baro.constants.AppCodes
-import com.baro.constants.AppTags
 import com.baro.constants.FileEnum
 import com.baro.constants.IntentEnum
-import com.baro.dialogs.ImageDialog
-import com.baro.helpers.AsyncHelpers
-import com.baro.helpers.FileHelper
 import com.baro.models.Course
 import com.baro.models.Slide
 import kotlinx.android.synthetic.main.dialog_image_chooser.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.io.File
-import java.lang.ref.WeakReference
 import java.nio.file.Paths
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 
 class LearnSlideActivity : AppCompatActivity() {
@@ -252,10 +240,10 @@ class LearnSlideActivity : AppCompatActivity() {
 
                     val file = course.getSlides()[slideCounter].getVideoUri()?.toFile()
 
-                    if (file?.exists() == true) {
-                        videoUri = course.getSlides()[slideCounter].getVideoUri()
+                    videoUri = if (file?.exists() == true) {
+                        course.getSlides()[slideCounter].getVideoUri()
                     } else {
-                        videoUri = null
+                        null
                     }
 
                 } else if (direction == AppCodes.BACKWARDS_SLIDE) {

@@ -307,15 +307,13 @@ class AsyncHelpers {
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun deleteCourse(rootDir: File?, course: Course): Boolean {
-        if (rootDir?.exists() == true) {
-            val coursePath = Paths.get(rootDir.toString(),
-            FileEnum.USER_DIRECTORY.key,
-            FileEnum.COURSE_DIRECTORY.key,
+    fun deleteCourse(courseDirectoryString: String, course: Course): Boolean? {
+
+        val coursePath = Paths.get(
+            courseDirectoryString,
             course.getCourseUUID().toString())
-            val courseFile = coursePath.toFile()
-            FileHelper.deleteFile(courseFile)
-            return true} else {return false}
+        val courseFile = coursePath.toFile()
+        return FileHelper.deleteFile(courseFile)
     }
 
 

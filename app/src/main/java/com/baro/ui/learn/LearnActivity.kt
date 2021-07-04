@@ -21,7 +21,7 @@ import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
 import java.nio.file.Paths
 
-class LearnActivity : AppCompatActivity(), CourseAdapter.OnCourseSelected {
+class LearnActivity : AppCompatActivity(), CourseAdapter.OnCourseSelected, AsyncHelpers.OnCourseDeleted {
     private lateinit var courseRecycleView: RecyclerView
 
     // Model
@@ -83,6 +83,25 @@ class LearnActivity : AppCompatActivity(), CourseAdapter.OnCourseSelected {
                 .setReorderingAllowed(true)
                 .commit()
         }
+    }
+
+    override fun onCourseDeleted(result: Course?) {
+        var position = -1
+
+        for (course in courses) {
+            if (result?.getCourseUUID() == course.first.getCourseUUID()) {
+                position = courses.indexOf(course)
+            }
+        }
+
+        if (position != -1) {
+            courses.removeAt(position)
+            courseAdapter?.notifyItemRemoved(position)
+            courseAdapter?.notifyItemRangeChanged(position, courses.size)
+
+        }
+
+        supportFragmentManager.popBackStack()
     }
 
 }

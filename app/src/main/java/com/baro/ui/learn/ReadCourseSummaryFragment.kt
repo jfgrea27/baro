@@ -104,10 +104,10 @@ class ReadCourseSummaryFragment : Fragment() {
         deleteButton.setOnClickListener{
             runBlocking {
                 launch {
-                    val done = AsyncHelpers().deleteCourse(context?.getExternalFilesDir(null), course)
-                    if (!done) {
-                        Toast.makeText(context, "Course Failed to Delete", Toast.LENGTH_SHORT).show()
-                    }
+                    val courseDirectoryPath = Paths.get(activity?.getExternalFilesDir(null).toString(),
+                        FileEnum.LEARN_DIRECTORY.key)
+                    AsyncHelpers().deleteCourse(courseDirectoryPath.toString(), course)
+
                     val onCourseDeleted = (activity as OnCourseDeleted)
                     onCourseDeleted.onCourseDeleted(course)
                 }

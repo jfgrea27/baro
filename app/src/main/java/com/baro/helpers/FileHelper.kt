@@ -121,15 +121,6 @@ object FileHelper {
         return false
     }
 
-    private fun saveInputStream(`in`: InputStream?, desiredLocation: String?): Boolean {
-        val outputFile = File(desiredLocation)
-        return try {
-            val fos = FileOutputStream(outputFile)
-            copyStream(`in`, fos)
-        } catch (e: IOException) {
-            false
-        }
-    }
 
     private fun copyStream(input: InputStream?, output: OutputStream?): Boolean {
         val buffer = ByteArray(1024)
@@ -144,11 +135,11 @@ object FileHelper {
         }
     }
 
-    fun deleteFile(file: File?) {
+    fun deleteFile(file: File?) : Boolean? {
         if (file?.isDirectory == true) {
             file.deleteRecursively()
         }
-        file?.delete()
+        return file?.delete()
     }
 
 
