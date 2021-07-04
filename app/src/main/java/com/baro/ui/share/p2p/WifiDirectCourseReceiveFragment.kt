@@ -24,8 +24,6 @@ class WifiDirectCourseReceiveFragment : Fragment(), OnCourseReceived{
     // UI
     private lateinit var progressBar: ProgressBar
 
-    private var courseSize: Long? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -64,6 +62,9 @@ class WifiDirectCourseReceiveFragment : Fragment(), OnCourseReceived{
 
     override fun onCourseReceived(result: Boolean?) {
 
+        if (result == true) {
+            activity?.finish()
+        }
         Toast.makeText(
             activity?.applicationContext,
             "DEBUG: Received FIle, Extracted = " + result,

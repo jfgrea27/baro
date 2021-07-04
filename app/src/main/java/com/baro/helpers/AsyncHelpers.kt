@@ -464,6 +464,11 @@ class AsyncHelpers {
         private var callback: OnCourseSent
     ) :
         AsyncTask<SendCourseAsyncTask.TaskParams?, Boolean?, Boolean?>() {
+        @Override
+        override fun onPostExecute(result: Boolean?) {
+            callback.onCourseSent(result)
+        }
+
         private val SOCKET_TIMEOUT = 5000
         override fun doInBackground(vararg p0: SendCourseAsyncTask.TaskParams?): Boolean? {
             val courseZipFile = p0[0]?.courseZipFile

@@ -297,8 +297,4 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
         }
 
     }
-
-
-
-
 }

@@ -74,11 +74,11 @@ class LearnActivity : AppCompatActivity(), CourseAdapter.OnCourseSelected, Async
         val weakReference = WeakReference<Activity>(this)
         if (PermissionsHelper.checkAndRequestPermissions(weakReference, PermissionsEnum.READ_COURSE)) {
 
-            val readCourseSummaryFragment: ReadCourseSummaryFragment =
-                ReadCourseSummaryFragment.newInstance(course)
+            val learnCourseSummaryFragment: LearnCourseSummaryFragment =
+                LearnCourseSummaryFragment.newInstance(course)
 
             supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container_peer_connection, readCourseSummaryFragment, null)
+                .add(R.id.fragment_container_peer_connection, learnCourseSummaryFragment, null)
                 .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)
                 .setReorderingAllowed(true)
                 .commit()

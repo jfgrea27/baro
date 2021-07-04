@@ -22,7 +22,7 @@ import kotlinx.coroutines.runBlocking
 import java.nio.file.Paths
 
 
-class ReadCourseSummaryFragment : Fragment() {
+class LearnCourseSummaryFragment : Fragment() {
 
     // UI
     private lateinit var courseTitleText: TextView
@@ -60,7 +60,7 @@ class ReadCourseSummaryFragment : Fragment() {
         configureLanguageView(view)
         configureCategoryView(view)
         configureDeleteButton(view)
-        configurTextCategories(view)
+        configureTextCategories(view)
         configureLearnButton(view)
         configureSendButton(view)
 
@@ -77,7 +77,7 @@ class ReadCourseSummaryFragment : Fragment() {
             intentToSlideActivity.putExtra(IntentEnum.COURSE.key, course)
 
             activity?.supportFragmentManager?.beginTransaction()
-                ?.remove(this@ReadCourseSummaryFragment)
+                ?.remove(this@LearnCourseSummaryFragment)
                 ?.commit()
             startActivity(intentToSlideActivity)
         }
@@ -87,13 +87,14 @@ class ReadCourseSummaryFragment : Fragment() {
         sendButton = view.findViewById(R.id.btn_send)
 
         sendButton.setOnClickListener{
-            val startWifiActivity = Intent(
-                activity,
-                WifiDirectActivity::class.java)
-
-            startWifiActivity.putExtra(AppTags.COURSE_OBJECT.name, course)
-            startWifiActivity.putExtra(AppTags.WIFIP2P_INTENT.name, AppCodes.WIFIP2P_PEER_SEND.code)
-            startActivity(startWifiActivity)
+            // TODO fix this as current WifiDirectActivity does not differentiate between learn and user/course folders..
+//            val startWifiActivity = Intent(
+//                activity,
+//                WifiDirectActivity::class.java)
+//
+//            startWifiActivity.putExtra(AppTags.COURSE_OBJECT.name, course)
+//            startWifiActivity.putExtra(AppTags.WIFIP2P_INTENT.name, AppCodes.WIFIP2P_PEER_SEND.code)
+//            startActivity(startWifiActivity)
         }
     }
 
@@ -137,7 +138,7 @@ class ReadCourseSummaryFragment : Fragment() {
         courseTitleText.text = course.getCourseName()
     }
 
-    private fun configurTextCategories(view: View) {
+    private fun configureTextCategories(view: View) {
         categoryTextView = view.findViewById(R.id.txt_category)
         var categories = ""
 
@@ -202,7 +203,7 @@ class ReadCourseSummaryFragment : Fragment() {
 
         @JvmStatic
         fun newInstance(course: Course?) =
-                ReadCourseSummaryFragment().apply {
+                LearnCourseSummaryFragment().apply {
                     arguments = Bundle().apply {
                         putParcelable(COURSE_PARAM, course)
                     }

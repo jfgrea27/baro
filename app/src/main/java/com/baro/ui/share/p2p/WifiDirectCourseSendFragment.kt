@@ -24,11 +24,10 @@ class WifiDirectCourseSendFragment : Fragment(), OnCourseSent{
     // UI
     private lateinit var courseThumbnail: ImageView
     private lateinit var sendButton: ImageButton
-    private lateinit var progressBar: ProgressBar
 
 
     // Model
-    private lateinit var course: Course // TODO retrieve this from previous activity
+    private lateinit var course: Course
     private lateinit var destinationInetAddress: InetAddress
 
 
@@ -49,7 +48,6 @@ class WifiDirectCourseSendFragment : Fragment(), OnCourseSent{
         var view =  inflater.inflate(R.layout.fragment_wifi_direct_send_course, container, false)
 
         configureCourseThumbnail(view)
-        configureProgressBar(view)
         configureSendButton(view)
         return view
     }
@@ -86,10 +84,6 @@ class WifiDirectCourseSendFragment : Fragment(), OnCourseSent{
         }
     }
 
-    private fun configureProgressBar(view: View) {
-        progressBar = view.findViewById(R.id.progressbar)
-
-    }
 
     private fun configureCourseThumbnail(view: View) {
         courseThumbnail = view.findViewById(R.id.img_wifi_status)
@@ -120,6 +114,9 @@ class WifiDirectCourseSendFragment : Fragment(), OnCourseSent{
                 "DEBUG: Course Sent",
                 Toast.LENGTH_LONG
             ).show()
+
+            activity?.finish()
+
         }
     }
 
