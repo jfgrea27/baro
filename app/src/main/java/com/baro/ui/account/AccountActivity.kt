@@ -150,13 +150,19 @@ class AccountActivity : AppCompatActivity(), OnCreatorCourseCredentialsLoad,
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun getCoursesFromFiles() {
-        val coursePath = Paths.get(
+        val coursesPath = Paths.get(
             getExternalFilesDir(null).toString(),
             FileEnum.USER_DIRECTORY.key,
             FileEnum.COURSE_DIRECTORY.key
         )
-        val params = AsyncHelpers.CreatorCourseCredentialsLoad.TaskParams(coursePath, user)
-        AsyncHelpers.CreatorCourseCredentialsLoad(this).execute(params)
+
+        runBlocking {
+            run {
+                val courses = AsyncHelpers().loadCoursesMetadataFromJson(coursesPath)
+                this@AccountActivity.courses = courses
+                updateRecycleView()
+            }
+        }
     }
 
     private fun onUserDataReturned(imageBitmap: Bitmap?) {

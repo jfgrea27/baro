@@ -85,12 +85,12 @@ class AsyncHelpers {
 
     @RequiresApi(Build.VERSION_CODES.P)
     fun userCredentialsSave(username: String, path: String, photoUri: Uri?, weakReference: WeakReference<Context>): Boolean {
-        savePhotoUri(photoUri, weakReference.get())
-        return saveCredentials(username, path)
+        saveUserPhotoUri(photoUri, weakReference.get())
+        return saveUserCredentials(username, path)
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    private fun saveCredentials(username: String, path: String): Boolean {
+    private fun saveUserCredentials(username: String, path: String): Boolean {
 
         val credentialDetails = HashMap<String?, String?>()
         val userUUID = UUID.randomUUID()
@@ -107,7 +107,7 @@ class AsyncHelpers {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.P)
-    private fun savePhotoUri(photoUri: Uri?, context: Context?) {
+    private fun saveUserPhotoUri(photoUri: Uri?, context: Context?) {
         if (photoUri != null) {
             if (context != null) {
                 val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, photoUri))
@@ -135,32 +135,30 @@ class AsyncHelpers {
         } else {
             null
         }
-        }
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     @RequiresApi(Build.VERSION_CODES.P)
     fun courseCredentialsSave(course: Course?, imageUri: Uri?, context: WeakReference<Context>): Boolean {
         if (course != null) {
-            saveCredentials(course, context)
+            saveCourseCredentials(course, context)
         }
 
         // Save Photo URI
-        savePhotoUri(imageUri, course, context)
+        saveCoursePhotoUri(imageUri, course, context)
 
         return true
-
-
 
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun saveCredentials(course: Course, context: WeakReference<Context>) {
+    private fun saveCourseCredentials(course: Course, context: WeakReference<Context>) {
 
         val course = course
         val courseMetadata = HashMap<String?, String?>()
-
-        courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUserUUID().toString()
+        courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUsername().toString()
+        courseMetadata[JSONEnum.USER_UUID_KEY.key] = course?.getCreator()?.getUserUUID().toString()
         courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
         courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
         courseMetadata[JSONEnum.COURSE_CREATION_DATETIME.key] = course.getCreationDate()?.toString()
@@ -189,7 +187,7 @@ class AsyncHelpers {
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
-    private fun savePhotoUri(photoUri: Uri?, course: Course?, context: WeakReference<Context>) {
+    private fun saveCoursePhotoUri(photoUri: Uri?, course: Course?, context: WeakReference<Context>) {
         if (photoUri != null) {
 
             val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.get()?.contentResolver!!, photoUri))
@@ -204,93 +202,83 @@ class AsyncHelpers {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun loadCoursesMetadataFromJson(coursesPath: Path): ArrayList<Pair<Course, Uri?>> {
+        var courses = ArrayList<Pair<Course, Uri?>>()
+        val coursesFile = FileHelper.createDirAtPath(coursesPath)
 
-    class CreatorCourseCredentialsLoad(private var callback: OnCreatorCourseCredentialsLoad) : AsyncTask<CreatorCourseCredentialsLoad.TaskParams, Void?, ArrayList<Pair<Course, Uri?>>>() {
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun doInBackground(vararg params: TaskParams?): ArrayList<Pair<Course, Uri?>>? {
-            var courses = ArrayList<Pair<Course, Uri?>>()
+        if (coursesFile.listFiles() != null) {
+            for (courseFolder in coursesFile.listFiles()) {
 
-            val path = params[0]?.path
-            val coursesFile = FileHelper.createDirAtPath(path)
-            val user = params[0]?.user
-            if (coursesFile.listFiles() != null) {
-                for (courseFolder in coursesFile.listFiles()) {
+                if (courseFolder.isDirectory) {
+                    val jsonFilePath = Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
 
-                    if (courseFolder.isDirectory) {
-                        val jsonFilePath = Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
+                    val jsonFile = jsonFilePath.toFile()
 
-                        val jsonFile = jsonFilePath.toFile()
+                    // Retrieve content file
+                    val contents = FileHelper.readFile(jsonFile)
 
-                        // Retrieve content file
-                        val contents = FileHelper.readFile(jsonFile)
+                    if (contents != null) {
+                        val jsonContents = JSONHelper.createJSONFromString(contents!!)
 
-                        if (contents != null) {
-                            val jsonContents = JSONHelper.createJSONFromString(contents!!)
+                        // Course UUID
+                        val courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
+                        // Course Name
+                        val courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
+                        // Category
+                        val categoryJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString())
+                        // Language
+                        val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
+                        // Timestamp
+                        val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString().toLong()
+                        // Slides
+                        val slidesJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())
+                        val userUUID = jsonContents?.get(JSONEnum.USER_UUID_KEY.key).toString()
+                        val username = jsonContents?.get(JSONEnum.USER_NAME_KEY.key).toString()
+                        val user = User(UUID.fromString(userUUID), username)
+                        // Creation course
+                        val course = Course(UUID.fromString(courseUUID as String?), user)
 
-                            // Course UUID
-                            val courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)
-                            // Course Name
-                            val courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
-                            // Category
-                            val categoryJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString())
-                            // Language
-                            val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
-                            // Timestamp
-                            val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString().toLong()
-                            // Slides
-                            val slidesJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())
+                        //  Adding course name
+                        course.setCourseName(courseName as String)
+                        // Adding Course Category
+                        course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(categoryJSON as JSONArray))
+                        // Adding Course language
+                        if (language.toString() == "null") {
+                            course.setCourseCountry(Country(null))
+                        } else {
+                            course.setCourseCountry(Country(language.toString()))
 
-                            // Creation course
-                            val course = Course(UUID.fromString(courseUUID as String?), user)
-
-                            //  Adding course name
-                            course.setCourseName(courseName as String)
-                            // Adding Course Category
-                            course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(categoryJSON as JSONArray))
-                            // Adding Course language
-                            if (language.toString() == "null") {
-                                course.setCourseCountry(Country(null))
-                            } else {
-                                course.setCourseCountry(Country(language.toString()))
-
-                            }
-                            // Adding timestamp
-                            course.setCreationDate(courseCreationTimestamp)
-
-                            // Adding Slides
-                            course.setSlidesFromJSONArray(slidesJSON)
-
-                            // Thumbnail
-                            val imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
-                            val imageFile = imagePath.toFile()
-                            val imageUri = Uri.fromFile(imageFile)
-
-                            val pair = Pair<Course, Uri>(course, imageUri)
-                            courses.add(pair)
                         }
+                        // Adding timestamp
+                        course.setCreationDate(courseCreationTimestamp)
+
+                        // Adding Slides
+                        course.setSlidesFromJSONArray(slidesJSON)
+
+                        // Thumbnail
+                        val imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                        val imageFile = imagePath.toFile()
+                        val imageUri = Uri.fromFile(imageFile)
+
+                        val pair = Pair<Course, Uri>(course, imageUri)
+                        courses.add(pair)
                     }
                 }
             }
-
-            var arrayListResults = ArrayList<Pair<Course, Uri?>>()
-
-            if (courses.size > 1) {
-                courses.sortedBy { it.first }
-            }
-            for (course in courses) {
-                arrayListResults.add(course)
-            }
-            return arrayListResults
-
         }
 
-        @RequiresApi(Build.VERSION_CODES.P)
-        override fun onPostExecute(result: ArrayList<Pair<Course, Uri?>>) {
-            callback.onCreatorCourseCredentialsLoad(result)
-        }
+        var arrayListResults = ArrayList<Pair<Course, Uri?>>()
 
-        class TaskParams(var path: Path?, var user: User?)
+        if (courses.size > 1) {
+            courses.sortedBy { it.first }
+        }
+        for (course in courses) {
+            arrayListResults.add(course)
+        }
+        return arrayListResults
     }
+
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
