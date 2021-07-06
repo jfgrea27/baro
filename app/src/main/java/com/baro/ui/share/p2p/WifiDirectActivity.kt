@@ -1,6 +1,7 @@
 package com.baro.ui.share.p2p
 
 import android.Manifest
+import android.app.Activity
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.IntentFilter
@@ -13,13 +14,15 @@ import androidx.core.app.ActivityCompat
 import com.baro.R
 import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
+import com.baro.constants.PermissionsEnum
 import com.baro.helpers.AsyncHelpers
+import com.baro.helpers.PermissionsHelper
 import com.baro.helpers.interfaces.OnClientInetAddressReceived
 import com.baro.helpers.interfaces.OnClientInetAddressSent
 import com.baro.models.Course
+import java.lang.ref.WeakReference
 import java.net.InetAddress
 import java.util.*
-
 
 
 class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoListener,
@@ -52,9 +55,10 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
     }
 
     private fun getUserIntent() {
-        isReceiving = intent.extras?.get(AppTags.WIFIP2P_INTENT.name) != AppCodes.WIFIP2P_PEER_SEND.code
+        isReceiving =
+            intent.extras?.get(AppTags.WIFIP2P_INTENT.name) != AppCodes.WIFIP2P_PEER_SEND.code
 
-        if (!isReceiving){
+        if (!isReceiving) {
             course = intent.getParcelableExtra(AppTags.COURSE_OBJECT.name) as Course?
         }
 
@@ -63,41 +67,44 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
 
     private fun configureView() {
 
-        if (!isReceiving){
+        if (!isReceiving) {
             val peerConnectionSelectionFragment: WifiDirectPeerConnectionSelectionFragment =
                 WifiDirectPeerConnectionSelectionFragment.newInstance()
             supportFragmentManager.beginTransaction()
                 .add(R.id.fragment_container_peer_connection, peerConnectionSelectionFragment, null)
                 .commit()
-        } else{
+        } else {
             val peerConnectionWaitingRoomFragment: WifiDirectPeerConnectionWaitingRoomFragment =
                 WifiDirectPeerConnectionWaitingRoomFragment.newInstance()
             supportFragmentManager.beginTransaction()
-                .add(R.id.fragment_container_peer_connection, peerConnectionWaitingRoomFragment, null)
+                .add(
+                    R.id.fragment_container_peer_connection,
+                    peerConnectionWaitingRoomFragment,
+                    null
+                )
                 .commit()
         }
     }
 
 
     private fun discoverPeers() {
+
+
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return
         }
         manager?.discoverPeers(channel, object : WifiP2pManager.ActionListener {
 
             override fun onSuccess() {
-                Toast.makeText(applicationContext, "DEBUG: Discovering peers", Toast.LENGTH_LONG)
+                Toast.makeText(
+                    applicationContext,
+                    "DEBUG: Discovering peers",
+                    Toast.LENGTH_LONG
+                )
                     .show()
             }
 
@@ -174,7 +181,7 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
     }
 
     fun updateWifiP2PDeviceList(wifiP2pDeviceList: MutableCollection<WifiP2pDevice>) {
-        if(!isReceiving) {
+        if (!isReceiving) {
             val wifiDirectPeerConnectionFragment = supportFragmentManager
                 .findFragmentById(R.id.fragment_container_peer_connection) as WifiDirectPeerConnectionSelectionFragment
             wifiDirectPeerConnectionFragment.updateWifiP2PDeviceList(wifiP2pDeviceList)
@@ -192,13 +199,6 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
                     Manifest.permission.ACCESS_FINE_LOCATION
                 ) != PackageManager.PERMISSION_GRANTED
             ) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
                 return
             }
             manager?.connect(channel, config, object : WifiP2pManager.ActionListener {
@@ -231,7 +231,8 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
                     Toast.LENGTH_LONG
                 ).show()
                 if (!isReceiving) {
-                    val dataReceiver = AsyncHelpers.GroupOwnerReceiveClientInetAddressAsyncTask(this)
+                    val dataReceiver =
+                        AsyncHelpers.GroupOwnerReceiveClientInetAddressAsyncTask(this)
                     dataReceiver.execute()
                 } else {
                     shareCourse()
@@ -242,7 +243,8 @@ class WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoLis
                 if (isReceiving) {
                     val wifiReceiver = WifiDirectEndpoint(
                         AsyncHelpers.GroupOwnerReceiveClientInetAddressAsyncTask.PORT_GET_CLIENT_INET,
-                        info?.groupOwnerAddress)
+                        info?.groupOwnerAddress
+                    )
                     val dataSender =
                         AsyncHelpers.ClientSendInetAddressAsyncTask(wifiReceiver, this)
                     dataSender.execute()

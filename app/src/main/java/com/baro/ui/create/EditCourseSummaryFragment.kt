@@ -1,5 +1,6 @@
 package com.baro.ui.create
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -20,6 +21,7 @@ import com.baro.dialogs.ImageDialog
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
 import com.baro.helpers.AsyncHelpers.OnCourseDeleted
+import com.baro.helpers.PermissionsHelper
 import com.baro.models.Category
 import com.baro.models.Country
 import com.baro.models.Course
@@ -27,6 +29,7 @@ import com.baro.ui.account.AccountActivity
 import com.baro.ui.dialogs.CategoryDialog
 import com.baro.ui.dialogs.CountryDialog
 import com.baro.ui.interfaces.OnBackPressed
+import com.baro.ui.share.ShareActivity
 import com.baro.ui.share.p2p.WifiDirectActivity
 import kotlinx.android.synthetic.main.dialog_image_chooser.view.*
 import kotlinx.coroutines.launch
@@ -89,13 +92,19 @@ class EditCourseSummaryFragment : Fragment() , ImageDialog.OnInputListener, Coun
         sendButton = view.findViewById(R.id.btn_send)
 
         sendButton.setOnClickListener{
-            val startWifiActivity = Intent(
-                activity,
-                WifiDirectActivity::class.java)
+            if (PermissionsHelper.checkAndRequestPermissions(WeakReference<Activity>(activity), PermissionsEnum.WIFI_DIRECT)) {
+                val startWifiActivity = Intent(
+                    activity,
+                    WifiDirectActivity::class.java
+                )
 
-            startWifiActivity.putExtra(AppTags.COURSE_OBJECT.name, course)
-            startWifiActivity.putExtra(AppTags.WIFIP2P_INTENT.name, AppCodes.WIFIP2P_PEER_SEND.code)
-            startActivity(startWifiActivity)
+                startWifiActivity.putExtra(AppTags.COURSE_OBJECT.name, course)
+                startWifiActivity.putExtra(
+                    AppTags.WIFIP2P_INTENT.name,
+                    AppCodes.WIFIP2P_PEER_SEND.code
+                )
+                startActivity(startWifiActivity)
+            }
         }
     }
 

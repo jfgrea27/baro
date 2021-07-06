@@ -70,10 +70,6 @@ class CourseAdapter internal constructor(var context: WeakReference<Context>, va
         return courses.size
     }
 
-    fun getItem(id: Int): Pair<Course, Uri?> {
-        return courses[id]
-    }
-
 
     inner class ViewHolder internal constructor(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var courseTitle: TextView = itemView.findViewById(R.id.txt_course_title)

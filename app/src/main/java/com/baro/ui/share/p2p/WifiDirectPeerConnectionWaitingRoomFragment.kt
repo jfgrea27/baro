@@ -24,7 +24,6 @@ class WifiDirectPeerConnectionWaitingRoomFragment : Fragment() {
 
         configureWifiDirectStatusImage(view)
 
-
         return view
     }
 

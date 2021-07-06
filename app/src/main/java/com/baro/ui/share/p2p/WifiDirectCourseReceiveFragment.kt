@@ -62,9 +62,9 @@ class WifiDirectCourseReceiveFragment : Fragment(), OnCourseReceived{
 
     override fun onCourseReceived(result: Boolean?) {
 
-        if (result == true) {
-            activity?.finish()
-        }
+//        if (result == true) {
+//            activity?.finish()
+//        }
         Toast.makeText(
             activity?.applicationContext,
             "DEBUG: Received FIle, Extracted = " + result,

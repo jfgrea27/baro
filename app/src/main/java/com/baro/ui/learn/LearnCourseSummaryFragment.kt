@@ -87,6 +87,8 @@ class LearnCourseSummaryFragment : Fragment() {
         sendButton = view.findViewById(R.id.btn_send)
 
         sendButton.setOnClickListener{
+            // TODO add permissions for wifidirect
+
             // TODO fix this as current WifiDirectActivity does not differentiate between learn and user/course folders..
 //            val startWifiActivity = Intent(
 //                activity,
@@ -177,7 +179,7 @@ class LearnCourseSummaryFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     private fun configureCategoryView(view: View) {
-        categoryButton = view.findViewById(R.id.btn_category)
+        categoryTextView = view.findViewById(R.id.txt_category)
         var string = ""
         for (category in course.getCourseCategory()){
             string += category.emoji + " "

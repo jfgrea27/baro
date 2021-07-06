@@ -230,7 +230,7 @@ class AsyncHelpers {
                         // Language
                         val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
                         // Timestamp
-                        val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString().toLong()
+                        //val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString().toLong()
                         // Slides
                         val slidesJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())
                         val userUUID = jsonContents?.get(JSONEnum.USER_UUID_KEY.key).toString()
@@ -242,16 +242,18 @@ class AsyncHelpers {
                         //  Adding course name
                         course.setCourseName(courseName as String)
                         // Adding Course Category
-                        course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(categoryJSON as JSONArray))
+                        course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(
+                            categoryJSON
+                        ))
                         // Adding Course language
                         if (language.toString() == "null") {
                             course.setCourseCountry(Country(null))
                         } else {
                             course.setCourseCountry(Country(language.toString()))
-
                         }
+
                         // Adding timestamp
-                        course.setCreationDate(courseCreationTimestamp)
+                        //course.setCreationDate(courseCreationTimestamp)
 
                         // Adding Slides
                         course.setSlidesFromJSONArray(slidesJSON)
@@ -435,7 +437,6 @@ class AsyncHelpers {
             }
         }
 
-        // TODO remove this
         private fun writeToFile(inputStream: InputStream?, courseZipFile: File): Boolean {
             val buf = ByteArray(1024)
             var len: Int
@@ -447,7 +448,6 @@ class AsyncHelpers {
                     outStream.write(buf, 0, len)
                     callback.setProgress(currentSize)
                 }
-                callback.setProgress(currentSize)
                 inputStream.close()
             } catch (e: IOException) {
                 Log.d("Not saved file", e.toString())

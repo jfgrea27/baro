@@ -114,9 +114,6 @@ class WifiDirectCourseSendFragment : Fragment(), OnCourseSent{
                 "DEBUG: Course Sent",
                 Toast.LENGTH_LONG
             ).show()
-
-            activity?.finish()
-
         }
     }
 

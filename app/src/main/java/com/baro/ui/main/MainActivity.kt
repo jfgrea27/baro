@@ -1,5 +1,6 @@
 package com.baro.ui.main
 
+import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
 import android.graphics.Bitmap
@@ -13,7 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.baro.ui.account.AccountActivity
 import com.baro.R
 import com.baro.constants.AppTags
+import com.baro.constants.PermissionsEnum
 import com.baro.helpers.AsyncHelpers
+import com.baro.helpers.PermissionsHelper
 import com.baro.models.User
 import com.baro.ui.learn.LearnActivity
 import com.baro.ui.share.ShareActivity
@@ -97,8 +100,8 @@ class MainActivity : AppCompatActivity() {
         shareButton = findViewById(R.id.btn_share)
         shareButton.setOnClickListener {
             val intentShareActivity = Intent(
-                    this@MainActivity,
-                    ShareActivity::class.java)
+                this@MainActivity,
+                ShareActivity::class.java)
             startActivity(intentShareActivity)
         }
     }
