@@ -5,7 +5,16 @@
     <dimen name="smaller_icon_width">60dp</dimen>
     <dimen name="smaller_icon_height">60dp</dimen>
     <dimen name="grid_height">500dp</dimen>
-    <dimen name="large_logo_width">200dp</dimen>
+    <dimen name="largest_logo_width">200dp</dimen>
     <dimen name="large_logo_height">200dp</dimen>
     <dimen name="large_text">40sp</dimen>
+    <dimen name="fragment_side_margin">20dp</dimen>
+    <dimen name="medium_text">30sp</dimen>
+    <dimen name="large_grid_view">500dp</dimen>
+    <dimen name="small_padding">5dp</dimen>
+    <dimen name="medium_large_icon_width">150dp</dimen>
+    <dimen name="medium_medium_large_icon_width">125dp</dimen>
+    <dimen name="smallest_icon_height">40dp</dimen>
+    <dimen name="large_logo_width">180dp</dimen>
+    <dimen name="small_text">15dp</dimen>
 </resources>

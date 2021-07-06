@@ -1,0 +1,84 @@
+Index: app/src/main/res/layout/activity_send_receive.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n    xmlns:tools=\"http://schemas.android.com/tools\"\n    android:layout_width=\"match_parent\"\n    android:layout_height=\"match_parent\"\n    tools:context=\".ui.share.WifiDirectActivity\">\n\n    <ImageButton\n        android:id=\"@+id/btn_receive\"\n        android:layout_width=\"@dimen/medium_icon_width\"\n        android:layout_height=\"@dimen/medium_icon_height\"\n        android:scaleType=\"fitCenter\"\n        app:layout_constraintBottom_toBottomOf=\"parent\"\n        app:layout_constraintEnd_toEndOf=\"parent\"\n        app:layout_constraintHorizontal_bias=\"0.5\"\n        app:layout_constraintStart_toStartOf=\"parent\"\n        app:layout_constraintTop_toTopOf=\"parent\"\n        app:layout_constraintVertical_bias=\"0.2\"\n        app:srcCompat=\"@drawable/ic_system_update_black_48dp\"\n        android:background=\"?android:selectableItemBackground\"/>\n\n    <ImageButton\n        android:id=\"@+id/btn_send\"\n        android:layout_width=\"@dimen/medium_icon_width\"\n        android:layout_height=\"@dimen/medium_icon_height\"\n        android:scaleType=\"fitCenter\"\n        app:layout_constraintTop_toBottomOf=\"@id/text_receive\"\n        app:layout_constraintBottom_toBottomOf=\"parent\"\n        app:layout_constraintStart_toStartOf=\"parent\"\n        app:layout_constraintEnd_toEndOf=\"parent\"\n        app:layout_constraintHorizontal_bias=\"0.5\"\n        app:layout_constraintVertical_bias=\"0.5\"\n        app:srcCompat=\"@drawable/ic_upload_file_black_48dp\"\n        android:background=\"?android:selectableItemBackground\"/>\n\n    <TextView\n        android:id=\"@+id/text_receive\"\n        android:layout_width=\"wrap_content\"\n        android:layout_height=\"wrap_content\"\n        android:text=\"@string/receive\"\n        app:layout_constraintTop_toBottomOf=\"@id/btn_receive\"\n        app:layout_constraintStart_toStartOf=\"@id/btn_receive\"\n        app:layout_constraintEnd_toEndOf=\"@id/btn_receive\"/>\n\n    <TextView\n        android:layout_width=\"wrap_content\"\n        android:layout_height=\"wrap_content\"\n        android:text=\"@string/send\"\n        app:layout_constraintTop_toBottomOf=\"@id/btn_send\"\n        app:layout_constraintStart_toStartOf=\"@id/btn_send\"\n        app:layout_constraintEnd_toEndOf=\"@id/btn_send\"/>\n</androidx.constraintlayout.widget.ConstraintLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_send_receive.xml	(revision 6b59a0b075b9839b2d998e88d43e82a59ca84a51)
++++ app/src/main/res/layout/activity_send_receive.xml	(date 1622312328250)
+@@ -4,7 +4,7 @@
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+-    tools:context=".ui.share.WifiDirectActivity">
++    tools:context=".ui.share.p2p.WifiDirectActivity">
+ 
+     <ImageButton
+         android:id="@+id/btn_receive"
+Index: app/src/main/java/com/baro/ui/share/SendReceiveActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.baro.ui.share\n\nimport android.content.Intent\nimport android.os.Bundle\nimport android.widget.ImageButton\nimport androidx.appcompat.app.AppCompatActivity\nimport com.baro.R\nimport com.baro.constants.AppCodes\nimport com.baro.constants.AppTags\n\n\nclass SendReceiveActivity : AppCompatActivity(){\n\n\n    private lateinit var sendButton: ImageButton\n    private lateinit var receiveButton: ImageButton\n\n\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        setContentView(R.layout.activity_send_receive)\n        configureSendButton()\n        configureReceiveButton()\n    }\n\n    private fun configureSendButton() {\n        sendButton = findViewById<ImageButton?>(R.id.btn_send)\n        sendButton.setOnClickListener {\n            val startWifiDirectActivity = Intent(\n                this,\n                WifiDirectActivity::class.java)\n\n            startWifiDirectActivity.putExtra(AppTags.WIFIP2P_INTENT.name, AppCodes.WIFIP2P_PEER_SEND.code)\n            startActivity(startWifiDirectActivity)\n        }\n    }\n    private fun configureReceiveButton() {\n        receiveButton = findViewById<ImageButton?>(R.id.btn_receive)\n        receiveButton.setOnClickListener{\n            val startWifiDirectActivity = Intent(\n                this,\n                WifiDirectActivity::class.java)\n            startWifiDirectActivity.putExtra(AppTags.WIFIP2P_INTENT.name, AppCodes.WIFIP2P_PEER_RECEIVE.code)\n            startActivity(startWifiDirectActivity)\n        }\n\n    }\n\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/baro/ui/share/SendReceiveActivity.kt	(revision 6b59a0b075b9839b2d998e88d43e82a59ca84a51)
++++ app/src/main/java/com/baro/ui/share/p2p/WifiDirectSendReceiveActivity.kt	(date 1622312342861)
+@@ -1,4 +1,4 @@
+-package com.baro.ui.share
++package com.baro.ui.share.p2p
+ 
+ import android.content.Intent
+ import android.os.Bundle
+@@ -9,7 +9,7 @@
+ import com.baro.constants.AppTags
+ 
+ 
+-class SendReceiveActivity : AppCompatActivity(){
++class WifiDirectSendReceiveActivity : AppCompatActivity(){
+ 
+ 
+     private lateinit var sendButton: ImageButton
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    package=\"com.baro\">\n\n    <uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\" />\n    <uses-permission android:name=\"android.permission.WRITE_EXTERNAL_STORAGE\" />\n    <uses-permission android:name=\"android.permission.CAMERA\" />\n    <uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\" />\n    <uses-permission android:name=\"android.permission.CHANGE_WIFI_STATE\" />\n    <uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />\n    <uses-permission android:name=\"android.permission.CHANGE_NETWORK_STATE\" />\n    <uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />\n    <uses-permission android:name=\"android.permission.INTERNET\" />\n\n\n    <application\n        android:allowBackup=\"true\"\n        android:icon=\"@mipmap/ic_launcher\"\n        android:label=\"@string/app_name\"\n        android:roundIcon=\"@mipmap/ic_launcher_round\"\n        android:supportsRtl=\"true\"\n        android:theme=\"@style/Theme.Baro\">\n        <activity android:name=\".ui.create.CreateSlideActivity\" />\n        <activity android:name=\".ui.learn.LearnActivity\" />\n\n        <provider\n            android:name=\"androidx.core.content.FileProvider\"\n            android:authorities=\"com.baro.fileprovider\"\n            android:exported=\"false\"\n            android:grantUriPermissions=\"true\">\n            <meta-data\n                android:name=\"android.support.FILE_PROVIDER_PATHS\"\n                android:resource=\"@xml/provider_paths\" />\n        </provider>\n\n        <activity android:name=\".ui.share.UploadActivity\" />\n        <activity android:name=\".ui.share.BluetoothReceiveActivity\" />\n        <activity android:name=\".ui.share.BluetoothSendActivity\" />\n        <activity android:name=\".ui.share.WifiDirectActivity\" />\n        <activity android:name=\".ui.share.SendReceiveActivity\" />\n        <activity android:name=\".ui.share.ShareActivity\" />\n        <activity android:name=\".ui.account.AccountActivity\" />\n        <activity android:name=\".ui.splash.SplashActivity\">\n            <intent-filter>\n                <action android:name=\"android.intent.action.MAIN\" />\n\n                <category android:name=\"android.intent.category.LAUNCHER\" />\n            </intent-filter>\n        </activity>\n        <activity android:name=\".ui.main.MainActivity\" />\n    </application>\n\n</manifest>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(revision 6b59a0b075b9839b2d998e88d43e82a59ca84a51)
++++ app/src/main/AndroidManifest.xml	(date 1622312380159)
+@@ -33,11 +33,11 @@
+                 android:resource="@xml/provider_paths" />
+         </provider>
+ 
+-        <activity android:name=".ui.share.UploadActivity" />
++        <activity android:name=".ui.share.firebase.FirebaseUploadActivity" />
+         <activity android:name=".ui.share.BluetoothReceiveActivity" />
+         <activity android:name=".ui.share.BluetoothSendActivity" />
+-        <activity android:name=".ui.share.WifiDirectActivity" />
+-        <activity android:name=".ui.share.SendReceiveActivity" />
++        <activity android:name=".ui.share.p2p.WifiDirectActivity" />
++        <activity android:name=".ui.share.p2p.WifiDirectSendReceiveActivity" />
+         <activity android:name=".ui.share.ShareActivity" />
+         <activity android:name=".ui.account.AccountActivity" />
+         <activity android:name=".ui.splash.SplashActivity">
+Index: app/src/main/res/layout/activity_upload.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\n<androidx.constraintlayout.widget.ConstraintLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\n    xmlns:tools=\"http://schemas.android.com/tools\"\n    android:layout_width=\"match_parent\"\n    android:layout_height=\"match_parent\"\n    tools:context=\".ui.share.UploadActivity\">\n\n    <TextView\n        android:layout_width=\"wrap_content\"\n        android:layout_height=\"wrap_content\"\n        android:text=\"Placeholder\"\n        app:layout_constraintBottom_toBottomOf=\"parent\"\n        app:layout_constraintEnd_toEndOf=\"parent\"\n        app:layout_constraintStart_toStartOf=\"parent\"\n        app:layout_constraintTop_toTopOf=\"parent\" />\n\n\n</androidx.constraintlayout.widget.ConstraintLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_upload.xml	(revision 6b59a0b075b9839b2d998e88d43e82a59ca84a51)
++++ app/src/main/res/layout/activity_upload.xml	(date 1622312380211)
+@@ -4,7 +4,7 @@
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+-    tools:context=".ui.share.UploadActivity">
++    tools:context=".ui.share.firebase.FirebaseUploadActivity">
+ 
+     <TextView
+         android:layout_width="wrap_content"

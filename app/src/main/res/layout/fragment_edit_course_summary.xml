@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.create.CreateCourseSummaryFragment"
+    android:background="@color/white">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/fragment_side_margin"
+        android:layout_marginTop="@dimen/fragment_side_margin"
+        android:layout_marginRight="@dimen/fragment_side_margin"
+        android:layout_marginBottom="@dimen/fragment_side_margin"
+        android:alpha="1"
+        android:background="@color/white">
+
+
+        <EditText
+            android:id="@+id/edit_course_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:ems="10"
+            android:hint="@string/course_name"
+            android:inputType="textPersonName"
+            android:textAlignment="center"
+            android:textSize="@dimen/medium_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btn_course_thumbnail"
+            android:layout_width="@dimen/largest_logo_width"
+            android:layout_height="@dimen/large_logo_height"
+            android:background="@color/white"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/edit_course_name"
+            app:layout_constraintVertical_bias="0.15"
+            app:srcCompat="@drawable/ic_picture" />
+
+        <ImageButton
+            android:id="@+id/btn_language"
+            android:layout_width="@dimen/medium_icon_width"
+            android:layout_height="@dimen/medium_icon_height"
+            android:backgroundTint="@color/white"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_category"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_course_thumbnail"
+            app:layout_constraintVertical_bias="0.3"
+            app:srcCompat="@drawable/ic_share_black_48dp" />
+
+        <ImageButton
+            android:id="@+id/btn_category"
+            android:layout_width="@dimen/medium_icon_height"
+            android:layout_height="@dimen/medium_icon_height"
+            android:background="@color/white"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@+id/btn_language"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_language"
+            app:layout_constraintTop_toTopOf="@+id/btn_language"
+            app:srcCompat="@drawable/ic_account" />
+
+
+        <TextView
+            android:id="@+id/txt_category"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_choose_category"
+            app:layout_constraintEnd_toEndOf="@+id/btn_category"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/btn_category"
+            app:layout_constraintTop_toBottomOf="@+id/btn_category" />
+
+        <TextView
+            android:id="@+id/text_create"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/edit"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="@+id/btn_create"
+            app:layout_constraintStart_toStartOf="@+id/btn_create"
+            app:layout_constraintTop_toBottomOf="@+id/btn_create" />
+
+        <TextView
+            android:id="@+id/text_country"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/choose_language"
+            app:layout_constraintEnd_toEndOf="@+id/btn_language"
+            app:layout_constraintStart_toStartOf="@+id/btn_language"
+            app:layout_constraintTop_toBottomOf="@+id/btn_language" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_choose_thumbnail"
+            app:layout_constraintEnd_toEndOf="@+id/btn_course_thumbnail"
+            app:layout_constraintStart_toStartOf="@+id/btn_course_thumbnail"
+            app:layout_constraintTop_toBottomOf="@+id/btn_course_thumbnail" />
+
+        <ImageButton
+            android:id="@+id/btn_create"
+            android:layout_width="@dimen/smaller_icon_width"
+            android:layout_height="@dimen/smaller_icon_width"
+            android:background="@color/white"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_send"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_delete"
+            app:layout_constraintTop_toBottomOf="@+id/text_country"
+            app:srcCompat="@drawable/ic_create" />
+
+        <ImageButton
+            android:id="@+id/btn_delete"
+            android:layout_width="@dimen/smaller_icon_width"
+            android:layout_height="@dimen/smaller_icon_width"
+            android:background="@color/white"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@+id/text_create"
+            app:layout_constraintEnd_toStartOf="@+id/btn_create"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/btn_create"
+            app:srcCompat="@drawable/ic_delete" />
+
+        <TextView
+            android:id="@+id/text_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/delete"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="@+id/btn_delete"
+            app:layout_constraintStart_toStartOf="@+id/btn_delete"
+            app:layout_constraintTop_toBottomOf="@+id/btn_delete" />
+
+        <ImageButton
+            android:id="@+id/btn_send"
+            android:layout_width="@dimen/smaller_icon_width"
+            android:layout_height="@dimen/smaller_icon_width"
+            android:background="@color/white"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@+id/text_create"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/btn_create"
+            app:srcCompat="@drawable/ic_upload_file_black_48dp" />
+
+        <TextView
+            android:id="@+id/text_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/send_txt"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toEndOf="@+id/btn_send"
+            app:layout_constraintStart_toStartOf="@+id/btn_send"
+            app:layout_constraintTop_toBottomOf="@+id/btn_send" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

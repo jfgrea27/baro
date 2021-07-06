@@ -2,6 +2,16 @@ package com.baro.constants
 
 // Contains the App tags used to pass to Exttras and Tags
 enum class AppTags {
+    CATEGORY_SELECTION,
     THUMBNAIL_SELECTION,
-    USER_OBJECT;
+    USER_OBJECT,
+    COURSE_OBJECT,
+    CREATE_COURSE_SUMMARY_FRAGMENT,
+    EDIT_COURSE_SUMMARY_FRAGMENT,
+    WIFIP2P_INTENT,
+    DESTINATION_INET_ADDRESS,
+    RECEIVE_COURSE_FRAGMENT,
+    SEND_COURSE_FRAGMENT,
+    COURSE_ZIP_FILE;
+
 }

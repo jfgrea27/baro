@@ -5,15 +5,16 @@ plugins {
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "com.baro"
         minSdkVersion 16
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
 
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -41,11 +42,12 @@ dependencies {
     implementation "androidx.fragment:fragment:+"
     implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation "androidx.activity:activity:+"
+    implementation 'com.google.firebase:firebase-auth:19.3.2'
     apply plugin: 'com.android.application'
     apply plugin: 'kotlin-android'
     apply plugin: 'kotlin-android-extensions'
     apply plugin: 'org.jetbrains.kotlin.android.extensions'
-
+    apply plugin: 'com.google.gms.google-services'
     testImplementation "junit:junit:4.+"
     testImplementation "org.json:json:+"
     testImplementation "org.jmockit:jmockit:1.8"
@@ -60,5 +62,16 @@ dependencies {
     androidTestImplementation "androidx.test:runner:1.1.0"
 
 
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:28.2.0')
 
+    // Declare the dependency for the Firebase Authentication library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.firebaseui:firebase-ui-auth:7.2.0'
+
+    // Required only if Facebook login support is required
+    // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
+
+    implementation 'com.android.support:multidex:1.0.3'
 }

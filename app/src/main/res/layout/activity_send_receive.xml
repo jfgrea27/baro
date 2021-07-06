@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.share.SendReceiveActivity">
-
+    tools:context=".ui.share.p2p.WifiDirectActivity">
 
     <ImageButton
         android:id="@+id/btn_receive"
@@ -45,12 +44,10 @@
         app:layout_constraintEnd_toEndOf="@id/btn_receive"/>
 
     <TextView
-        android:id="@+id/text_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/send"
         app:layout_constraintTop_toBottomOf="@id/btn_send"
         app:layout_constraintStart_toStartOf="@id/btn_send"
         app:layout_constraintEnd_toEndOf="@id/btn_send"/>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

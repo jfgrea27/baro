@@ -7,8 +7,7 @@
     tools:context=".ui.splash.SplashActivity">
 
     <ImageView
-        android:id="@+id/image_view_logo"
-        android:layout_width="@dimen/large_logo_width"
+        android:layout_width="@dimen/largest_logo_width"
         android:layout_height="@dimen/large_logo_height"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,7 +27,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/fragment_container_view"
+        android:id="@+id/fragment_container_peer_connection"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -1,8 +1,7 @@
 package com.baro.ui.splash
 
-import android.Manifest
+import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -13,13 +12,11 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts.*
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
+import androidx.activity.result.contract.ActivityResultContracts.TakePicture
 import androidx.annotation.RequiresApi
-import androidx.annotation.VisibleForTesting
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
-
 import com.baro.R
 import com.baro.constants.AppCodes
 import com.baro.constants.AppTags
@@ -28,46 +25,44 @@ import com.baro.dialogs.ImageDialog
 import com.baro.dialogs.ImageDialog.OnInputListener
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
-import com.baro.helpers.interfaces.OnUserCredentialsSaveComplete
+import com.baro.models.User
 import com.baro.ui.main.MainActivity
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.lang.ref.WeakReference
 import java.nio.file.Paths
-import java.util.*
 
 @RequiresApi(api = Build.VERSION_CODES.N)
-class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSaveComplete {
+class SplashLoggingFragment : Fragment(), OnInputListener  {
 
     private lateinit var photoThumbnailButton: ImageButton
     private lateinit var usernameEditText: EditText
-    private lateinit var passwordEditText: EditText
     private lateinit var nextButton: ImageButton
-    private var cameraPermission = false
-    private var readPermission = false
-    private var writePermission = false
+
     private var photoUri: Uri? = null
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.P)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_logging, container, false)
 
         // Configure UI
         configurePhotoThumbnailButton(view)
         configureUsernameEditText(view)
-        configurePasswordEditText(view)
         configureNextButton(view)
         return view
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private fun configurePhotoThumbnailButton(view: View?) {
-        photoThumbnailButton = view?.findViewById(R.id.im_account )!!
+        photoThumbnailButton = view?.findViewById(R.id.im_account)!!
 
-        photoThumbnailButton.setOnClickListener { v: View? ->
-            checkCameraPermissions()
-            if (cameraPermission and readPermission and writePermission) {
-                val imageDialog = ImageDialog(this)
-                imageDialog.show(parentFragmentManager, AppTags.THUMBNAIL_SELECTION.toString())
-            }
+        photoThumbnailButton.setOnClickListener {
+            val imageDialog = ImageDialog(this)
+            imageDialog.show(parentFragmentManager, AppTags.THUMBNAIL_SELECTION.toString())
+
         }
     }
 
@@ -77,7 +72,6 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
         photoThumbnailButton.setImageURI(uri)
     }
 
-    //TODO - Implement as Helper - Add Permission Check
     @RequiresApi(Build.VERSION_CODES.O)
     private var getCameraContent: ActivityResultLauncher<Uri?>? = registerForActivityResult(
             TakePicture()
@@ -91,25 +85,36 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
     override fun sendInput(choice: Int) {
         if (choice == AppCodes.CAMERA_ROLL_SELECTION.code) {
             val userMetaDataPath = Paths.get(activity?.getExternalFilesDir(null).toString(),
-                    FileEnum.USER_DIRECTORY.key,
-                    FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                        FileEnum.USER_DIRECTORY.key,
+                        FileEnum.PHOTO_THUMBNAIL_FILE.key)
             val userThumbnailFile = FileHelper.createFileAtPath(userMetaDataPath)
             photoUri = FileProvider.getUriForFile(activity?.applicationContext!!, activity?.applicationContext!!.packageName + ".fileprovider", userThumbnailFile!!)
+            getCameraContent?.launch(photoUri)
 
-        getCameraContent?.launch(photoUri)
         } else if (choice == AppCodes.GALLERY_SELECTION.code) {
-            getGalleryContent?.launch("image/*")
+
+                getGalleryContent?.launch("image/*")
+
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.P)
     private fun configureNextButton(view: View?) {
-        nextButton = view?.findViewById<ImageButton?>(R.id.btn_next)!!
+        nextButton = view?.findViewById(R.id.btn_next)!!
 
-        nextButton.setOnClickListener { v: View? ->
+        nextButton.setOnClickListener {
             if (usernameEditText.text.length > 5) {
-                val userCredentialsSave = AsyncHelpers.UserCredentialsSave(this)
-                userCredentialsSave.execute(context)
+                runBlocking {
+                    launch {
+                        val weakReference  = WeakReference<Context>(context)
+                        val result = AsyncHelpers().userCredentialsSave(usernameEditText.text.toString(),
+                            requireContext().getExternalFilesDir(null).toString(),
+                            photoUri,
+                            weakReference)
+                        onUserCredentialsSaveDone(result)
+
+                    }
+                }
             } else {
                 // TODO discuss if we need a username..
                 Toast.makeText(
@@ -124,93 +129,40 @@ class SplashLoggingFragment : Fragment(), OnInputListener, OnUserCredentialsSave
         usernameEditText = view?.findViewById(R.id.edit_text_username)!!
     }
 
-    private fun configurePasswordEditText(view: View?) {
-        passwordEditText = view?.findViewById(R.id.edit_text_password)!!
-    }
 
-    // Permissions
-    private fun checkCameraPermissions() {
-        val permissionsToBeGranted = ArrayList<String?>()
-        if (ContextCompat.checkSelfPermission(
-                        requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE) !=
-                PackageManager.PERMISSION_GRANTED) {
-            permissionsToBeGranted.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
-            readPermission = true
-        }
-        if (ContextCompat.checkSelfPermission(
-                        requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
-                PackageManager.PERMISSION_GRANTED) {
-            permissionsToBeGranted.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        } else {
-            writePermission = true
-        }
-        if (ContextCompat.checkSelfPermission(
-                        requireContext(), Manifest.permission.CAMERA) !=
-                PackageManager.PERMISSION_GRANTED) {
-            permissionsToBeGranted.add(Manifest.permission.CAMERA)
-        } else {
-            cameraPermission = true
-        }
-        if (permissionsToBeGranted.size > 0) {
-            val permissions = permissionsToBeGranted.toTypedArray()
-            requestPermissionLauncher!!.launch(permissions)
-        }
-    }
-
-    //TODO - Refactor
-    @VisibleForTesting
-    private val requestPermissionLauncher: ActivityResultLauncher<Array<String?>?>? = registerForActivityResult(RequestMultiplePermissions()) { permissions: MutableMap<String?, Boolean?>? ->
-        if (permissions != null) {
-            for ((key, value) in permissions) {
-                value?.let { handlePermission(key, it) }
-            }
-        }
-    }
-
-    private fun handlePermission(permission: String?, isGranted: Boolean) {
-        when (permission) {
-            Manifest.permission.READ_EXTERNAL_STORAGE -> if (!isGranted) {
-                Toast.makeText(context, R.string.read_storage_permission, Toast.LENGTH_LONG).show()
-            } else {
-                readPermission = true
-            }
-            Manifest.permission.WRITE_EXTERNAL_STORAGE -> if (!isGranted) {
-                Toast.makeText(context, R.string.write_storage_permission, Toast.LENGTH_LONG).show()
-            } else {
-                writePermission = true
-            }
-            Manifest.permission.CAMERA -> if (!isGranted) {
-                Toast.makeText(context, R.string.need_camera_access_toast, Toast.LENGTH_LONG).show()
-            } else {
-                cameraPermission = true
-            }
-        }
-    }
-
-    override fun onUserCredentialsSaveDone(result: Boolean?) {
+    private fun onUserCredentialsSaveDone(result: Boolean?) {
         if (result == true) {
-            val startMainActivity = Intent(
+            val splashActivity = activity as SplashActivity
+
+
+            if (splashActivity.isOnline(context)) {
+                if (FirebaseAuth.getInstance().currentUser?.uid == null) {
+                    (activity as SplashActivity).supportFragmentManager.beginTransaction()
+                        .setReorderingAllowed(true)
+                        .add(R.id.fragment_container_peer_connection,
+                            SplashLoggingFirebaseFragment::class.java, null)
+                        .commit()
+                } else {
+                    val startMainActivity = Intent(
+                        activity,
+                        MainActivity::class.java)
+                    // Perhaps use UserCredentialsTask From SplashActivity to get the credentials once created
+//                    startMainActivity.putExtra(AppTags.USER_OBJECT.name, User(usernameEditText))
+                    startActivity(startMainActivity)
+                    requireActivity().finish()
+                }
+            } else {
+                val startMainActivity = Intent(
                     activity,
                     MainActivity::class.java)
-            // Perhaps use UserCredentialsTask From SplashActivity to get the credentials once created
-            startActivity(startMainActivity)
-            requireActivity().finish()
+                // Perhaps use UserCredentialsTask From SplashActivity to get the credentials once created
+                startActivity(startMainActivity)
+                requireActivity().finish()
+            }
+
         } else {
             Toast.makeText(context, R.string.error_saving_credentials, Toast.LENGTH_LONG).show()
         }
-    }
-
-    override fun getUsername(): String {
-        return usernameEditText.getText().toString()
-    }
-
-    override fun getPath(): String {
-        return requireContext().getExternalFilesDir(null).toString()
-    }
-
-    override fun getPhotoUri(): Uri? {
-        return photoUri
     }
 
 }

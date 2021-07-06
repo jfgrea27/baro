@@ -54,6 +54,7 @@ class FileHelperTest {
                 file!!.exists()
                 result = true
                 file.absolutePath
+
                 result = "path/to/parent/filename"
             }
         }
@@ -159,16 +160,12 @@ class FileHelperTest {
     fun writeUriToFileShouldReturnTrueWhenUriIsNotSavedToValidFilePath(
             @Mocked contentResolver: ContentResolver,
             @Mocked fis: FileInputStream) {
-
-        // TODO complete this - cannot seem to mock effectively
     }
 
     @Test
     fun writeUriToFileShouldReturnTrueWhenUriIsSavedToInvalidFilePath(
             @Mocked contentResolver: ContentResolver,
             @Mocked fis: FileInputStream) {
-
-        // TODO complete this - cannot seem to mock effectively
     }
 
     @Test
@@ -176,8 +173,6 @@ class FileHelperTest {
     fun writeUriToFileShouldReturnFalseWhenMethodThrowsIOException(
             @Mocked contentResolver: ContentResolver,
             @Mocked fis: FileInputStream) {
-
-        // TODO complete this - cannot seem to mock effectively
     }
 
 

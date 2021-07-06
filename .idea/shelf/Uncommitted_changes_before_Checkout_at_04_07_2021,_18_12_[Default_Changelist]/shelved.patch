@@ -1,0 +1,884 @@
+Index: app/src/main/java/com/baro/helpers/AsyncHelpers.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.baro.helpers\n\nimport android.content.ContentResolver\nimport android.content.Context\nimport android.graphics.Bitmap\nimport android.graphics.ImageDecoder\nimport android.net.Uri\nimport android.os.AsyncTask\nimport android.os.Build\nimport android.util.Log\nimport androidx.annotation.RequiresApi\nimport com.baro.constants.CategoryEnum\nimport com.baro.constants.FileEnum\nimport com.baro.constants.JSONEnum\nimport com.baro.helpers.interfaces.*\nimport com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad\nimport com.baro.models.Country\nimport com.baro.models.Course\nimport com.baro.models.User\nimport com.baro.ui.share.p2p.WifiDirectEndpoint\nimport org.json.JSONArray\nimport java.io.*\nimport java.lang.ref.WeakReference\nimport java.net.InetAddress\nimport java.net.InetSocketAddress\nimport java.net.ServerSocket\nimport java.net.Socket\nimport java.nio.file.Path\nimport java.nio.file.Paths\nimport java.util.*\nimport kotlin.collections.ArrayList\nimport kotlin.collections.HashMap\n\n\nclass AsyncHelpers {\n    /**\n     * With this class you can call the following methods:\n     * VerifyUserCredentials(callback)\n     */\n\n    ///////////////////////////////////////////////////////////////////////////////////////////////\n\n    class VerifyUserCredentials(private var callback: OnUserLoginCheckComplete) :\n        AsyncTask<File?, Void?, User?>() {\n        @RequiresApi(api = Build.VERSION_CODES.O)\n\n\n        override fun doInBackground(vararg externalFilesDir: File?): User? {\n\n            val userMetaDataPath = Paths.get(\n                externalFilesDir[0].toString(),\n                FileEnum.USER_DIRECTORY.key,\n                FileEnum.META_DATA_FILE.key\n            )\n\n\n            val userThumbnailPath = Paths.get(\n                externalFilesDir[0].toString(),\n                FileEnum.USER_DIRECTORY.key,\n                FileEnum.PHOTO_THUMBNAIL_FILE.key\n            )\n\n            val userMetaDataFile = FileHelper.getFileAtPath(userMetaDataPath)\n            val userThumbnailFile = FileHelper.getFileAtPath(userThumbnailPath)\n\n            var user: User? = null\n\n            if (userMetaDataFile != null) {\n                val contentMetaData = FileHelper.readFile(userMetaDataFile)\n                val jsonMetaData = contentMetaData?.let { JSONHelper.createJSONFromString(it) }\n\n                user = if (userThumbnailFile != null && userThumbnailFile.length() > 0) {\n                    User(\n                        UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),\n                        jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String,\n                        userThumbnailFile\n                    )\n                } else {\n                    User(\n                        UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),\n                        jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String\n                    )\n                }\n            }\n            return user\n        }\n\n        @RequiresApi(Build.VERSION_CODES.O)\n        override fun onPostExecute(result: User?) {\n            callback.onUserLoginCheckDone(result)\n        }\n\n    }\n\n    ////////////////////////////////////////////////////////////////////////////////////////////////\n\n    class UserCredentialsSave(private var callback: OnUserCredentialsSaveComplete) :\n        AsyncTask<Context, Void?, Boolean?>() {\n        @RequiresApi(api = Build.VERSION_CODES.P)\n        override fun doInBackground(vararg context: Context): Boolean {\n            // Save the Meta information\n            saveCredentials(callback.getUsername(), callback.getPath())\n            // Save Photo URI\n            savePhotoUri(callback.getPhotoUri(), context[0])\n            return true\n        }\n\n\n        override fun onPostExecute(result: Boolean?) {\n            callback.onUserCredentialsSaveDone(result)\n        }\n\n        @RequiresApi(api = Build.VERSION_CODES.O)\n        private fun saveCredentials(username: String, path: String) {\n            val credentialDetails = HashMap<String?, String?>()\n            val userUUID = UUID.randomUUID()\n            credentialDetails[JSONEnum.USER_NAME_KEY.key] = username\n            credentialDetails[JSONEnum.USER_UUID_KEY.key] = userUUID.toString()\n            val jsonCredentials = JSONHelper.createJSONFromHashMap(credentialDetails)\n            val userMetaDataPath = Paths.get(\n                path,\n                FileEnum.USER_DIRECTORY.key,\n                FileEnum.META_DATA_FILE.key\n            )\n            val userMetaDataFile = FileHelper.createFileAtPath(userMetaDataPath)\n            FileHelper.writeToFile(userMetaDataFile, jsonCredentials.toString())\n        }\n\n        @RequiresApi(api = Build.VERSION_CODES.P)\n        private fun savePhotoUri(photoUri: Uri?, context: Context) {\n            if (photoUri != null) {\n\n                val bitmap = ImageDecoder.decodeBitmap(\n                    ImageDecoder.createSource(\n                        context.contentResolver,\n                        photoUri\n                    )\n                )\n                val userThumbnailPicturePath = Paths.get(\n                    context.getExternalFilesDir(null).toString(),\n                    FileEnum.USER_DIRECTORY.key,\n                    FileEnum.PHOTO_THUMBNAIL_FILE.key\n                )\n                val file = File(userThumbnailPicturePath.toString())\n\n                FileHelper.writeBitmapToFile(file, bitmap)\n            }\n        }\n\n\n    }\n\n    ////////////////////////////////////////////////////////////////////////////////////////////////\n\n    class LoadUserData(private var callback: OnUserDataFound) :\n        AsyncTask<LoadUserData.TaskParams, Void?, LoadUserData.LoadUserDataResponse?>() {\n        @RequiresApi(Build.VERSION_CODES.P)\n        override fun doInBackground(vararg params: TaskParams?): LoadUserDataResponse? {\n            val user = params[0]?.user\n            val contentResolver = params[0]?.contentResolver\n            if (user?.getThumbnailFile() != null) {\n                val source = ImageDecoder.createSource(\n                    contentResolver!!,\n                    Uri.fromFile(user.getThumbnailFile())\n                )\n                val username = user.getUsername()\n                val imageBmp = ImageDecoder.decodeBitmap(source)\n                return LoadUserDataResponse(username, imageBmp)\n            } else if (user?.getUsername() != null) {\n                return LoadUserDataResponse(user.getUsername(), null)\n            } else {\n                return null\n            }\n        }\n\n        @RequiresApi(Build.VERSION_CODES.P)\n        override fun onPostExecute(result: LoadUserDataResponse?) {\n            callback.onUserDataReturned(result)\n        }\n\n        class TaskParams(var user: User?, var contentResolver: ContentResolver)\n        class LoadUserDataResponse(var username: String?, var imageBmp: Bitmap?)\n    }\n\n\n    ////////////////////////////////////////////////////////////////////////////////////////////////\n\n    class CourseCredentialsSave(\n        private var callback: OnCourseCredentialsSaveComplete,\n        private var context: WeakReference<Context>\n    ) : AsyncTask<CourseCredentialsSave.TaskParams, Void?, Boolean?>() {\n        @RequiresApi(Build.VERSION_CODES.P)\n        override fun doInBackground(vararg params: TaskParams?): Boolean? {\n            // Save the Meta information\n            val course = params[0]?.course\n            val imageUri = params[0]?.imageUri\n\n            if (course != null) {\n                saveCredentials(course)\n            }\n\n            // Save Photo URI\n            savePhotoUri(imageUri, course)\n\n            return true\n        }\n\n        @RequiresApi(api = Build.VERSION_CODES.O)\n        private fun saveCredentials(course: Course) {\n\n            val course = course\n\n            val courseMetadata = HashMap<String?, String?>()\n\n            courseMetadata[JSONEnum.USER_NAME_KEY.key] =\n                course?.getCreator()?.getUserUUID().toString()\n            courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()\n            courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()\n            courseMetadata[JSONEnum.COURSE_CREATION_DATETIME.key] =\n                course.getCreationDate()?.toString()\n            val isoCode = course.getCourseCountry()?.getIsoCode()\n            if (isoCode == null) {\n                courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = \"null\"\n            } else {\n                courseMetadata[JSONEnum.COURSE_LANGUAGE.key] =\n                    course.getCourseCountry()?.getIsoCode()\n            }\n            courseMetadata[JSONEnum.COURSE_CATEGORY.key] =\n                JSONArray(course.getCourseCategory().toString()).toString()\n            courseMetadata[JSONEnum.COURSE_SLIDES.key] =\n                JSONArray(course.getSlides().toString()).toString()\n\n            val courseMetaDataPath = Paths.get(\n                context.get()?.getExternalFilesDir(null).toString(),\n                FileEnum.USER_DIRECTORY.key,\n                FileEnum.COURSE_DIRECTORY.key,\n                course?.getCourseUUID().toString(),\n                FileEnum.META_DATA_FILE.key\n            )\n\n            val courseMetaDataFile = FileHelper.createFileAtPath(courseMetaDataPath)\n            val courseJSONMeta = JSONHelper.createJSONFromHashMap(courseMetadata)\n\n\n            FileHelper.writeToFile(courseMetaDataFile, courseJSONMeta.toString())\n        }\n\n        @RequiresApi(api = Build.VERSION_CODES.P)\n        private fun savePhotoUri(photoUri: Uri?, course: Course?) {\n            if (photoUri != null) {\n\n                val bitmap = ImageDecoder.decodeBitmap(\n                    ImageDecoder.createSource(\n                        context.get()?.contentResolver!!,\n                        photoUri\n                    )\n                )\n                val userThumbnailPicturePath = Paths.get(\n                    context.get()?.getExternalFilesDir(null).toString(),\n                    FileEnum.USER_DIRECTORY.key,\n                    FileEnum.COURSE_DIRECTORY.key,\n                    course?.getCourseUUID().toString(),\n                    FileEnum.PHOTO_THUMBNAIL_FILE.key\n                )\n                val file = File(userThumbnailPicturePath.toString())\n\n                FileHelper.writeBitmapToFile(file, bitmap)\n            }\n        }\n\n\n        @RequiresApi(Build.VERSION_CODES.P)\n        override fun onPostExecute(result: Boolean?) {\n            callback.onCourseDataReturned(result)\n        }\n\n        class TaskParams(var course: Course?, var imageUri: Uri?)\n\n    }\n\n\n    class CreatorCourseCredentialsLoad(private var callback: OnCreatorCourseCredentialsLoad) :\n        AsyncTask<CreatorCourseCredentialsLoad.TaskParams, Void?, ArrayList<Pair<Course, Uri?>>>() {\n        @RequiresApi(Build.VERSION_CODES.P)\n        override fun doInBackground(vararg params: TaskParams?): ArrayList<Pair<Course, Uri?>>? {\n            var courses = ArrayList<Pair<Course, Uri?>>()\n\n            val path = params[0]?.path\n            val coursesFile = FileHelper.createDirAtPath(path)\n            val user = params[0]?.user\n            if (coursesFile.listFiles() != null) {\n                for (courseFolder in coursesFile.listFiles()) {\n\n                    if (courseFolder.isDirectory) {\n                        val jsonFilePath =\n                            Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)\n\n                        val jsonFile = jsonFilePath.toFile()\n\n                        // Retrieve content file\n                        val contents = FileHelper.readFile(jsonFile)\n\n                        if (contents != null) {\n                            val jsonContents = JSONHelper.createJSONFromString(contents!!)\n\n                            // Course UUID\n                            val courseUUID = jsonContents?.get(JSONEnum.COURSE_UUID_KEY.key)\n                            // Course Name\n                            val courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)\n                            // Category\n                            val categoryJSON = JSONArray(\n                                jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString()\n                            )\n                            // Language\n                            val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)\n                            // Timestamp\n                            val courseCreationTimestamp =\n                                jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString()\n                                    .toLong()\n                            // Slides\n                            val slidesJSON =\n                                JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())\n\n                            // Creation course\n                            val course = Course(UUID.fromString(courseUUID as String?), user)\n\n                            //  Adding course name\n                            course.setCourseName(courseName as String)\n                            // Adding Course Category\n                            course.setCourseCategory(\n                                CategoryEnum.getCategoriesFromJSONArray(\n                                    categoryJSON as JSONArray\n                                )\n                            )\n                            // Adding Course language\n                            if (language.toString() == \"null\") {\n                                course.setCourseCountry(Country(null))\n                            } else {\n                                course.setCourseCountry(Country(language.toString()))\n\n                            }\n                            // Adding timestamp\n                            course.setCreationDate(courseCreationTimestamp)\n\n                            // Adding Slides\n                            course.setSlidesFromJSONArray(slidesJSON)\n\n                            // Thumbnail\n                            val imagePath = Paths.get(\n                                courseFolder.toString(),\n                                FileEnum.PHOTO_THUMBNAIL_FILE.key\n                            )\n                            val imageFile = imagePath.toFile()\n                            val imageUri = Uri.fromFile(imageFile)\n\n                            val pair = Pair<Course, Uri>(course, imageUri)\n                            courses.add(pair)\n                        }\n                    }\n                }\n            }\n\n            var arrayListResults = ArrayList<Pair<Course, Uri?>>()\n\n            if (courses.size > 1) {\n                courses.sortedBy { it.first }\n            }\n            for (course in courses) {\n                arrayListResults.add(course)\n            }\n            return arrayListResults\n\n        }\n\n        @RequiresApi(Build.VERSION_CODES.P)\n        override fun onPostExecute(result: ArrayList<Pair<Course, Uri?>>) {\n            callback.onCreatorCourseCredentialsLoad(result)\n        }\n\n        class TaskParams(var path: Path?, var user: User?)\n    }\n\n\n    ///////////////////////////////////////////////////////////////////////////////////////////////\n    class VideoUriSave(\n        private var callback: OnVideoUriSaved,\n        private var weakReferenceContentResolver: WeakReference<ContentResolver>\n    ) : AsyncTask<VideoUriSave.TaskParams, Void?, File?>() {\n        override fun doInBackground(vararg params: TaskParams?): File? {\n            val outputFile = params[0]?.outputFile\n            val videoUri = params[0]?.videoUri\n\n            if (outputFile != null && outputFile.exists()) {\n                if (videoUri != null) {\n                    return FileHelper.copyVideoToFile(\n                        outputFile,\n                        videoUri,\n                        weakReferenceContentResolver.get()\n                    )\n                }\n            }\n            return null\n\n        }\n\n        @RequiresApi(Build.VERSION_CODES.P)\n        override fun onPostExecute(result: File?) {\n            callback.onVideoUriSaved(result)\n        }\n\n        class TaskParams(var outputFile: File?, var videoUri: Uri?)\n\n    }\n\n\n    class DeleteFile(private var callback: OnDeleteFile) :\n        AsyncTask<DeleteFile.TaskParams, Boolean?, Boolean?>() {\n        override fun doInBackground(vararg params: TaskParams?): Boolean? {\n            val deleteFile = params[0]?.deleteFile\n            val deleteSlide = params[0]?.deleteSlide\n            FileHelper.deleteFile(deleteFile)\n            return deleteSlide\n        }\n\n        @RequiresApi(Build.VERSION_CODES.P)\n        override fun onPostExecute(result: Boolean?) {\n            callback.onDeleteFile(result)\n        }\n\n        class TaskParams(var deleteFile: File?, var deleteSlide: Boolean?)\n\n    }\n\n\n    class UpdateJSONFile(private var callback: OnUpdatedJSONFile) :\n        AsyncTask<UpdateJSONFile.TaskParams, Boolean?, Boolean?>() {\n        override fun doInBackground(vararg params: UpdateJSONFile.TaskParams?): Boolean? {\n            val fileToUpdate = params[0]?.fileToUpdate\n            val hashMapData = params[0]?.hashMapData\n\n            var contents = FileHelper.readFile(fileToUpdate)\n\n            var jsonContents = JSONHelper.createJSONFromString(contents!!)\n\n            for ((key, value) in hashMapData!!) {\n                jsonContents!!.put(key, value)\n            }\n\n            return FileHelper.writeToFile(fileToUpdate, jsonContents.toString())\n        }\n\n        @RequiresApi(Build.VERSION_CODES.P)\n        override fun onPostExecute(result: Boolean?) {\n            callback.onUpdatedJSONFile(result)\n        }\n\n        class TaskParams(\n            var fileToUpdate: File?,\n            var hashMapData: HashMap<String, ArrayList<String>>?\n        )\n\n    }\n\n    class DeleteCourse(\n        private var callback: OnCourseDeleted,\n        private var context: WeakReference<Context>\n    ) : AsyncTask<DeleteCourse.TaskParams, Course?, Course?>() {\n\n        class TaskParams(var course: Course)\n\n        @RequiresApi(Build.VERSION_CODES.O)\n        override fun doInBackground(vararg params: TaskParams?): Course? {\n            val course = params[0]?.course\n            val coursePath = Paths.get(\n                context.get()?.getExternalFilesDir(null).toString(),\n                FileEnum.USER_DIRECTORY.key,\n                FileEnum.COURSE_DIRECTORY.key,\n                course?.getCourseUUID().toString()\n            )\n            val courseFile = coursePath.toFile()\n            FileHelper.deleteFile(courseFile)\n            return course\n        }\n\n        @RequiresApi(Build.VERSION_CODES.P)\n        override fun onPostExecute(course: Course?) {\n            callback.onCourseDeleted(course)\n        }\n\n    }\n\n    class GroupOwnerReceiveClientInetAddressAsyncTask(\n        private var callback: OnClientInetAddressReceived\n\n    ) :\n        AsyncTask<String?, Void, InetAddress?>() {\n\n        companion object {\n            val PORT_GET_CLIENT_INET = 8988\n        }\n\n        @Override\n        override fun onPostExecute(result: InetAddress?) {\n            callback.onClientInetAddressReceived(result)\n        }\n\n        override fun doInBackground(vararg p0: String?): InetAddress? {\n            return try {\n                val serverSocket = ServerSocket(PORT_GET_CLIENT_INET)\n                val client = serverSocket.accept();\n                val clientInetAddress = client.inetAddress\n                serverSocket.close();\n                return clientInetAddress\n            } catch (e: IOException) {\n                null;\n            }\n        }\n    }\n\n    class ClientSendInetAddressAsyncTask(\n        private var serverEndPoint: WifiDirectEndpoint,\n        private var callback: OnClientInetAddressSent\n    ) :\n        AsyncTask<Void?, InetAddress?, InetAddress?>() {\n        private val SOCKET_TIMEOUT = 5000\n        override fun doInBackground(vararg p0: Void?): InetAddress? {\n            val socket = Socket()\n            try {\n                socket.bind(null)\n                socket.connect(\n                    InetSocketAddress(serverEndPoint.ip, serverEndPoint.port),\n                    SOCKET_TIMEOUT\n                )\n            } catch (e: IOException) {\n\n            } finally {\n                if (socket != null) {\n                    if (socket.isConnected) {\n                        try {\n                            socket.close()\n                        } catch (e: IOException) {\n                            e.printStackTrace()\n                        }\n                    }\n                }\n            }\n            return socket.inetAddress\n        }\n\n\n        @Override\n        override fun onPostExecute(result: InetAddress?) {\n            callback.onClientInetAddressRSent()\n        }\n    }\n\n\n    class ReceiveCourseAsyncTask(\n        private var weakContext: WeakReference<Context>,\n        private var callback: OnCourseReceived\n    ) :\n        AsyncTask<Void?, Boolean?, Boolean?>() {\n        companion object {\n            val PORT_GET_COURSE = 9989\n        }\n\n        @Override\n        override fun onPostExecute(result: Boolean?) {\n            callback.onCourseReceived(result)\n        }\n\n        @RequiresApi(Build.VERSION_CODES.O)\n        override fun doInBackground(vararg p0: Void?): Boolean? {\n            return try {\n                val serverSocket = ServerSocket(PORT_GET_COURSE)\n                val client = serverSocket.accept();\n\n\n                val inputStream = client.getInputStream();\n\n                val dis = DataInputStream(inputStream)\n                val courseSize = dis.readLong()\n                val courseUUID = dis.readUTF()\n                callback.retrieveSize(courseSize)\n                val courseZipPath = Paths.get(\n                    weakContext.get()?.getExternalFilesDir(null).toString(),\n                    FileEnum.LEARN_DIRECTORY.key,\n                    \"$courseUUID.zip\"\n                )\n                val courseFileDestination = Paths.get(\n                    weakContext.get()?.filesDir.toString(),\n                    FileEnum.LEARN_DIRECTORY.key,\n                    courseUUID\n                )\n                val courseTempZipFile = FileHelper.createFileAtPath(courseZipPath)\n\n                writeToFile(inputStream, courseTempZipFile!!);\n                serverSocket.close();\n\n                FileHelper.unzip(courseTempZipFile, courseFileDestination.toString())\n            } catch (e: IOException) {\n                false\n            }\n        }\n\n        // TODO remove this\n        private fun writeToFile(inputStream: InputStream?, courseZipFile: File): Boolean {\n            val buf = ByteArray(1024)\n            var len: Int\n            var currentSize = 0\n            try {\n                val outStream: OutputStream = FileOutputStream(courseZipFile)\n                while (inputStream!!.read(buf).also { len = it } != -1) {\n                    currentSize += 1024\n                    outStream.write(buf, 0, len)\n                    callback.sendProgress(currentSize)\n                }\n                inputStream.close()\n            } catch (e: IOException) {\n                Log.d(\"Not saved file\", e.toString())\n                return false\n            }\n            return true\n        }\n\n    }\n\n\n    class SendCourseAsyncTask(\n        private var receiverEndPoint: WifiDirectEndpoint,\n        private var callback: OnCourseSent\n    ) :\n        AsyncTask<SendCourseAsyncTask.TaskParams?, Boolean?, Boolean?>() {\n        private val SOCKET_TIMEOUT = 5000\n        override fun doInBackground(vararg p0: SendCourseAsyncTask.TaskParams?): Boolean? {\n            val courseZipFile = p0[0]?.courseZipFile\n            val courseUUID = p0[0]?.courseUUID\n            val socket = Socket()\n\n            try {\n                socket.bind(null)\n                socket.connect(\n                    InetSocketAddress(receiverEndPoint.ip, receiverEndPoint.port),\n                    SOCKET_TIMEOUT\n                )\n                val stream: OutputStream = socket.getOutputStream()\n\n\n                // Send course UUID\n                val dos = DataOutputStream(stream)\n                courseZipFile?.length()?.let { dos.writeLong(it) }\n                dos.flush()\n                dos.writeUTF(courseUUID.toString())\n                dos.flush()\n\n                var `is`: InputStream? = null\n                try {\n                    `is` = FileInputStream(courseZipFile)\n                } catch (e: FileNotFoundException) {\n                }\n                copyFile(`is`, stream)\n            } catch (e: IOException) {\n                Log.i(\"FAILED SEND COURSE\", e.toString())\n                return false\n            } finally {\n                if (socket != null) {\n                    if (socket.isConnected) {\n                        try {\n                            socket.close()\n                        } catch (e: IOException) {\n                            e.printStackTrace()\n                        }\n                    }\n                }\n            }\n            return true\n        }\n\n        @Override\n        override fun onPostExecute(result: Boolean?) {\n            callback.onCourseSent(result)\n        }\n\n\n        private fun copyFile(inputStream: InputStream?, out: OutputStream): Boolean {\n            val buf = ByteArray(1024)\n            var len: Int\n            try {\n                while (inputStream?.read(buf).also { len = it!! } != -1) {\n                    out.write(buf, 0, len)\n                }\n                out.close()\n                inputStream?.close()\n            } catch (e: IOException) {\n                return false\n            }\n            return true\n        }\n\n        class TaskParams(\n            var courseZipFile: File?,\n            var courseUUID: UUID?\n        )\n\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/baro/helpers/AsyncHelpers.kt	(revision a4d452775bd205313faaaf74d89777d5d9ef6bd5)
++++ app/src/main/java/com/baro/helpers/AsyncHelpers.kt	(date 1625415130633)
+@@ -19,6 +19,7 @@
+ import com.baro.models.User
+ import com.baro.ui.share.p2p.WifiDirectEndpoint
+ import org.json.JSONArray
++import org.json.JSONObject
+ import java.io.*
+ import java.lang.ref.WeakReference
+ import java.net.InetAddress
+@@ -40,247 +41,172 @@
+ 
+     ///////////////////////////////////////////////////////////////////////////////////////////////
+ 
+-    class VerifyUserCredentials(private var callback: OnUserLoginCheckComplete) :
+-        AsyncTask<File?, Void?, User?>() {
+-        @RequiresApi(api = Build.VERSION_CODES.O)
++
++    @RequiresApi(api = Build.VERSION_CODES.O)
++    fun verifyUserCredentials(file: File?): User? {
+ 
+ 
+-        override fun doInBackground(vararg externalFilesDir: File?): User? {
+-
+-            val userMetaDataPath = Paths.get(
+-                externalFilesDir[0].toString(),
+-                FileEnum.USER_DIRECTORY.key,
+-                FileEnum.META_DATA_FILE.key
+-            )
++        val userMetaDataPath = Paths.get(file.toString(),
++            FileEnum.USER_DIRECTORY.key,
++            FileEnum.META_DATA_FILE.key)
+ 
+ 
+-            val userThumbnailPath = Paths.get(
+-                externalFilesDir[0].toString(),
+-                FileEnum.USER_DIRECTORY.key,
+-                FileEnum.PHOTO_THUMBNAIL_FILE.key
+-            )
++        val userThumbnailPath = Paths.get(file.toString(),
++            FileEnum.USER_DIRECTORY.key,
++            FileEnum.PHOTO_THUMBNAIL_FILE.key)
+ 
+-            val userMetaDataFile = FileHelper.getFileAtPath(userMetaDataPath)
+-            val userThumbnailFile = FileHelper.getFileAtPath(userThumbnailPath)
++        val userMetaDataFile = FileHelper.getFileAtPath(userMetaDataPath)
++        val userThumbnailFile = FileHelper.getFileAtPath(userThumbnailPath)
+ 
+-            var user: User? = null
++        var user: User? = null
+ 
+-            if (userMetaDataFile != null) {
+-                val contentMetaData = FileHelper.readFile(userMetaDataFile)
+-                val jsonMetaData = contentMetaData?.let { JSONHelper.createJSONFromString(it) }
++        if (userMetaDataFile != null) {
++            val contentMetaData = FileHelper.readFile(userMetaDataFile)
++            val jsonMetaData = contentMetaData?.let { JSONHelper.createJSONFromString(it) }
+ 
+-                user = if (userThumbnailFile != null && userThumbnailFile.length() > 0) {
+-                    User(
+-                        UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
+-                        jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String,
+-                        userThumbnailFile
+-                    )
+-                } else {
+-                    User(
+-                        UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
+-                        jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String
+-                    )
+-                }
+-            }
+-            return user
+-        }
++            user = if (userThumbnailFile != null && userThumbnailFile.length() > 0) {
++                User(
++                    UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
++                    jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String,
++                    userThumbnailFile
++                )
++            } else {
++                User(
++                    UUID.fromString(jsonMetaData?.get(JSONEnum.USER_UUID_KEY.key) as String),
++                    jsonMetaData[JSONEnum.USER_NAME_KEY.key] as String)
++            }
++        }
++        return user
+ 
+-        @RequiresApi(Build.VERSION_CODES.O)
+-        override fun onPostExecute(result: User?) {
+-            callback.onUserLoginCheckDone(result)
+-        }
++    }
+ 
+-    }
++
+ 
+     ////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+-    class UserCredentialsSave(private var callback: OnUserCredentialsSaveComplete) :
+-        AsyncTask<Context, Void?, Boolean?>() {
+-        @RequiresApi(api = Build.VERSION_CODES.P)
+-        override fun doInBackground(vararg context: Context): Boolean {
+-            // Save the Meta information
+-            saveCredentials(callback.getUsername(), callback.getPath())
+-            // Save Photo URI
+-            savePhotoUri(callback.getPhotoUri(), context[0])
+-            return true
+-        }
+-
+-
+-        override fun onPostExecute(result: Boolean?) {
+-            callback.onUserCredentialsSaveDone(result)
+-        }
++    @RequiresApi(Build.VERSION_CODES.P)
++    fun userCredentialsSave(username: String, path: String, photoUri: Uri?, weakReference: WeakReference<Context>): Boolean {
++        savePhotoUri(photoUri, weakReference.get())
++        return saveCredentials(username, path)
++    }
+ 
+-        @RequiresApi(api = Build.VERSION_CODES.O)
+-        private fun saveCredentials(username: String, path: String) {
+-            val credentialDetails = HashMap<String?, String?>()
+-            val userUUID = UUID.randomUUID()
+-            credentialDetails[JSONEnum.USER_NAME_KEY.key] = username
+-            credentialDetails[JSONEnum.USER_UUID_KEY.key] = userUUID.toString()
+-            val jsonCredentials = JSONHelper.createJSONFromHashMap(credentialDetails)
+-            val userMetaDataPath = Paths.get(
+-                path,
+-                FileEnum.USER_DIRECTORY.key,
+-                FileEnum.META_DATA_FILE.key
+-            )
+-            val userMetaDataFile = FileHelper.createFileAtPath(userMetaDataPath)
+-            FileHelper.writeToFile(userMetaDataFile, jsonCredentials.toString())
+-        }
++    @RequiresApi(api = Build.VERSION_CODES.O)
++    private fun saveCredentials(username: String, path: String): Boolean {
++
++        val credentialDetails = HashMap<String?, String?>()
++        val userUUID = UUID.randomUUID()
++        credentialDetails[JSONEnum.USER_NAME_KEY.key] = username
++        credentialDetails[JSONEnum.USER_UUID_KEY.key] = userUUID.toString()
++        val jsonCredentials = JSONHelper.createJSONFromHashMap(credentialDetails)
++        val userMetaDataPath = Paths.get(
++            path,
++            FileEnum.USER_DIRECTORY.key,
++            FileEnum.META_DATA_FILE.key
++        )
++        val userMetaDataFile = FileHelper.createFileAtPath(userMetaDataPath)
++        return FileHelper.writeToFile(userMetaDataFile, jsonCredentials.toString())
++    }
+ 
+-        @RequiresApi(api = Build.VERSION_CODES.P)
+-        private fun savePhotoUri(photoUri: Uri?, context: Context) {
+-            if (photoUri != null) {
+-
+-                val bitmap = ImageDecoder.decodeBitmap(
+-                    ImageDecoder.createSource(
+-                        context.contentResolver,
+-                        photoUri
+-                    )
+-                )
++    @RequiresApi(api = Build.VERSION_CODES.P)
++    private fun savePhotoUri(photoUri: Uri?, context: Context?) {
++        if (photoUri != null) {
++            if (context != null) {
++                val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.contentResolver, photoUri))
+                 val userThumbnailPicturePath = Paths.get(
+                     context.getExternalFilesDir(null).toString(),
+                     FileEnum.USER_DIRECTORY.key,
+-                    FileEnum.PHOTO_THUMBNAIL_FILE.key
+-                )
++                    FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                 val file = File(userThumbnailPicturePath.toString())
++                FileHelper.writeBitmapToFile(file, bitmap)}
++
+ 
+-                FileHelper.writeBitmapToFile(file, bitmap)
+-            }
+-        }
++        }
++    }
+ 
+-
+-    }
+ 
+     ////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+-    class LoadUserData(private var callback: OnUserDataFound) :
+-        AsyncTask<LoadUserData.TaskParams, Void?, LoadUserData.LoadUserDataResponse?>() {
+-        @RequiresApi(Build.VERSION_CODES.P)
+-        override fun doInBackground(vararg params: TaskParams?): LoadUserDataResponse? {
+-            val user = params[0]?.user
+-            val contentResolver = params[0]?.contentResolver
+-            if (user?.getThumbnailFile() != null) {
+-                val source = ImageDecoder.createSource(
+-                    contentResolver!!,
+-                    Uri.fromFile(user.getThumbnailFile())
+-                )
+-                val username = user.getUsername()
+-                val imageBmp = ImageDecoder.decodeBitmap(source)
+-                return LoadUserDataResponse(username, imageBmp)
+-            } else if (user?.getUsername() != null) {
+-                return LoadUserDataResponse(user.getUsername(), null)
+-            } else {
+-                return null
+-            }
++
++    @RequiresApi(Build.VERSION_CODES.P)
++    fun loadUserThumbnail(thumbnailFile: File?, weakReferenceContentResolver: WeakReference<ContentResolver>): Bitmap? {
++        val content = weakReferenceContentResolver.get()
++        return if (thumbnailFile != null && thumbnailFile.exists()) {
++            val source = ImageDecoder.createSource(content!!, Uri.fromFile(thumbnailFile))
++            ImageDecoder.decodeBitmap(source)
++        } else {
++            null
+         }
+-
+-        @RequiresApi(Build.VERSION_CODES.P)
+-        override fun onPostExecute(result: LoadUserDataResponse?) {
+-            callback.onUserDataReturned(result)
+         }
+-
+-        class TaskParams(var user: User?, var contentResolver: ContentResolver)
+-        class LoadUserDataResponse(var username: String?, var imageBmp: Bitmap?)
+-    }
+-
+ 
+     ////////////////////////////////////////////////////////////////////////////////////////////////
+ 
+-    class CourseCredentialsSave(
+-        private var callback: OnCourseCredentialsSaveComplete,
+-        private var context: WeakReference<Context>
+-    ) : AsyncTask<CourseCredentialsSave.TaskParams, Void?, Boolean?>() {
+-        @RequiresApi(Build.VERSION_CODES.P)
+-        override fun doInBackground(vararg params: TaskParams?): Boolean? {
+-            // Save the Meta information
+-            val course = params[0]?.course
+-            val imageUri = params[0]?.imageUri
+-
+-            if (course != null) {
+-                saveCredentials(course)
+-            }
++    @RequiresApi(Build.VERSION_CODES.P)
++    fun courseCredentialsSave(course: Course?, imageUri: Uri?, context: WeakReference<Context>): Boolean {
++        if (course != null) {
++            saveCredentials(course, context)
++        }
+ 
+-            // Save Photo URI
+-            savePhotoUri(imageUri, course)
++        // Save Photo URI
++        savePhotoUri(imageUri, course, context)
+ 
+-            return true
+-        }
++        return true
++
++
++
++    }
+ 
+-        @RequiresApi(api = Build.VERSION_CODES.O)
+-        private fun saveCredentials(course: Course) {
++    @RequiresApi(Build.VERSION_CODES.O)
++    private fun saveCredentials(course: Course, context: WeakReference<Context>) {
+ 
+-            val course = course
+-
+-            val courseMetadata = HashMap<String?, String?>()
++        val course = course
++        val courseMetadata = HashMap<String?, String?>()
+ 
+-            courseMetadata[JSONEnum.USER_NAME_KEY.key] =
+-                course?.getCreator()?.getUserUUID().toString()
+-            courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
+-            courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
+-            courseMetadata[JSONEnum.COURSE_CREATION_DATETIME.key] =
+-                course.getCreationDate()?.toString()
+-            val isoCode = course.getCourseCountry()?.getIsoCode()
+-            if (isoCode == null) {
+-                courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = "null"
+-            } else {
+-                courseMetadata[JSONEnum.COURSE_LANGUAGE.key] =
+-                    course.getCourseCountry()?.getIsoCode()
+-            }
+-            courseMetadata[JSONEnum.COURSE_CATEGORY.key] =
+-                JSONArray(course.getCourseCategory().toString()).toString()
+-            courseMetadata[JSONEnum.COURSE_SLIDES.key] =
+-                JSONArray(course.getSlides().toString()).toString()
++        courseMetadata[JSONEnum.USER_NAME_KEY.key] = course?.getCreator()?.getUserUUID().toString()
++        courseMetadata[JSONEnum.COURSE_NAME_KEY.key] = course?.getCourseName()
++        courseMetadata[JSONEnum.COURSE_UUID_KEY.key] = course?.getCourseUUID().toString()
++        courseMetadata[JSONEnum.COURSE_CREATION_DATETIME.key] = course.getCreationDate()?.toString()
++        val isoCode = course.getCourseCountry()?.getIsoCode()
++        if (isoCode == null) {
++            courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = "null"
++        } else {
++            courseMetadata[JSONEnum.COURSE_LANGUAGE.key] = course.getCourseCountry()?.getIsoCode()
++        }
++        courseMetadata[JSONEnum.COURSE_CATEGORY.key] = JSONArray(course.getCourseCategory().toString()).toString()
++        courseMetadata[JSONEnum.COURSE_SLIDES.key] = JSONArray(course.getSlides().toString()).toString()
+ 
+-            val courseMetaDataPath = Paths.get(
+-                context.get()?.getExternalFilesDir(null).toString(),
+-                FileEnum.USER_DIRECTORY.key,
+-                FileEnum.COURSE_DIRECTORY.key,
+-                course?.getCourseUUID().toString(),
+-                FileEnum.META_DATA_FILE.key
+-            )
++        val courseMetaDataPath = Paths.get(
++            context.get()?.getExternalFilesDir(null).toString(),
++            FileEnum.USER_DIRECTORY.key,
++            FileEnum.COURSE_DIRECTORY.key,
++            course?.getCourseUUID().toString(),
++            FileEnum.META_DATA_FILE.key
++        )
+ 
+-            val courseMetaDataFile = FileHelper.createFileAtPath(courseMetaDataPath)
+-            val courseJSONMeta = JSONHelper.createJSONFromHashMap(courseMetadata)
++        val courseMetaDataFile = FileHelper.createFileAtPath(courseMetaDataPath)
++        val courseJSONMeta = JSONHelper.createJSONFromHashMap(courseMetadata)
+ 
+ 
+-            FileHelper.writeToFile(courseMetaDataFile, courseJSONMeta.toString())
+-        }
++        FileHelper.writeToFile(courseMetaDataFile, courseJSONMeta.toString())
++    }
+ 
+-        @RequiresApi(api = Build.VERSION_CODES.P)
+-        private fun savePhotoUri(photoUri: Uri?, course: Course?) {
+-            if (photoUri != null) {
++    @RequiresApi(Build.VERSION_CODES.P)
++    private fun savePhotoUri(photoUri: Uri?, course: Course?, context: WeakReference<Context>) {
++        if (photoUri != null) {
+ 
+-                val bitmap = ImageDecoder.decodeBitmap(
+-                    ImageDecoder.createSource(
+-                        context.get()?.contentResolver!!,
+-                        photoUri
+-                    )
+-                )
+-                val userThumbnailPicturePath = Paths.get(
+-                    context.get()?.getExternalFilesDir(null).toString(),
+-                    FileEnum.USER_DIRECTORY.key,
+-                    FileEnum.COURSE_DIRECTORY.key,
+-                    course?.getCourseUUID().toString(),
+-                    FileEnum.PHOTO_THUMBNAIL_FILE.key
+-                )
+-                val file = File(userThumbnailPicturePath.toString())
++            val bitmap = ImageDecoder.decodeBitmap(ImageDecoder.createSource(context.get()?.contentResolver!!, photoUri))
++            val userThumbnailPicturePath = Paths.get(context.get()?.getExternalFilesDir(null).toString(),
++                FileEnum.USER_DIRECTORY.key,
++                FileEnum.COURSE_DIRECTORY.key,
++                course?.getCourseUUID().toString(),
++                FileEnum.PHOTO_THUMBNAIL_FILE.key)
++            val file = File(userThumbnailPicturePath.toString())
+ 
+-                FileHelper.writeBitmapToFile(file, bitmap)
+-            }
+-        }
++            FileHelper.writeBitmapToFile(file, bitmap)
++        }
++    }
+ 
+ 
+-        @RequiresApi(Build.VERSION_CODES.P)
+-        override fun onPostExecute(result: Boolean?) {
+-            callback.onCourseDataReturned(result)
+-        }
+-
+-        class TaskParams(var course: Course?, var imageUri: Uri?)
+-
+-    }
+-
+-
+-    class CreatorCourseCredentialsLoad(private var callback: OnCreatorCourseCredentialsLoad) :
+-        AsyncTask<CreatorCourseCredentialsLoad.TaskParams, Void?, ArrayList<Pair<Course, Uri?>>>() {
++    class CreatorCourseCredentialsLoad(private var callback: OnCreatorCourseCredentialsLoad) : AsyncTask<CreatorCourseCredentialsLoad.TaskParams, Void?, ArrayList<Pair<Course, Uri?>>>() {
+         @RequiresApi(Build.VERSION_CODES.P)
+         override fun doInBackground(vararg params: TaskParams?): ArrayList<Pair<Course, Uri?>>? {
+             var courses = ArrayList<Pair<Course, Uri?>>()
+@@ -292,8 +218,7 @@
+                 for (courseFolder in coursesFile.listFiles()) {
+ 
+                     if (courseFolder.isDirectory) {
+-                        val jsonFilePath =
+-                            Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
++                        val jsonFilePath = Paths.get(courseFolder.toString(), FileEnum.META_DATA_FILE.key)
+ 
+                         val jsonFile = jsonFilePath.toFile()
+ 
+@@ -308,18 +233,13 @@
+                             // Course Name
+                             val courseName = jsonContents?.get(JSONEnum.COURSE_NAME_KEY.key)
+                             // Category
+-                            val categoryJSON = JSONArray(
+-                                jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString()
+-                            )
++                            val categoryJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_CATEGORY.key).toString())
+                             // Language
+                             val language = jsonContents?.get(JSONEnum.COURSE_LANGUAGE.key)
+                             // Timestamp
+-                            val courseCreationTimestamp =
+-                                jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString()
+-                                    .toLong()
++                            val courseCreationTimestamp = jsonContents?.get(JSONEnum.COURSE_CREATION_DATETIME.key).toString().toLong()
+                             // Slides
+-                            val slidesJSON =
+-                                JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())
++                            val slidesJSON = JSONArray(jsonContents?.get(JSONEnum.COURSE_SLIDES.key).toString())
+ 
+                             // Creation course
+                             val course = Course(UUID.fromString(courseUUID as String?), user)
+@@ -327,11 +247,7 @@
+                             //  Adding course name
+                             course.setCourseName(courseName as String)
+                             // Adding Course Category
+-                            course.setCourseCategory(
+-                                CategoryEnum.getCategoriesFromJSONArray(
+-                                    categoryJSON as JSONArray
+-                                )
+-                            )
++                            course.setCourseCategory(CategoryEnum.getCategoriesFromJSONArray(categoryJSON as JSONArray))
+                             // Adding Course language
+                             if (language.toString() == "null") {
+                                 course.setCourseCountry(Country(null))
+@@ -346,10 +262,7 @@
+                             course.setSlidesFromJSONArray(slidesJSON)
+ 
+                             // Thumbnail
+-                            val imagePath = Paths.get(
+-                                courseFolder.toString(),
+-                                FileEnum.PHOTO_THUMBNAIL_FILE.key
+-                            )
++                            val imagePath = Paths.get(courseFolder.toString(), FileEnum.PHOTO_THUMBNAIL_FILE.key)
+                             val imageFile = imagePath.toFile()
+                             val imageUri = Uri.fromFile(imageFile)
+ 
+@@ -382,112 +295,49 @@
+ 
+ 
+     ///////////////////////////////////////////////////////////////////////////////////////////////
+-    class VideoUriSave(
+-        private var callback: OnVideoUriSaved,
+-        private var weakReferenceContentResolver: WeakReference<ContentResolver>
+-    ) : AsyncTask<VideoUriSave.TaskParams, Void?, File?>() {
+-        override fun doInBackground(vararg params: TaskParams?): File? {
+-            val outputFile = params[0]?.outputFile
+-            val videoUri = params[0]?.videoUri
+ 
+-            if (outputFile != null && outputFile.exists()) {
+-                if (videoUri != null) {
+-                    return FileHelper.copyVideoToFile(
+-                        outputFile,
+-                        videoUri,
+-                        weakReferenceContentResolver.get()
+-                    )
+-                }
+-            }
+-            return null
+-
+-        }
+-
+-        @RequiresApi(Build.VERSION_CODES.P)
+-        override fun onPostExecute(result: File?) {
+-            callback.onVideoUriSaved(result)
+-        }
+-
+-        class TaskParams(var outputFile: File?, var videoUri: Uri?)
+-
++    fun videoUriSave(outputFile: File?, videoUri: Uri?, weakReferenceContentResolver: WeakReference<ContentResolver>): File? {
++        if (outputFile != null && outputFile.exists()) {
++            if (videoUri != null) {
++                return FileHelper.copyVideoToFile(outputFile, videoUri, weakReferenceContentResolver.get())
++            }
++        }
++        return null
+     }
+-
+-
+-    class DeleteFile(private var callback: OnDeleteFile) :
+-        AsyncTask<DeleteFile.TaskParams, Boolean?, Boolean?>() {
+-        override fun doInBackground(vararg params: TaskParams?): Boolean? {
+-            val deleteFile = params[0]?.deleteFile
+-            val deleteSlide = params[0]?.deleteSlide
+-            FileHelper.deleteFile(deleteFile)
+-            return deleteSlide
+-        }
+ 
+-        @RequiresApi(Build.VERSION_CODES.P)
+-        override fun onPostExecute(result: Boolean?) {
+-            callback.onDeleteFile(result)
+-        }
+ 
+-        class TaskParams(var deleteFile: File?, var deleteSlide: Boolean?)
++    fun updateJSONFile(courseMetaFile: File, slideHashMap: java.util.HashMap<String, java.util.ArrayList<String>>): Boolean {
+ 
+-    }
++        val contents = FileHelper.readFile(courseMetaFile)
+ 
++        val jsonContents = JSONHelper.createJSONFromString(contents!!)
+ 
+-    class UpdateJSONFile(private var callback: OnUpdatedJSONFile) :
+-        AsyncTask<UpdateJSONFile.TaskParams, Boolean?, Boolean?>() {
+-        override fun doInBackground(vararg params: UpdateJSONFile.TaskParams?): Boolean? {
+-            val fileToUpdate = params[0]?.fileToUpdate
+-            val hashMapData = params[0]?.hashMapData
+-
+-            var contents = FileHelper.readFile(fileToUpdate)
+-
+-            var jsonContents = JSONHelper.createJSONFromString(contents!!)
+-
+-            for ((key, value) in hashMapData!!) {
+-                jsonContents!!.put(key, value)
+-            }
+-
+-            return FileHelper.writeToFile(fileToUpdate, jsonContents.toString())
++        for ((key, value) in slideHashMap) {
++            jsonContents!!.put(key, value)
+         }
+-
+-        @RequiresApi(Build.VERSION_CODES.P)
+-        override fun onPostExecute(result: Boolean?) {
+-            callback.onUpdatedJSONFile(result)
+-        }
++        return FileHelper.writeToFile(courseMetaFile, jsonContents.toString())
++    }
+ 
+-        class TaskParams(
+-            var fileToUpdate: File?,
+-            var hashMapData: HashMap<String, ArrayList<String>>?
+-        )
+-
+-    }
+-
+-    class DeleteCourse(
+-        private var callback: OnCourseDeleted,
+-        private var context: WeakReference<Context>
+-    ) : AsyncTask<DeleteCourse.TaskParams, Course?, Course?>() {
+-
+-        class TaskParams(var course: Course)
+ 
+-        @RequiresApi(Build.VERSION_CODES.O)
+-        override fun doInBackground(vararg params: TaskParams?): Course? {
+-            val course = params[0]?.course
+-            val coursePath = Paths.get(
+-                context.get()?.getExternalFilesDir(null).toString(),
+-                FileEnum.USER_DIRECTORY.key,
+-                FileEnum.COURSE_DIRECTORY.key,
+-                course?.getCourseUUID().toString()
+-            )
++    @RequiresApi(Build.VERSION_CODES.O)
++    fun deleteCourse(rootDir: File?, course: Course): Boolean {
++        if (rootDir?.exists() == true) {
++            val coursePath = Paths.get(rootDir.toString(),
++            FileEnum.USER_DIRECTORY.key,
++            FileEnum.COURSE_DIRECTORY.key,
++            course.getCourseUUID().toString())
+             val courseFile = coursePath.toFile()
+             FileHelper.deleteFile(courseFile)
+-            return course
+-        }
++            return true} else {return false}
++    }
+ 
+-        @RequiresApi(Build.VERSION_CODES.P)
+-        override fun onPostExecute(course: Course?) {
+-            callback.onCourseDeleted(course)
+-        }
++
+ 
++    interface OnCourseDeleted {
++        fun onCourseDeleted(result: Course?)
+     }
++
++
+ 
+     class GroupOwnerReceiveClientInetAddressAsyncTask(
+         private var callback: OnClientInetAddressReceived
+@@ -676,12 +526,6 @@
+             return true
+         }
+ 
+-        @Override
+-        override fun onPostExecute(result: Boolean?) {
+-            callback.onCourseSent(result)
+-        }
+-
+-
+         private fun copyFile(inputStream: InputStream?, out: OutputStream): Boolean {
+             val buf = ByteArray(1024)
+             var len: Int
+@@ -696,11 +540,11 @@
+             }
+             return true
+         }
+-
+         class TaskParams(
+             var courseZipFile: File?,
+             var courseUUID: UUID?
+         )
+ 
+     }
++
+ }
+Index: app/src/main/java/com/baro/ui/share/p2p/WifiDirectActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.baro.ui.share.p2p\n\nimport android.Manifest\nimport android.content.BroadcastReceiver\nimport android.content.Context\nimport android.content.IntentFilter\nimport android.content.pm.PackageManager\nimport android.net.wifi.p2p.*\nimport android.os.Bundle\nimport android.widget.Toast\nimport androidx.appcompat.app.AppCompatActivity\nimport androidx.core.app.ActivityCompat\nimport com.baro.R\nimport com.baro.constants.AppCodes\nimport com.baro.constants.AppTags\nimport com.baro.helpers.AsyncHelpers\nimport com.baro.helpers.interfaces.OnClientInetAddressReceived\nimport com.baro.helpers.interfaces.OnClientInetAddressSent\nimport com.baro.models.Course\nimport java.net.InetAddress\nimport java.util.*\n\n\n\nclass WifiDirectActivity : AppCompatActivity(), WifiP2pManager.ConnectionInfoListener,\n    OnClientInetAddressReceived, OnClientInetAddressSent {\n\n    private var course: Course? = null\n\n    // WifiDirect\n    private val manager: WifiP2pManager? by lazy(LazyThreadSafetyMode.NONE) {\n        getSystemService(Context.WIFI_P2P_SERVICE) as WifiP2pManager?\n    }\n    private var channel: WifiP2pManager.Channel? = null\n    private var receiver: BroadcastReceiver? = null\n\n    private var isReceiving: Boolean = false\n    private var isSetUp: Boolean? = null\n\n    private var otherDeviceInetAddress: InetAddress? = null\n\n\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        setContentView(R.layout.activity_wifi_direct)\n\n        getUserIntent()\n        configureView()\n\n        initWifiP2P()\n        discoverPeers()\n    }\n\n    private fun getUserIntent() {\n        isReceiving = intent.extras?.get(AppTags.WIFIP2P_INTENT.name) != AppCodes.WIFIP2P_PEER_SEND.code\n\n        if (!isReceiving){\n            course = intent.getParcelableExtra(AppTags.COURSE_OBJECT.name) as Course\n        }\n\n    }\n\n\n    private fun configureView() {\n\n        if (!isReceiving){\n            val peerConnectionSelectionFragment: WifiDirectPeerConnectionSelectionFragment =\n                WifiDirectPeerConnectionSelectionFragment.newInstance()\n            supportFragmentManager.beginTransaction()\n                .add(R.id.fragment_container_peer_connection, peerConnectionSelectionFragment, null)\n                .commit()\n        } else{\n            val peerConnectionWaitingRoomFragment: WifiDirectPeerConnectionWaitingRoomFragment =\n                WifiDirectPeerConnectionWaitingRoomFragment.newInstance()\n            supportFragmentManager.beginTransaction()\n                .add(R.id.fragment_container_peer_connection, peerConnectionWaitingRoomFragment, null)\n                .commit()\n        }\n    }\n\n\n    private fun discoverPeers() {\n        if (ActivityCompat.checkSelfPermission(\n                this,\n                Manifest.permission.ACCESS_FINE_LOCATION\n            ) != PackageManager.PERMISSION_GRANTED\n        ) {\n            // TODO: Consider calling\n            //    ActivityCompat#requestPermissions\n            // here to request the missing permissions, and then overriding\n            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,\n            //                                          int[] grantResults)\n            // to handle the case where the user grants the permission. See the documentation\n            // for ActivityCompat#requestPermissions for more details.\n            return\n        }\n        manager?.discoverPeers(channel, object : WifiP2pManager.ActionListener {\n\n            override fun onSuccess() {\n                Toast.makeText(applicationContext, \"DEBUG: Discovering peers\", Toast.LENGTH_LONG)\n                    .show()\n            }\n\n            override fun onFailure(reasonCode: Int) {\n                Toast.makeText(\n                    applicationContext,\n                    \"DEBUG: Cannot discover peers\",\n                    Toast.LENGTH_LONG\n                ).show()\n            }\n        })\n\n    }\n\n    private fun initWifiP2P() {\n        channel = manager?.initialize(this, mainLooper, null)\n        channel?.also { channel ->\n            receiver = manager?.let { WiFiDirectBroadcastReceiver(it, channel, this) }\n        }\n    }\n\n    private val intentFilter = IntentFilter().apply {\n        addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION)\n        addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION)\n        addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION)\n        addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)\n    }\n\n\n    /* register the broadcast receiver with the intent values to be matched */\n    override fun onResume() {\n        super.onResume()\n        receiver?.also { receiver ->\n            registerReceiver(receiver, intentFilter)\n        }\n    }\n\n    /* unregister the broadcast receiver */\n    override fun onPause() {\n        super.onPause()\n        receiver?.also { receiver ->\n            unregisterReceiver(receiver)\n        }\n\n        manager!!.removeGroup(channel, object : WifiP2pManager.ActionListener {\n            override fun onSuccess() {\n                Toast.makeText(\n                    applicationContext,\n                    \"DEBUG: Device disconnected\", Toast.LENGTH_LONG\n                ).show()\n            }\n\n            override fun onFailure(reason: Int) {\n                Toast.makeText(\n                    applicationContext,\n                    \"DEBUG: Could not disconnect devices Reason :$reason\", Toast.LENGTH_LONG\n                ).show()\n            }\n        })\n    }\n\n    // Notify WifiDirectPeerConnectFragment\n    fun wifiDirectStatusUpdate(wifiDirectConnected: Boolean) {\n        if (!isReceiving) {\n            val wifiDirectPeerConnectionFragment = supportFragmentManager\n                .findFragmentById(R.id.fragment_container_peer_connection) as WifiDirectPeerConnectionSelectionFragment?\n            wifiDirectPeerConnectionFragment?.changeWifiDirectStatus(wifiDirectConnected)\n        } else {\n            val wifiDirectPeerWaitingRoomFragment = supportFragmentManager\n                .findFragmentById(R.id.fragment_container_peer_connection) as WifiDirectPeerConnectionWaitingRoomFragment?\n            wifiDirectPeerWaitingRoomFragment?.changeWifiDirectStatus(wifiDirectConnected)\n        }\n\n    }\n\n    fun updateWifiP2PDeviceList(wifiP2pDeviceList: MutableCollection<WifiP2pDevice>) {\n        if(!isReceiving) {\n            val wifiDirectPeerConnectionFragment = supportFragmentManager\n                .findFragmentById(R.id.fragment_container_peer_connection) as WifiDirectPeerConnectionSelectionFragment\n            wifiDirectPeerConnectionFragment.updateWifiP2PDeviceList(wifiP2pDeviceList)\n        }\n    }\n\n\n    fun connectClientDevice(device: WifiP2pDevice) {\n        val config = WifiP2pConfig()\n\n        config.deviceAddress = device.deviceAddress\n        channel?.also { channel ->\n            if (ActivityCompat.checkSelfPermission(\n                    this,\n                    Manifest.permission.ACCESS_FINE_LOCATION\n                ) != PackageManager.PERMISSION_GRANTED\n            ) {\n                // TODO: Consider calling\n                //    ActivityCompat#requestPermissions\n                // here to request the missing permissions, and then overriding\n                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,\n                //                                          int[] grantResults)\n                // to handle the case where the user grants the permission. See the documentation\n                // for ActivityCompat#requestPermissions for more details.\n                return\n            }\n            manager?.connect(channel, config, object : WifiP2pManager.ActionListener {\n\n                override fun onSuccess() {\n                    Toast.makeText(\n                        applicationContext,\n                        \"DEBUG: Connection to \" + device.deviceName,\n                        Toast.LENGTH_LONG\n                    ).show()\n                }\n\n                override fun onFailure(reason: Int) {\n                    Toast.makeText(\n                        applicationContext,\n                        \"DEBUG: No connection established\",\n                        Toast.LENGTH_LONG\n                    ).show()\n                }\n            })\n        }\n    }\n\n    override fun onConnectionInfoAvailable(info: WifiP2pInfo?) {\n        if (isSetUp == null) {\n            if (info?.isGroupOwner == true && info?.groupFormed) {\n                Toast.makeText(\n                    applicationContext,\n                    \"DEBUG: GROUP OWNER\",\n                    Toast.LENGTH_LONG\n                ).show()\n                if (!isReceiving) {\n                    val dataReceiver = AsyncHelpers.GroupOwnerReceiveClientInetAddressAsyncTask(this)\n                    dataReceiver.execute()\n                } else {\n                    shareCourse()\n                }\n\n            } else {\n                otherDeviceInetAddress = info?.groupOwnerAddress\n                if (isReceiving) {\n                    val wifiReceiver = WifiDirectEndpoint(\n                        AsyncHelpers.GroupOwnerReceiveClientInetAddressAsyncTask.PORT_GET_CLIENT_INET,\n                        info?.groupOwnerAddress)\n                    val dataSender =\n                        AsyncHelpers.ClientSendInetAddressAsyncTask(wifiReceiver, this)\n                    dataSender.execute()\n                } else {\n                    shareCourse()\n                }\n            }\n        }\n\n\n    }\n\n\n    override fun onClientInetAddressReceived(clientInetAddress: InetAddress?) {\n        Toast.makeText(\n            applicationContext,\n            \"DEBUG: Received Client's IP: \" + clientInetAddress?.hostAddress,\n            Toast.LENGTH_LONG\n\n        ).show()\n        otherDeviceInetAddress = clientInetAddress\n        shareCourse()\n    }\n\n    override fun onClientInetAddressRSent() {\n        shareCourse()\n    }\n\n\n    private fun shareCourse() {\n        isSetUp = true\n        if (isReceiving) {\n            val receiveFragment: WifiDirectCourseReceiveFragment =\n                WifiDirectCourseReceiveFragment.newInstance()\n\n            supportFragmentManager.beginTransaction()\n                .add(R.id.fragment_container_send_receive, receiveFragment, null)\n                .addToBackStack(AppTags.RECEIVE_COURSE_FRAGMENT.name)\n                .setReorderingAllowed(true)\n                .commit()\n\n        } else {\n\n            val sendFragment: WifiDirectCourseSendFragment =\n                WifiDirectCourseSendFragment.newInstance(course, otherDeviceInetAddress)\n\n            supportFragmentManager.beginTransaction()\n                .add(R.id.fragment_container_send_receive, sendFragment, null)\n                .addToBackStack(AppTags.SEND_COURSE_FRAGMENT.name)\n                .setReorderingAllowed(true)\n                .commit()\n        }\n\n    }\n\n\n\n\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/baro/ui/share/p2p/WifiDirectActivity.kt	(revision a4d452775bd205313faaaf74d89777d5d9ef6bd5)
++++ app/src/main/java/com/baro/ui/share/p2p/WifiDirectActivity.kt	(date 1625415127388)
+@@ -55,7 +55,7 @@
+         isReceiving = intent.extras?.get(AppTags.WIFIP2P_INTENT.name) != AppCodes.WIFIP2P_PEER_SEND.code
+ 
+         if (!isReceiving){
+-            course = intent.getParcelableExtra(AppTags.COURSE_OBJECT.name) as Course
++            course = intent.getParcelableExtra(AppTags.COURSE_OBJECT.name) as Course?
+         }
+ 
+     }
+Index: app/src/main/java/com/baro/ui/account/AccountActivity.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.baro.ui.account\n\nimport android.content.Context\nimport android.net.Uri\nimport android.os.Build\nimport android.os.Bundle\nimport android.widget.ImageButton\nimport android.widget.ImageView\nimport androidx.annotation.RequiresApi\nimport androidx.appcompat.app.AppCompatActivity\nimport androidx.fragment.app.Fragment\nimport androidx.recyclerview.widget.GridLayoutManager\nimport androidx.recyclerview.widget.RecyclerView\nimport com.baro.R\nimport com.baro.adapters.CourseAdapter\nimport com.baro.constants.AppTags\nimport com.baro.constants.FileEnum\nimport com.baro.helpers.AsyncHelpers\nimport com.baro.helpers.interfaces.OnCourseCreate\nimport com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete\nimport com.baro.helpers.interfaces.OnCourseDeleted\nimport com.baro.helpers.interfaces.OnUserDataFound\nimport com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad\nimport com.baro.models.Course\nimport com.baro.models.User\nimport com.baro.ui.create.CreateCourseSummaryFragment\nimport com.baro.ui.create.EditCourseSummaryFragment\nimport java.lang.ref.WeakReference\nimport java.nio.file.Paths\nimport java.util.*\nimport kotlin.collections.ArrayList\n\n\nclass AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad,\n    CourseAdapter.OnCourseSelected, OnCourseCredentialsSaveComplete, OnCourseDeleted, OnCourseCreate{\n    // UI\n    private lateinit var userThumbnailImageView: ImageView\n    private lateinit var followersButton: ImageButton\n    private lateinit var settingsButton: ImageButton\n    private lateinit var createButton: ImageButton\n    private lateinit var courseRecycleView: RecyclerView\n\n    // Model\n    private var user: User? = null\n    private lateinit var courses: ArrayList<Pair<Course, Uri?>>\n    private var courseAdapter: CourseAdapter? = null\n\n    @RequiresApi(Build.VERSION_CODES.O)\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        setContentView(R.layout.activity_account)\n\n        // Gets User Credentials\n        user = intent.getParcelableExtra(AppTags.USER_OBJECT.name)\n\n        // Configure UI\n        configureUserThumbnailImageView()\n        configureFollowersButton()\n        configureSettingsButton()\n        configureCreateButton()\n        configureRecycleView()\n\n        // Update UI with User Credentials\n        val loadUserDataParams = AsyncHelpers.LoadUserData.TaskParams(user, this.contentResolver)\n        val userRetrieveThumbnail = AsyncHelpers.LoadUserData(this)\n        userRetrieveThumbnail.execute(loadUserDataParams)\n\n    }\n\n    override fun onBackPressed() {\n        tellFragments()\n        super.onBackPressed()\n    }\n\n    private fun tellFragments() {\n        val fragments: List<Fragment> = supportFragmentManager.fragments\n        for (f in fragments) {\n            if (f != null && f is EditCourseSummaryFragment) {\n                f.onBackPressed()\n            }\n        }\n    }\n\n\n    private fun configureCreateButton() {\n        createButton = findViewById(R.id.btn_create)\n\n        createButton.setOnClickListener {\n            // TODO __PERMISSION_REFACTOR__\n\n            val course = Course(UUID.randomUUID(), user)\n            course.setCreationDate(System.currentTimeMillis())\n            val createCourseSummaryFragment: CreateCourseSummaryFragment =\n                CreateCourseSummaryFragment.newInstance(course)\n\n            supportFragmentManager.beginTransaction()\n                .add(R.id.fragment_container_peer_connection, createCourseSummaryFragment, null)\n                .addToBackStack(AppTags.CREATE_COURSE_SUMMARY_FRAGMENT.name)\n                .setReorderingAllowed(true)\n                .commit()\n        }\n    }\n\n    private fun configureUserThumbnailImageView() {\n        userThumbnailImageView = findViewById(R.id.im_account)\n    }\n\n    private fun configureFollowersButton() {\n        followersButton = findViewById(R.id.btn_followers)\n        followersButton.setOnClickListener {\n            // TODO - this will display the Users the current user is following - allows for deletion/access straight to their profile\n        }\n    }\n\n    private fun configureSettingsButton() {\n        settingsButton = findViewById(R.id.btn_settings)\n        settingsButton.setOnClickListener {\n            // TODO - this will display account settings: deleting account, changing password if Internet, etc.\n        }\n    }\n\n    @RequiresApi(Build.VERSION_CODES.O)\n    private fun configureRecycleView() {\n        courseRecycleView = findViewById(R.id.grid_courses)\n        courseRecycleView.layoutManager =\n            GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false)\n\n        getCoursesFromFiles()\n    }\n\n    @RequiresApi(Build.VERSION_CODES.O)\n    private fun getCoursesFromFiles() {\n        var coursePath = Paths.get(\n            getExternalFilesDir(null).toString(),\n            FileEnum.USER_DIRECTORY.key,\n            FileEnum.COURSE_DIRECTORY.key\n        )\n        var params = AsyncHelpers.CreatorCourseCredentialsLoad.TaskParams(coursePath, user)\n        AsyncHelpers.CreatorCourseCredentialsLoad(this).execute(params)\n    }\n\n    override fun onUserDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {\n        if (user != null) {\n            val imageBmp = userData?.imageBmp\n            if (imageBmp != null) {\n                userThumbnailImageView.setImageBitmap(imageBmp)\n            }\n        }\n\n    }\n\n    override fun onCreatorCourseCredentialsLoad(courses: ArrayList<Pair<Course, Uri?>>) {\n        this.courses = courses\n        updateRecycleView()\n    }\n\n    private fun updateRecycleView() {\n        courseAdapter?.notifyDataSetChanged()\n\n        var weakReference = WeakReference<Context>(this)\n        courseAdapter = CourseAdapter(weakReference, this.courses, this)\n        courseRecycleView.adapter = courseAdapter\n    }\n\n    override fun notifyCourseSelected(course: Course) {\n        // TODO __PERMISSION_REFACTOR_holder_\n\n        val editCourseSummaryFragment: EditCourseSummaryFragment =\n            EditCourseSummaryFragment.newInstance(course)\n\n        supportFragmentManager.beginTransaction()\n            .add(R.id.fragment_container_peer_connection, editCourseSummaryFragment, null)\n            .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)\n            .setReorderingAllowed(true)\n            .commit()\n    }\n\n    @RequiresApi(Build.VERSION_CODES.O)\n    override fun onCourseDataReturned(result: Boolean?) {\n        getCoursesFromFiles()\n        courseAdapter?.notifyDataSetChanged()\n    }\n\n    override fun onCourseDeleted(courseDeleted: Course?) {\n        var position = -1\n\n        for (course in courses) {\n            if (courseDeleted?.getCourseUUID() == course.first.getCourseUUID()) {\n                position = courses.indexOf(course)\n            }\n        }\n\n        if (position != -1) {\n            courses.removeAt(position)\n            courseAdapter?.notifyItemRemoved(position)\n            courseAdapter?.notifyItemRangeChanged(position, courses.size)\n\n        }\n\n        supportFragmentManager.popBackStack()\n    }\n\n    override fun onCourseCreate(course: Pair<Course, Uri?>) {\n        courses.add(course)\n        courseAdapter?.notifyItemInserted(courses.size - 1)\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/baro/ui/account/AccountActivity.kt	(revision a4d452775bd205313faaaf74d89777d5d9ef6bd5)
++++ app/src/main/java/com/baro/ui/account/AccountActivity.kt	(date 1625415125416)
+@@ -1,6 +1,9 @@
+ package com.baro.ui.account
+ 
++import android.app.Activity
++import android.content.ContentResolver
+ import android.content.Context
++import android.graphics.Bitmap
+ import android.net.Uri
+ import android.os.Build
+ import android.os.Bundle
+@@ -15,24 +18,26 @@
+ import com.baro.adapters.CourseAdapter
+ import com.baro.constants.AppTags
+ import com.baro.constants.FileEnum
++import com.baro.constants.PermissionsEnum
+ import com.baro.helpers.AsyncHelpers
++import com.baro.helpers.PermissionsHelper
+ import com.baro.helpers.interfaces.OnCourseCreate
+-import com.baro.helpers.interfaces.OnCourseCredentialsSaveComplete
+-import com.baro.helpers.interfaces.OnCourseDeleted
+-import com.baro.helpers.interfaces.OnUserDataFound
++import com.baro.helpers.AsyncHelpers.OnCourseDeleted
+ import com.baro.helpers.interfaceweaks.OnCreatorCourseCredentialsLoad
+ import com.baro.models.Course
+ import com.baro.models.User
+ import com.baro.ui.create.CreateCourseSummaryFragment
+ import com.baro.ui.create.EditCourseSummaryFragment
++import kotlinx.coroutines.launch
++import kotlinx.coroutines.runBlocking
+ import java.lang.ref.WeakReference
+ import java.nio.file.Paths
+ import java.util.*
+ import kotlin.collections.ArrayList
+ 
+ 
+-class AccountActivity : AppCompatActivity(), OnUserDataFound, OnCreatorCourseCredentialsLoad,
+-    CourseAdapter.OnCourseSelected, OnCourseCredentialsSaveComplete, OnCourseDeleted, OnCourseCreate{
++class AccountActivity : AppCompatActivity(), OnCreatorCourseCredentialsLoad,
++    CourseAdapter.OnCourseSelected, OnCourseDeleted, OnCourseCreate{
+     // UI
+     private lateinit var userThumbnailImageView: ImageView
+     private lateinit var followersButton: ImageButton
+@@ -45,7 +50,7 @@
+     private lateinit var courses: ArrayList<Pair<Course, Uri?>>
+     private var courseAdapter: CourseAdapter? = null
+ 
+-    @RequiresApi(Build.VERSION_CODES.O)
++    @RequiresApi(Build.VERSION_CODES.P)
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+         setContentView(R.layout.activity_account)
+@@ -61,21 +66,32 @@
+         configureRecycleView()
+ 
+         // Update UI with User Credentials
+-        val loadUserDataParams = AsyncHelpers.LoadUserData.TaskParams(user, this.contentResolver)
+-        val userRetrieveThumbnail = AsyncHelpers.LoadUserData(this)
+-        userRetrieveThumbnail.execute(loadUserDataParams)
++        updateUserCredentials()
++
++
++    }
+ 
++    @RequiresApi(Build.VERSION_CODES.P)
++    private fun updateUserCredentials() {
++        runBlocking {
++            launch {
++                val weakReference = WeakReference<ContentResolver>(contentResolver)
++                val bitmap = AsyncHelpers().loadUserThumbnail(user?.getThumbnailFile(), weakReference)
++                onUserDataReturned(bitmap) }
++        }
+     }
+ 
++    @RequiresApi(Build.VERSION_CODES.P)
+     override fun onBackPressed() {
+         tellFragments()
+         super.onBackPressed()
+     }
+ 
++    @RequiresApi(Build.VERSION_CODES.P)
+     private fun tellFragments() {
+         val fragments: List<Fragment> = supportFragmentManager.fragments
+         for (f in fragments) {
+-            if (f != null && f is EditCourseSummaryFragment) {
++            if (f is EditCourseSummaryFragment) {
+                 f.onBackPressed()
+             }
+         }
+@@ -86,18 +102,22 @@
+         createButton = findViewById(R.id.btn_create)
+ 
+         createButton.setOnClickListener {
+-            // TODO __PERMISSION_REFACTOR__
+-
+-            val course = Course(UUID.randomUUID(), user)
+-            course.setCreationDate(System.currentTimeMillis())
+-            val createCourseSummaryFragment: CreateCourseSummaryFragment =
+-                CreateCourseSummaryFragment.newInstance(course)
++            val weakReference = WeakReference<Activity>(this)
++            if (PermissionsHelper.checkAndRequestPermissions(weakReference, PermissionsEnum.CREATE_COURSE_SELECTION)) {
++                val course = Course(UUID.randomUUID(), user)
++                course.setCreationDate(System.currentTimeMillis())
++                val createCourseSummaryFragment: CreateCourseSummaryFragment =
++                    CreateCourseSummaryFragment.newInstance(course)
+ 
+-            supportFragmentManager.beginTransaction()
+-                .add(R.id.fragment_container_peer_connection, createCourseSummaryFragment, null)
+-                .addToBackStack(AppTags.CREATE_COURSE_SUMMARY_FRAGMENT.name)
+-                .setReorderingAllowed(true)
+-                .commit()
++                supportFragmentManager.beginTransaction()
++                    .add(R.id.fragment_container_peer_connection, createCourseSummaryFragment, null)
++                    .addToBackStack(AppTags.CREATE_COURSE_SUMMARY_FRAGMENT.name)
++                    .setReorderingAllowed(true)
++                    .commit()
++            }
++
++
++
+         }
+     }
+ 
+@@ -130,24 +150,21 @@
+ 
+     @RequiresApi(Build.VERSION_CODES.O)
+     private fun getCoursesFromFiles() {
+-        var coursePath = Paths.get(
++        val coursePath = Paths.get(
+             getExternalFilesDir(null).toString(),
+             FileEnum.USER_DIRECTORY.key,
+             FileEnum.COURSE_DIRECTORY.key
+         )
+-        var params = AsyncHelpers.CreatorCourseCredentialsLoad.TaskParams(coursePath, user)
++        val params = AsyncHelpers.CreatorCourseCredentialsLoad.TaskParams(coursePath, user)
+         AsyncHelpers.CreatorCourseCredentialsLoad(this).execute(params)
+     }
+ 
+-    override fun onUserDataReturned(userData: AsyncHelpers.LoadUserData.LoadUserDataResponse?) {
+-        if (user != null) {
+-            val imageBmp = userData?.imageBmp
+-            if (imageBmp != null) {
+-                userThumbnailImageView.setImageBitmap(imageBmp)
+-            }
+-        }
++    private fun onUserDataReturned(imageBitmap: Bitmap?) {
++        if (imageBitmap != null) {
++            userThumbnailImageView.setImageBitmap(imageBitmap)
++        }
++    }
+ 
+-    }
+ 
+     override fun onCreatorCourseCredentialsLoad(courses: ArrayList<Pair<Course, Uri?>>) {
+         this.courses = courses
+@@ -157,35 +174,32 @@
+     private fun updateRecycleView() {
+         courseAdapter?.notifyDataSetChanged()
+ 
+-        var weakReference = WeakReference<Context>(this)
++        val weakReference = WeakReference<Context>(this)
+         courseAdapter = CourseAdapter(weakReference, this.courses, this)
+         courseRecycleView.adapter = courseAdapter
+     }
+ 
+     override fun notifyCourseSelected(course: Course) {
+-        // TODO __PERMISSION_REFACTOR_holder_
++
++        val weakReference = WeakReference<Activity>(this)
++        if (PermissionsHelper.checkAndRequestPermissions(weakReference, PermissionsEnum.READ_COURSE)) {
+ 
+-        val editCourseSummaryFragment: EditCourseSummaryFragment =
+-            EditCourseSummaryFragment.newInstance(course)
++            val editCourseSummaryFragment: EditCourseSummaryFragment =
++                EditCourseSummaryFragment.newInstance(course)
+ 
+-        supportFragmentManager.beginTransaction()
+-            .add(R.id.fragment_container_peer_connection, editCourseSummaryFragment, null)
+-            .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)
+-            .setReorderingAllowed(true)
+-            .commit()
+-    }
+-
+-    @RequiresApi(Build.VERSION_CODES.O)
+-    override fun onCourseDataReturned(result: Boolean?) {
+-        getCoursesFromFiles()
+-        courseAdapter?.notifyDataSetChanged()
++            supportFragmentManager.beginTransaction()
++                .add(R.id.fragment_container_peer_connection, editCourseSummaryFragment, null)
++                .addToBackStack(AppTags.EDIT_COURSE_SUMMARY_FRAGMENT.name)
++                .setReorderingAllowed(true)
++                .commit()
++        }
+     }
+ 
+-    override fun onCourseDeleted(courseDeleted: Course?) {
++    override fun onCourseDeleted(result: Course?) {
+         var position = -1
+ 
+         for (course in courses) {
+-            if (courseDeleted?.getCourseUUID() == course.first.getCourseUUID()) {
++            if (result?.getCourseUUID() == course.first.getCourseUUID()) {
+                 position = courses.indexOf(course)
+             }
+         }
+@@ -204,4 +218,11 @@
+         courses.add(course)
+         courseAdapter?.notifyItemInserted(courses.size - 1)
+     }
++
++    @RequiresApi(Build.VERSION_CODES.O)
++    override fun onResume() {
++        super.onResume()
++        getCoursesFromFiles()
++        courseAdapter?.notifyDataSetChanged()
++    }
+ }
+\ No newline at end of file
+Index: app/src/main/res/values/strings.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><resources>\n    <string name=\"app_name\">Baro</string>\n    <string name=\"account\">Account</string>\n    <string name=\"create\">Create</string>\n    <string name=\"share\">Share</string>\n    <string name=\"followers\">Followers</string>\n    <string name=\"settings\">Settings</string>\n    <string name=\"course_name\">Course Name</string>\n    <string name=\"username\">Username</string>\n    <string name=\"share_locally\">Share Locally</string>\n    <string name=\"share_online\">Share Online</string>\n    <string name=\"receive\">Receive</string>\n    <string name=\"send\">Send</string>\n    <string name=\"toast_no_username_found\">No username found.</string>\n    <string name=\"please_enter_valid_username_toast\">Please enter a valid username</string>\n    <string name=\"need_camera_access_toast\">Need camera access</string>\n    <string name=\"write_storage_permission\">Need write external storage access</string>\n    <string name=\"read_storage_permission\">Need read external storage access</string>\n    <string name=\"choose_image_input\">Image Input</string>\n    <string name=\"error_saving_credentials\">Error in saving credentials</string>\n    <string name=\"learn\">Learn</string>\n    <string name=\"error_retrieving_credentials\">Could not retrieve credentials</string>\n    <string name=\"text_choose_category\">Choose Category</string>\n    <string name=\"text_choose_thumbnail\">Choose Thumbnail</string>\n    <string name=\"lenght_course_name_warning_toast\">Course should have a longer name.</string>\n    <string name=\"video_not_saved\">Video was not saved correctly</string>\n    <string name=\"choose_language\">Choose Language</string>\n    <string name=\"flag_name\">Flag Name</string>\n    <string name=\"choose_Categories\">Choose Categories</string>\n    <string name=\"edit\">Edit</string>\n    <string name=\"delete\">Delete</string>\n    <string name=\"no_category\">No Category</string>\n    <string name=\"wifi_direct_peer_connection\">WifiDirect Peer Connection</string>\n    <string name=\"wifidirect_connection\">WifiDirect Connection</string>\n    <string name=\"list_of_devices\">List of Devices</string>\n    <string name=\"send_course\">Send Course</string>\n    <string name=\"receive_course\">Receive Course</string>\n    <string name=\"send_txt\">Send</string>\n    <string name=\"waiting_room\">Waiting Room</string>\n</resources>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/values/strings.xml	(revision a4d452775bd205313faaaf74d89777d5d9ef6bd5)
++++ app/src/main/res/values/strings.xml	(date 1625415127352)
+@@ -30,11 +30,13 @@
+     <string name="edit">Edit</string>
+     <string name="delete">Delete</string>
+     <string name="no_category">No Category</string>
+-    <string name="wifi_direct_peer_connection">WifiDirect Peer Connection</string>
+-    <string name="wifidirect_connection">WifiDirect Connection</string>
++    <string name="course_saved_successfully">Course Saved Successfully!!</string>
++    <string name="course_saved_unsuccessfully">Course not saved :(</string>
++    <string name="send_txt">Send</string>
++    <string name="wifidirect_connection">Wifi Connection</string>
++    <string name="wifi_direct_peer_connection">Wifi Direct Sharing</string>
+     <string name="list_of_devices">List of Devices</string>
+-    <string name="send_course">Send Course</string>
+     <string name="receive_course">Receive Course</string>
+-    <string name="send_txt">Send</string>
++    <string name="send_course">Send Course</string>
+     <string name="waiting_room">Waiting Room</string>
+ </resources>
+\ No newline at end of file
