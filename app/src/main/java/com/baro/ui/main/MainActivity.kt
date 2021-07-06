@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.baro.ui.account.AccountActivity
 import com.baro.R
 import com.baro.constants.AppTags
-import com.baro.constants.PermissionsEnum
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.PermissionsHelper
 import com.baro.models.User

@@ -128,12 +128,28 @@ class SplashLoggingFragment : Fragment(), OnInputListener  {
 
     private fun onUserCredentialsSaveDone(result: Boolean?) {
         if (result == true) {
-            val startMainActivity = Intent(
+            val splashActivity = activity as SplashActivity
+
+
+            if (splashActivity.isOnline(context)) {
+                (activity as SplashActivity).supportFragmentManager.beginTransaction()
+                    .setReorderingAllowed(true)
+                    .add(R.id.fragment_container_peer_connection,
+                        SplashLoggingFirebaseFragment::class.java, null)
+                    .commit()
+            } else {
+                val startMainActivity = Intent(
                     activity,
                     MainActivity::class.java)
-            // Perhaps use UserCredentialsTask From SplashActivity to get the credentials once created
-            startActivity(startMainActivity)
-            requireActivity().finish()
+                // Perhaps use UserCredentialsTask From SplashActivity to get the credentials once created
+                startActivity(startMainActivity)
+                requireActivity().finish()
+            }
+
+            // TODO step 1 - check if Internet connected
+            // TODO step 2 - If yes, start SplashLoggingFirebaseFragment else -> MainActivity
+
+
         } else {
             Toast.makeText(context, R.string.error_saving_credentials, Toast.LENGTH_LONG).show()
         }

@@ -1,10 +1,14 @@
 package com.baro.ui.splash
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
@@ -55,17 +59,26 @@ class SplashActivity : AppCompatActivity() {
     }
 
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun onUserLoginCheckDone(result: User?) {
         if (result != null) {
 
-            val startMainActivity = Intent(
+            if (isOnline(this.applicationContext)) {
+                supportFragmentManager.beginTransaction()
+                    .setReorderingAllowed(true)
+                    .add(R.id.fragment_container_peer_connection,
+                        SplashLoggingFirebaseFragment::class.java, null)
+                    .commit()
+            } else {
+                val startMainActivity = Intent(
                     this,
                     MainActivity::class.java)
 
-            startMainActivity.putExtra(AppTags.USER_OBJECT.name, result)
+                startMainActivity.putExtra(AppTags.USER_OBJECT.name, result)
 
-            startActivity(startMainActivity)
-            finish()
+                startActivity(startMainActivity)
+                finish()
+            }
         } else {
             Toast.makeText(this,
                     getString(R.string.toast_no_username_found),
@@ -80,5 +93,32 @@ class SplashActivity : AppCompatActivity() {
                     .add(R.id.fragment_container_peer_connection, SplashLoggingFragment::class.java, null)
                     .commit()
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun isOnline(context: Context?): Boolean {
+        val connectivityManager =
+            context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivityManager != null) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+            if (capabilities != null) {
+                when {
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
+                        Log.i("Internet", "NetworkCapabilities.TRANSPORT_CELLULAR")
+                        return true
+                    }
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                        Log.i("Internet", "NetworkCapabilities.TRANSPORT_WIFI")
+                        return true
+                    }
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> {
+                        Log.i("Internet", "NetworkCapabilities.TRANSPORT_ETHERNET")
+                        return true
+                    }
+                }
+            }
+        }
+        return false
     }
 }

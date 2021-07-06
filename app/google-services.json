@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "818538168917",
+    "project_id": "baro-86f66",
+    "storage_bucket": "baro-86f66.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:818538168917:android:49d08c1bd03c3fbd3acadc",
+        "android_client_info": {
+          "package_name": "com.baro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "818538168917-qmvv22ranq3a6amo7jvjqq16fg56pisc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAfewFcQoTIZuEZTUeVhi8ZSFuZXw7TMNU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "818538168917-qmvv22ranq3a6amo7jvjqq16fg56pisc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
