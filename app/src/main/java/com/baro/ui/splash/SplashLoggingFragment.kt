@@ -25,7 +25,11 @@ import com.baro.dialogs.ImageDialog
 import com.baro.dialogs.ImageDialog.OnInputListener
 import com.baro.helpers.AsyncHelpers
 import com.baro.helpers.FileHelper
+import com.baro.models.User
 import com.baro.ui.main.MainActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.ref.WeakReference
@@ -132,11 +136,21 @@ class SplashLoggingFragment : Fragment(), OnInputListener  {
 
 
             if (splashActivity.isOnline(context)) {
-                (activity as SplashActivity).supportFragmentManager.beginTransaction()
-                    .setReorderingAllowed(true)
-                    .add(R.id.fragment_container_peer_connection,
-                        SplashLoggingFirebaseFragment::class.java, null)
-                    .commit()
+                if (FirebaseAuth.getInstance().currentUser?.uid == null) {
+                    (activity as SplashActivity).supportFragmentManager.beginTransaction()
+                        .setReorderingAllowed(true)
+                        .add(R.id.fragment_container_peer_connection,
+                            SplashLoggingFirebaseFragment::class.java, null)
+                        .commit()
+                } else {
+                    val startMainActivity = Intent(
+                        activity,
+                        MainActivity::class.java)
+                    // Perhaps use UserCredentialsTask From SplashActivity to get the credentials once created
+//                    startMainActivity.putExtra(AppTags.USER_OBJECT.name, User(usernameEditText))
+                    startActivity(startMainActivity)
+                    requireActivity().finish()
+                }
             } else {
                 val startMainActivity = Intent(
                     activity,
@@ -145,10 +159,6 @@ class SplashLoggingFragment : Fragment(), OnInputListener  {
                 startActivity(startMainActivity)
                 requireActivity().finish()
             }
-
-            // TODO step 1 - check if Internet connected
-            // TODO step 2 - If yes, start SplashLoggingFirebaseFragment else -> MainActivity
-
 
         } else {
             Toast.makeText(context, R.string.error_saving_credentials, Toast.LENGTH_LONG).show()

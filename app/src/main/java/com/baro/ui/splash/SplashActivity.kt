@@ -1,5 +1,6 @@
 package com.baro.ui.splash
 
+
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -20,6 +21,7 @@ import com.baro.constants.AppTags
 import com.baro.helpers.*
 import com.baro.models.User
 import com.baro.ui.main.MainActivity
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -64,21 +66,20 @@ class SplashActivity : AppCompatActivity() {
         if (result != null) {
 
             if (isOnline(this.applicationContext)) {
-                supportFragmentManager.beginTransaction()
-                    .setReorderingAllowed(true)
-                    .add(R.id.fragment_container_peer_connection,
-                        SplashLoggingFirebaseFragment::class.java, null)
-                    .commit()
-            } else {
-                val startMainActivity = Intent(
-                    this,
-                    MainActivity::class.java)
-
-                startMainActivity.putExtra(AppTags.USER_OBJECT.name, result)
-
-                startActivity(startMainActivity)
-                finish()
+                if (FirebaseAuth.getInstance().currentUser?.uid == null) {
+                    supportFragmentManager.beginTransaction()
+                        .setReorderingAllowed(true)
+                        .add(R.id.fragment_container_peer_connection,
+                            SplashLoggingFirebaseFragment::class.java, null)
+                        .commit()
+                }
             }
+            val startMainActivity = Intent(
+                this,
+                MainActivity::class.java)
+
+            startActivity(startMainActivity)
+            finish()
         } else {
             Toast.makeText(this,
                     getString(R.string.toast_no_username_found),

@@ -38,9 +38,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Gets User Credentials
-        user = intent.getParcelableExtra(AppTags.USER_OBJECT.name)
-
         // Configure UI
         configureAccountButton()
         configureShareButton()
@@ -57,7 +54,10 @@ class MainActivity : AppCompatActivity() {
             launch {
                 val weakReference = WeakReference<ContentResolver>(contentResolver)
                 val bitmap = AsyncHelpers().loadUserThumbnail(user?.getThumbnailFile(), weakReference)
-                onUserDataReturned(bitmap) }
+                user = AsyncHelpers().verifyUserCredentials(getExternalFilesDir(null))
+                onUserDataReturned(bitmap)
+
+            }
         }
     }
 

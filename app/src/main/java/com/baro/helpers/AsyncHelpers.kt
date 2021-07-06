@@ -13,7 +13,6 @@ import com.baro.constants.CategoryEnum
 import com.baro.constants.FileEnum
 import com.baro.constants.JSONEnum
 import com.baro.helpers.interfaces.*
-import com.baro.helpers.interfaces.OnCreatorCourseCredentialsLoad
 import com.baro.models.Country
 import com.baro.models.Course
 import com.baro.models.User
